@@ -1,0 +1,211 @@
+CRITICAL - 2026-05-20 01:10:17 --> CodeIgniter\HTTP\Exceptions\HTTPException: Failed to parse JSON string. Error: Syntax error
+in SYSTEMPATH\HTTP\IncomingRequest.php on line 588.
+ 1 SYSTEMPATH\HTTP\IncomingRequest.php(588): CodeIgniter\HTTP\Exceptions\HTTPException::forInvalidJSON('Syntax error')
+ 2 APPPATH\Controllers\Api\Perawat.php(46): CodeIgniter\HTTP\IncomingRequest->getJSON(true)
+ 3 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->create()
+ 4 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+ 5 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-20 03:11:03 --> mysqli_sql_exception: Table 'keperawatan.tabel_unit_kerja' doesn't exist in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(306): mysqli->query('SELECT *\nFROM `...', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+CRITICAL - 2026-05-20 03:11:03 --> CodeIgniter\Database\Exceptions\DatabaseException: Table 'keperawatan.tabel_unit_kerja' doesn't exist
+in SYSTEMPATH\Database\BaseConnection.php on line 647.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_unit_kerja`', [], false)
+ 2 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+ 6 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+ 7 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 03:11:03 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Table 'keperawatan.tabel_unit_kerja' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 311.
+ 1 SYSTEMPATH\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `tabel_unit_kerja`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `tabel_unit_kerja`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_unit_kerja`', [], false)
+ 4 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+ 8 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+ 9 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 03:11:03 --> [Caused by] mysqli_sql_exception: Table 'keperawatan.tabel_unit_kerja' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 306.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(306): mysqli->query('SELECT *
+FROM `tabel_unit_kerja`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `tabel_unit_kerja`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `tabel_unit_kerja`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_unit_kerja`', [], false)
+ 5 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+ 9 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+10 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 03:24:51 --> CodeIgniter\HTTP\Exceptions\HTTPException: Failed to parse JSON string. Error: Syntax error
+in SYSTEMPATH\HTTP\IncomingRequest.php on line 588.
+ 1 SYSTEMPATH\HTTP\IncomingRequest.php(588): CodeIgniter\HTTP\Exceptions\HTTPException::forInvalidJSON('Syntax error')
+ 2 APPPATH\Controllers\Api\Perawat.php(46): CodeIgniter\HTTP\IncomingRequest->getJSON(true)
+ 3 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->create()
+ 4 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+ 5 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 03:27:11 --> CodeIgniter\HTTP\Exceptions\HTTPException: Failed to parse JSON string. Error: Syntax error
+in SYSTEMPATH\HTTP\IncomingRequest.php on line 588.
+ 1 SYSTEMPATH\HTTP\IncomingRequest.php(588): CodeIgniter\HTTP\Exceptions\HTTPException::forInvalidJSON('Syntax error')
+ 2 APPPATH\Controllers\Api\Perawat.php(46): CodeIgniter\HTTP\IncomingRequest->getJSON(true)
+ 3 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->create()
+ 4 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+ 5 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-20 03:35:10 --> mysqli_sql_exception: Unknown column 'foto' in 'field list' in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(306): mysqli->query('UPDATE `tabel_p...', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `tabel_p...')
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `tabel_p...')
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(2474): CodeIgniter\Database\BaseConnection->query('UPDATE `tabel_p...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(394): CodeIgniter\Database\BaseBuilder->update()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(987): CodeIgniter\Model->doUpdate(Array, Array)
+#6 D:\xampp\htdocs\keperawatan\system\Model.php(812): CodeIgniter\BaseModel->update(Array, Array)
+#7 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Perawat.php(74): CodeIgniter\Model->update('4', Array)
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Perawat->update('4')
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+#10 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#12 {main}
+CRITICAL - 2026-05-20 03:35:10 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'foto' in 'field list'
+in SYSTEMPATH\Database\BaseConnection.php on line 647.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2474): CodeIgniter\Database\BaseConnection->query('UPDATE `tabel_perawat` SET `nip` = :nip:, `nama` = :nama:, `tempat_lahir` = :tempat_lahir:, `jk` = :jk:, `alamat` = :alamat:, `hp` = :hp:, `email` = :email:, `unit_kerja` = :unit_kerja:, `jabatan` = :jabatan:, `status` = :status:, `foto` = :foto:
+WHERE `tabel_perawat`.`id_perawat` IN :tabel_perawat.id_perawat:', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(987): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(812): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\Api\Perawat.php(74): CodeIgniter\Model->update('4', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->update('4')
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 03:35:10 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'foto' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 311.
+ 1 SYSTEMPATH\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `tabel_perawat` SET `nip` = \'198601022025211048\', `nama` = \'Feri Adi Burhani, S.Kom\', `tempat_lahir` = \'Magelang\', `jk` = \'L\', `alamat` = \'tes\', `hp` = \'085640733683\', `email` = \'rslhdata@gmail.com\', `unit_kerja` = \'Instalasi SIMRS\', `jabatan` = \'tes\', `status` = \'A\', `foto` = \'uploads/1779248110_3d41e17cdb93b4b96c0f.jpg\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'4\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `tabel_perawat` SET `nip` = \'198601022025211048\', `nama` = \'Feri Adi Burhani, S.Kom\', `tempat_lahir` = \'Magelang\', `jk` = \'L\', `alamat` = \'tes\', `hp` = \'085640733683\', `email` = \'rslhdata@gmail.com\', `unit_kerja` = \'Instalasi SIMRS\', `jabatan` = \'tes\', `status` = \'A\', `foto` = \'uploads/1779248110_3d41e17cdb93b4b96c0f.jpg\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'4\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2474): CodeIgniter\Database\BaseConnection->query('UPDATE `tabel_perawat` SET `nip` = :nip:, `nama` = :nama:, `tempat_lahir` = :tempat_lahir:, `jk` = :jk:, `alamat` = :alamat:, `hp` = :hp:, `email` = :email:, `unit_kerja` = :unit_kerja:, `jabatan` = :jabatan:, `status` = :status:, `foto` = :foto:
+WHERE `tabel_perawat`.`id_perawat` IN :tabel_perawat.id_perawat:', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(987): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(812): CodeIgniter\BaseModel->update([...], [...])
+ 7 APPPATH\Controllers\Api\Perawat.php(74): CodeIgniter\Model->update('4', [...])
+ 8 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->update('4')
+ 9 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+10 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 03:35:10 --> [Caused by] mysqli_sql_exception: Unknown column 'foto' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 306.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(306): mysqli->query('UPDATE `tabel_perawat` SET `nip` = \'198601022025211048\', `nama` = \'Feri Adi Burhani, S.Kom\', `tempat_lahir` = \'Magelang\', `jk` = \'L\', `alamat` = \'tes\', `hp` = \'085640733683\', `email` = \'rslhdata@gmail.com\', `unit_kerja` = \'Instalasi SIMRS\', `jabatan` = \'tes\', `status` = \'A\', `foto` = \'uploads/1779248110_3d41e17cdb93b4b96c0f.jpg\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'4\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `tabel_perawat` SET `nip` = \'198601022025211048\', `nama` = \'Feri Adi Burhani, S.Kom\', `tempat_lahir` = \'Magelang\', `jk` = \'L\', `alamat` = \'tes\', `hp` = \'085640733683\', `email` = \'rslhdata@gmail.com\', `unit_kerja` = \'Instalasi SIMRS\', `jabatan` = \'tes\', `status` = \'A\', `foto` = \'uploads/1779248110_3d41e17cdb93b4b96c0f.jpg\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'4\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `tabel_perawat` SET `nip` = \'198601022025211048\', `nama` = \'Feri Adi Burhani, S.Kom\', `tempat_lahir` = \'Magelang\', `jk` = \'L\', `alamat` = \'tes\', `hp` = \'085640733683\', `email` = \'rslhdata@gmail.com\', `unit_kerja` = \'Instalasi SIMRS\', `jabatan` = \'tes\', `status` = \'A\', `foto` = \'uploads/1779248110_3d41e17cdb93b4b96c0f.jpg\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'4\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2474): CodeIgniter\Database\BaseConnection->query('UPDATE `tabel_perawat` SET `nip` = :nip:, `nama` = :nama:, `tempat_lahir` = :tempat_lahir:, `jk` = :jk:, `alamat` = :alamat:, `hp` = :hp:, `email` = :email:, `unit_kerja` = :unit_kerja:, `jabatan` = :jabatan:, `status` = :status:, `foto` = :foto:
+WHERE `tabel_perawat`.`id_perawat` IN :tabel_perawat.id_perawat:', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(987): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(812): CodeIgniter\BaseModel->update([...], [...])
+ 8 APPPATH\Controllers\Api\Perawat.php(74): CodeIgniter\Model->update('4', [...])
+ 9 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->update('4')
+10 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+11 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-20 03:36:57 --> mysqli_sql_exception: Unknown column 'foto' in 'field list' in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:306
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(306): mysqli->query('UPDATE `tabel_p...', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `tabel_p...')
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `tabel_p...')
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(2474): CodeIgniter\Database\BaseConnection->query('UPDATE `tabel_p...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(394): CodeIgniter\Database\BaseBuilder->update()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(987): CodeIgniter\Model->doUpdate(Array, Array)
+#6 D:\xampp\htdocs\keperawatan\system\Model.php(812): CodeIgniter\BaseModel->update(Array, Array)
+#7 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Perawat.php(74): CodeIgniter\Model->update('3', Array)
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Perawat->update('3')
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+#10 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#12 {main}
+CRITICAL - 2026-05-20 03:36:57 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'foto' in 'field list'
+in SYSTEMPATH\Database\BaseConnection.php on line 647.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2474): CodeIgniter\Database\BaseConnection->query('UPDATE `tabel_perawat` SET `nip` = :nip:, `nama` = :nama:, `foto` = :foto:
+WHERE `tabel_perawat`.`id_perawat` IN :tabel_perawat.id_perawat:', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(987): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(812): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\Api\Perawat.php(74): CodeIgniter\Model->update('3', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->update('3')
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 03:36:57 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'foto' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 311.
+ 1 SYSTEMPATH\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `tabel_perawat` SET `nip` = \'12345\', `nama` = \'Budi Santoso\', `foto` = \'uploads/1779248217_619eb853067783000bba.csv\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'3\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `tabel_perawat` SET `nip` = \'12345\', `nama` = \'Budi Santoso\', `foto` = \'uploads/1779248217_619eb853067783000bba.csv\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'3\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2474): CodeIgniter\Database\BaseConnection->query('UPDATE `tabel_perawat` SET `nip` = :nip:, `nama` = :nama:, `foto` = :foto:
+WHERE `tabel_perawat`.`id_perawat` IN :tabel_perawat.id_perawat:', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(987): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(812): CodeIgniter\BaseModel->update([...], [...])
+ 7 APPPATH\Controllers\Api\Perawat.php(74): CodeIgniter\Model->update('3', [...])
+ 8 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->update('3')
+ 9 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+10 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 03:36:57 --> [Caused by] mysqli_sql_exception: Unknown column 'foto' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 306.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(306): mysqli->query('UPDATE `tabel_perawat` SET `nip` = \'12345\', `nama` = \'Budi Santoso\', `foto` = \'uploads/1779248217_619eb853067783000bba.csv\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'3\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `tabel_perawat` SET `nip` = \'12345\', `nama` = \'Budi Santoso\', `foto` = \'uploads/1779248217_619eb853067783000bba.csv\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'3\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `tabel_perawat` SET `nip` = \'12345\', `nama` = \'Budi Santoso\', `foto` = \'uploads/1779248217_619eb853067783000bba.csv\'
+WHERE `tabel_perawat`.`id_perawat` IN (\'3\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2474): CodeIgniter\Database\BaseConnection->query('UPDATE `tabel_perawat` SET `nip` = :nip:, `nama` = :nama:, `foto` = :foto:
+WHERE `tabel_perawat`.`id_perawat` IN :tabel_perawat.id_perawat:', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(987): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(812): CodeIgniter\BaseModel->update([...], [...])
+ 8 APPPATH\Controllers\Api\Perawat.php(74): CodeIgniter\Model->update('3', [...])
+ 9 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->update('3')
+10 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+11 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-20 15:23:08 --> CodeIgniter\HTTP\Exceptions\HTTPException: Failed to parse JSON string. Error: Syntax error
+in SYSTEMPATH\HTTP\IncomingRequest.php on line 588.
+ 1 SYSTEMPATH\HTTP\IncomingRequest.php(588): CodeIgniter\HTTP\Exceptions\HTTPException::forInvalidJSON('Syntax error')
+ 2 APPPATH\Controllers\Api\PengajuanSertifikasi.php(30): CodeIgniter\HTTP\IncomingRequest->getJSON(true)
+ 3 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\PengajuanSertifikasi->create()
+ 4 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\PengajuanSertifikasi))
+ 5 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()

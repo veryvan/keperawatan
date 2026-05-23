@@ -1,0 +1,861 @@
+ERROR - 2026-05-22 21:31:24 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:24 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:24 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:24 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:24 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:24 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:24 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_unit_kerja`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:24 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_grup`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:24 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_jabatan`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:24 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_jenjang_jabatan`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:24 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_perawat`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:24 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_kompetensi`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:25 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:25 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_grup`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_unit_kerja`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:25 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\PengajuanSertifikasi.php(21): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\PengajuanSertifikasi->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\PengajuanSertifikasi))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\PengajuanSertifikasi.php(21): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\PengajuanSertifikasi->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\PengajuanSertifikasi))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_pengajuan_sertifikasi`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\PengajuanSertifikasi.php(21): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\PengajuanSertifikasi->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\PengajuanSertifikasi))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:25 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:25 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:25 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_kompetensi`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_jabatan`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_jenjang_jabatan`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:26 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:26 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_perawat`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:26 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\PengajuanSertifikasi.php(21): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\PengajuanSertifikasi->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\PengajuanSertifikasi))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\PengajuanSertifikasi.php(21): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\PengajuanSertifikasi->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\PengajuanSertifikasi))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:26 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_pengajuan_sertifikasi`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\PengajuanSertifikasi.php(21): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\PengajuanSertifikasi->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\PengajuanSertifikasi))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:46 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:46 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_jabatan`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Jabatan.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Jabatan->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Jabatan))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:46 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:46 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_kompetensi`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Kompetensi.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Kompetensi->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Kompetensi))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:46 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:46 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_unit_kerja`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\UnitKerja.php(11): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\UnitKerja->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\UnitKerja))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:46 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:46 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_perawat`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Perawat.php(18): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Perawat->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Perawat))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:46 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+ERROR - 2026-05-22 21:31:46 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:46 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_jenjang_jabatan`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\JenjangJabatan.php(29): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\JenjangJabatan->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\JenjangJabatan))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-05-22 21:31:46 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_grup`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\Grup.php(15): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\Grup->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Grup))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
+ERROR - 2026-05-22 21:31:47 --> Error connecting to the database: mysqli_sql_exception: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:185
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php(185): mysqli->real_connect('192.168.0.22', 'root', '', 'keperawatan', 3306, '', 0)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#5 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#6 D:\xampp\htdocs\keperawatan\app\Controllers\Api\User.php(12): CodeIgniter\BaseModel->findAll()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\User->index()
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\User))
+#9 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: No connection could be made because the target machine actively refused it in D:\xampp\htdocs\keperawatan\system\Database\MySQLi\Connection.php:229
+Stack trace:
+#0 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 D:\xampp\htdocs\keperawatan\system\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 D:\xampp\htdocs\keperawatan\system\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 D:\xampp\htdocs\keperawatan\system\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+#4 D:\xampp\htdocs\keperawatan\system\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+#5 D:\xampp\htdocs\keperawatan\app\Controllers\Api\User.php(12): CodeIgniter\BaseModel->findAll()
+#6 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(943): App\Controllers\Api\User->index()
+#7 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\User))
+#8 D:\xampp\htdocs\keperawatan\system\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 D:\xampp\htdocs\keperawatan\public\index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-05-22 21:31:47 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: No connection could be made because the target machine actively refused it
+in SYSTEMPATH\Database\BaseConnection.php on line 428.
+ 1 SYSTEMPATH\Database\BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `tabel_user`', [], false)
+ 3 SYSTEMPATH\Model.php(243): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(638): CodeIgniter\Model->doFindAll(0, 0)
+ 5 APPPATH\Controllers\Api\User.php(12): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH\CodeIgniter.php(943): App\Controllers\Api\User->index()
+ 7 SYSTEMPATH\CodeIgniter.php(503): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\User))
+ 8 SYSTEMPATH\CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 FCPATH\index.php(79): CodeIgniter\CodeIgniter->run()
