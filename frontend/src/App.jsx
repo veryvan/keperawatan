@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import nursingWallpaper from './assets/nursing_wallpaper.png';
+import certificateBackground from './assets/sertifikat.png';
 import logoRS from './assets/logo.png';
+import logoKudus from './assets/logo_kudus.png';
+import AdminSoal from './AdminSoal';
+import AdminPejabat from './AdminPejabat';
 import {
   Users, Award, Stethoscope, FileText, ClipboardCheck,
   Clock, BookOpen, LayoutDashboard, Settings, Bell,
   Search, Menu, X, ChevronRight, Activity, Sun, Moon,
   Building, Briefcase, Tags, Edit2, Trash2, Check, XCircle, Eye, CheckCircle,
   Lock, LogOut, Shield, UserCheck, UserX, UserPlus, User, GraduationCap,
-  ChevronDown, Plus, ChevronLeft
+  ChevronDown, Plus, ChevronLeft, AlertTriangle
 } from 'lucide-react';
 
 const SidebarItem = ({ icon: Icon, label, active, onClick }) => (
@@ -99,6 +103,132 @@ const StatCard = ({ title, value, icon: Icon, trend, trendUp }) => (
     )}
   </div>
 );
+
+const SignaturePad = ({ value, onChange, onClear, disabled, label }) => {
+  const canvasRef = React.useRef(null);
+  const [isDrawing, setIsDrawing] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!value && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.strokeStyle = '#1e3a8a'; // Dark blue stroke
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+    }
+  }, [value]);
+
+  const getCoordinates = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    if (e.touches && e.touches.length > 0) {
+      const touch = e.touches[0];
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      };
+    }
+    
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  };
+
+  const startDrawing = (e) => {
+    if (disabled || value) return;
+    const coords = getCoordinates(e);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    
+    ctx.beginPath();
+    ctx.moveTo(coords.x, coords.y);
+    setIsDrawing(true);
+    e.preventDefault();
+  };
+
+  const draw = (e) => {
+    if (!isDrawing || disabled || value) return;
+    const coords = getCoordinates(e);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    
+    ctx.lineTo(coords.x, coords.y);
+    ctx.stroke();
+    e.preventDefault();
+  };
+
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    
+    const canvas = canvasRef.current;
+    const base64 = canvas.toDataURL('image/png');
+    onChange(base64);
+  };
+
+  const clearCanvas = () => {
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    onClear();
+  };
+
+  return (
+    <div className="flex flex-col items-center w-full">
+      {value ? (
+        <div className="relative border border-border rounded bg-white p-1 flex items-center justify-center w-full h-[120px] shadow-inner">
+          <img src={value} alt={label} className="max-h-full max-w-full object-contain" />
+          {!disabled && (
+            <button 
+              type="button" 
+              onClick={clearCanvas} 
+              className="absolute top-2 right-2 px-2.5 py-1 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white text-[9px] font-bold rounded-md transition-colors border border-destructive/20"
+            >
+              Ulangi
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center w-full space-y-1.5">
+          <canvas
+            ref={canvasRef}
+            width={240}
+            height={120}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={stopDrawing}
+            className={`border-2 border-dashed border-border rounded-lg bg-white w-full max-w-[240px] h-[120px] cursor-crosshair shadow-sm hover:border-primary/50 transition-colors ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
+          />
+          {!disabled && (
+            <div className="flex gap-2">
+              <button 
+                type="button" 
+                onClick={clearCanvas} 
+                className="px-2.5 py-1 bg-muted hover:bg-muted/80 text-foreground text-[9px] font-bold rounded border border-border transition-colors uppercase tracking-wider"
+              >
+                Bersihkan
+              </button>
+              <span className="text-[9px] text-muted-foreground self-center italic">Gambarkan tanda tangan Anda di atas</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ReminderItem = ({ title, date, type, onClickDetail }) => (
   <div className="flex items-center justify-between p-4 border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
@@ -463,13 +593,340 @@ const LIST_12_KOMPETENSI = [
   }
 ];
 
+const LIST_12_KOMPETENSI_KEBIDANAN = [
+  {
+    kode: 'KDB-01',
+    judul: 'Asuhan antenatal (kehamilan) fisiologis',
+    keterangan: 'Asuhan kehamilan normal, Leopold, TFU, edukasi nutrisi dan tablet Fe',
+    form02: {
+      elemen1: 'Melakukan pemeriksaan fisik dan obstetrik ibu hamil',
+      k1_1: 'Mampu melakukan palpasi Leopold I - IV dengan benar',
+      k1_2: 'Mampu mengukur Tinggi Fundus Uteri (TFU) menggunakan pita ukur',
+      k1_3: 'Mampu mendengarkan DJJ janin dengan Doppler',
+      elemen2: 'Memberikan edukasi asuhan antenatal fisiologis',
+      k2_1: 'Mampu mengedukasi ibu tentang nutrisi dan tablet Fe selama kehamilan',
+      k2_2: 'Mampu mengidentifikasi tanda bahaya kehamilan trimester I, II, dan III',
+      k2_3: 'Mampu menentukan usia kehamilan dan Hari Perkiraan Lahir (HPL)'
+    },
+    form03: {
+      acuan: 'KDB-01 ASUHAN ANTENATAL FISIOLOGIS',
+      q_obs1: 'Melakukan palpasi Leopold dan mendengarkan DJJ dengan Doppler',
+      q_obs2: 'Mengukur Tinggi Fundus Uteri (TFU) dan lingkar perut ibu hamil',
+      q_obs3: 'Mengidentifikasi status imunisasi TT dan tablet Fe ibu hamil',
+      q_obs4: 'Memberikan konseling tanda bahaya kehamilan dan nutrisi ibu',
+      q_lisan1: 'Sebutkan minimal 5 tanda bahaya kehamilan pada Trimester III.',
+      q_lisan2: 'Bagaimana cara menentukan TFU menurut Mc Donald dan menghitung HPL?',
+      q_tulis: 'Jelaskan patofisiologi mual muntah berlebihan (hiperemesis gravidarum) dan cara pencegahan anemia pada ibu hamil.',
+      dok1: 'Buku KIA / Kartu Ibu (ANC)',
+      dok2: 'Sertifikat Pelatihan ANC Terpadu / USG Terbatas'
+    }
+  },
+  {
+    kode: 'KDB-02',
+    judul: 'Asuhan persalinan dan kelahiran fisiologis',
+    keterangan: 'Asuhan persalinan normal (APN) kala I, II, III, dan IV, Partograf',
+    form02: {
+      elemen1: 'Melakukan pemantauan kemajuan persalinan',
+      k1_1: 'Mampu mengisi lembar partograf secara akurat dan tepat waktu',
+      k1_2: 'Mampu melakukan pemeriksaan dalam (VT) secara aseptik',
+      k1_3: 'Mampu menilai his (frekuensi, durasi, kekuatan) and DJJ saat inpartu',
+      elemen2: 'Menolong persalinan normal',
+      k2_1: 'Mampu memimpin persalinan Kala II sesuai 60 langkah APN',
+      k2_2: 'Mampu melakukan manajemen aktif kala III (MAK III) secara tepat',
+      k2_3: 'Mampu mengidentifikasi dan merawat luka perineum derajat 1-2'
+    },
+    form03: {
+      acuan: 'KDB-02 ASUHAN PERSALINAN DAN KELAHIRAN FISIOLOGIS',
+      q_obs1: 'Menerapkan teknik 60 langkah asuhan persalinan normal (APN)',
+      q_obs2: 'Melakukan pemantauan kala I aktif menggunakan partograf',
+      q_obs3: 'Menyuntikkan oksitosin 10 IU IM segera setelah bayi lahir',
+      q_obs4: 'Melakukan pemeriksaan plasenta (selaput dan kotiledon) setelah lahir',
+      q_lisan1: 'Jelaskan 3 pilar penting dalam manajemen aktif kala III (MAK III).',
+      q_lisan2: 'Kapan lembar partograf mulai diisi dan apa indikasi garis waspada?',
+      q_tulis: 'Deskripsikan langkah-langkah penanganan laserasi jalan lahir derajat 2.',
+      dok1: 'Logbook Partus Normal (Minimal 50 kasus)',
+      dok2: 'Sertifikat Asuhan Persalinan Normal (APN) Valid'
+    }
+  },
+  {
+    kode: 'KDB-03',
+    judul: 'Asuhan nifas dan menyusui fisiologis',
+    keterangan: 'Asuhan post partum, involusi uteri, pengeluaran lochea, laktasi',
+    form02: {
+      elemen1: 'Melakukan pemantauan involusi dan lochea',
+      k1_1: 'Mampu memeriksa TFU dan kontraksi uterus post partum',
+      k1_2: 'Mampu mengidentifikasi jenis dan karakteristik lochea normal',
+      k1_3: 'Mampu memantau pengeluaran ASI dan kondisi payudara ibu nifas',
+      elemen2: 'Edukasi dan konseling laktasi',
+      k2_1: 'Mampu mengajarkan teknik menyusui yang benar (posisi dan pelekatan)',
+      k2_2: 'Mampu mengedukasi ibu tentang gizi ibu menyusui dan KB pasca salin',
+      k2_3: 'Mampu melakukan perawatan payudara (breast care) dan bendungan ASI'
+    },
+    form03: {
+      acuan: 'KDB-03 ASUHAN NIFAS DAN MENYUSUI FISIOLOGIS',
+      q_obs1: 'Memeriksa TFU, kontraksi uterus, dan lochea pada ibu nifas',
+      q_obs2: 'Membimbing ibu tentang posisi dan pelekatan menyusui yang benar',
+      q_obs3: 'Melakukan edukasi perawatan payudara pasca melahirkan',
+      q_obs4: 'Mendokumentasikan pemantauan masa nifas pada rekam medis',
+      q_lisan1: 'Bagaimana cara membedakan lochea rubra, sanguinolenta, serosa, dan alba?',
+      q_lisan2: 'Apa tanda-tanda pelekatan menyusui yang baik dan efektif?',
+      q_tulis: 'Jelaskan penanganan bendungan ASI dan edukasi menyusui eksklusif.',
+      dok1: 'Logbook Pemantauan Nifas',
+      dok2: 'Sertifikat Pelatihan Konseling Menyusui / Laktasi'
+    }
+  },
+  {
+    kode: 'KDB-04',
+    judul: 'Asuhan bayi baru lahir (neonatus) fisiologis',
+    keterangan: 'Pemeriksaan fisik bayi baru lahir, APGAR score, imunisasi Hb0, salep mata, vitamin K1',
+    form02: {
+      elemen1: 'Melakukan asuhan segera bayi baru lahir',
+      k1_1: 'Mampu melakukan penilaian APGAR score menit 1 dan 5',
+      k1_2: 'Mampu melakukan Inisiasi Menyusu Dini (IMD) minimal 1 jam',
+      k1_3: 'Mampu memberikan salep mata antibiotik dan injeksi Vitamin K1 IM',
+      elemen2: 'Melakukan pemeriksaan fisik dan perawatan neonatus',
+      k2_1: 'Mampu mengukur berat badan, panjang badan, dan lingkar kepala neonatus',
+      k2_2: 'Mampu memandikan bayi baru lahir dan merawat tali pusat dengan steril',
+      k2_3: 'Mampu memberikan imunisasi Hepatitis B0 (HB0) secara tepat'
+    },
+    form03: {
+      acuan: 'KDB-04 ASUHAN BAYI BBL FISIOLOGIS',
+      q_obs1: 'Melakukan penilaian awal bayi baru lahir dan menjaga kehangatan tubuh bayi',
+      q_obs2: 'Melakukan penyuntikan vitamin K1 1 mg IM di paha kiri anterolateral',
+      q_obs3: 'Melakukan pemeriksaan fisik neonatus secara head-to-toe',
+      q_obs4: 'Memberikan salep mata profilaksis pada kedua mata bayi baru lahir',
+      q_lisan1: 'Mengapa vitamin K1 sangat penting diberikan pada bayi baru lahir?',
+      q_lisan2: 'Bagaimana kriteria penilaian APGAR score untuk menilai derajat asfiksia?',
+      q_tulis: 'Jelaskan langkah-langkah pencegahan hipotermia pada neonatus.',
+      dok1: 'Logbook Asuhan Neonatus Baru Lahir',
+      dok2: 'Sertifikat Pelatihan Resusitasi Neonatus / Manajemen BBLR'
+    }
+  },
+  {
+    kode: 'KDB-05',
+    judul: 'Pelayanan kontrasepsi dan keluarga berencana (KB)',
+    keterangan: 'Konseling KB, pemasangan dan pencabutan kontrasepsi suntik, IUD, implan',
+    form02: {
+      elemen1: 'Melakukan konseling KB menggunakan alat bantu',
+      k1_1: 'Mampu menggunakan Lembar Balik ABPK KB untuk konseling pasutri',
+      k1_2: 'Mampu mengidentifikasi indikasi dan kontraindikasi tiap metode kontrasepsi',
+      k1_3: 'Mampu menghitung efektivitas dan menjelaskan efek samping KB',
+      elemen2: 'Melaksanakan pemasangan dan pencabutan alat kontrasepsi',
+      k2_1: 'Mampu melakukan penyuntikan KB (1 bulanan / 3 bulanan) dengan benar',
+      k2_2: 'Mampu mempersiapkan dan melakukan insersi IUD/AKDR secara aseptik',
+      k2_3: 'Mampu mempersiapkan dan melakukan insersi/ekstraksi implan/AKBK'
+    },
+    form03: {
+      acuan: 'KDB-05 PELAYANAN KONTRASEPSI DAN KELUARGA BERENCANA',
+      q_obs1: 'Memberikan konseling KB menggunakan ABPK secara lengkap',
+      q_obs2: 'Melakukan teknik insersi IUD/AKDR menggunakan uterus model',
+      q_obs3: 'Melakukan teknik insersi/ekstraksi implan/AKBK di bawah pengawasan',
+      q_obs4: 'Mendokumentasikan pilihan dan tanggal kontrol KB pasien',
+      q_lisan1: 'Sebutkan kontraindikasi mutlak dari penggunaan pil KB kombinasi.',
+      q_lisan2: 'Bagaimana penanganan efek samping spotting dan amenore pada akseptor KB suntik 3 bulan?',
+      q_tulis: 'Jelaskan mekanisme kerja IUD dan implan dalam mencegah kehamilan.',
+      dok1: 'Logbook Pemasangan IUD/Implan',
+      dok2: 'Sertifikat Pelatihan CTU (Contraceptive Technology Update)'
+    }
+  },
+  {
+    kode: 'KDB-06',
+    judul: 'Asuhan kesehatan reproduksi perempuan sepanjang siklus kehidupan',
+    keterangan: 'Asuhan masa remaja, pra-nikah, klimakterium/menopause, IVA test/Papsmear',
+    form02: {
+      elemen1: 'Melakukan pengkajian kesehatan reproduksi',
+      k1_1: 'Mampu mendeteksi gangguan menstruasi (dismenore, amenore) pada remaja',
+      k1_2: 'Mampu melakukan konseling pra-nikah (kesehatan reproduksi dan gizi)',
+      k1_3: 'Mampu mengedukasi perempuan klimakterium tentang gejala menopause',
+      elemen2: 'Melakukan skrining kanker organ reproduksi',
+      k2_1: 'Mampu mempersiapkan pasien dan alat untuk skrining IVA Test',
+      k2_2: 'Mampu mengaplikasikan asam asetat 3-5% pada serviks secara tepat',
+      k2_3: 'Mampu melakukan rujukan dini jika ditemukan lesi pra-kanker serviks'
+    },
+    form03: {
+      acuan: 'KDB-06 ASUHAN KESEHATAN REPRODUKSI PEREMPUAN',
+      q_obs1: 'Menyiapkan alat dan melakukan pemeriksaan IVA Test',
+      q_obs2: 'Melakukan konseling masa klimakterium/menopause pada wanita paruh baya',
+      q_obs3: 'Melakukan edukasi SADARI (Pemeriksaan Payudara Sendiri) pada pasien',
+      q_obs4: 'Mendokumentasikan hasil pemeriksaan reproduksi secara rahasia',
+      q_lisan1: 'Jelaskan interpretasi hasil pemeriksaan IVA Test (positif/negatif).',
+      q_lisan2: 'Bagaimana edukasi gizi dan psikologis bagi wanita yang memasuki masa menopause?',
+      q_tulis: 'Uraikan peran bidan dalam konseling pranikah untuk pencegahan stunting.',
+      dok1: 'Logbook Pelayanan Kesehatan Reproduksi / IVA',
+      dok2: 'Sertifikat Pelatihan IVA Test / Skrining Kanker Serviks'
+    }
+  },
+  {
+    kode: 'KDB-07',
+    judul: 'Deteksi dini komplikasi maternal dan neonatal',
+    keterangan: 'Skrining komplikasi kehamilan, preeklamsia, perdarahan, ikterus, asfiksia',
+    form02: {
+      elemen1: 'Mendeteksi dini komplikasi pada ibu hamil/melahirkan',
+      k1_1: 'Mampu mendeteksi tanda-tanda preeklamsia (edema, proteinuria, hipertensi)',
+      k1_2: 'Mampu mengidentifikasi gejala perdarahan antepartum (plasenta previa, solusio)',
+      k1_3: 'Mampu mendeteksi tanda-tanda inpartu patologis (partus lama/macet)',
+      elemen2: 'Mendeteksi dini komplikasi pada neonatus',
+      k2_1: 'Mampu menilai tanda-tanda ikterus patologis pada bayi baru lahir',
+      k2_2: 'Mampu menilai status pernapasan bayi (asfiksia/respiratory distress)',
+      k2_3: 'Mampu mendeteksi tanda bahaya infeksi tali pusat (omfalitis) dan sepsis'
+    },
+    form03: {
+      acuan: 'KDB-07 DETEKSI DINI KOMPLIKASI MATERNAL DAN NEONATAL',
+      q_obs1: 'Melakukan pemeriksaan urine protein celup (proteinuria dipstick)',
+      q_obs2: 'Menghitung skor Poedji Rochjati untuk menilai risiko kehamilan ibu',
+      q_obs3: 'Melakukan penilaian refleks hisap dan refleks moro pada bayi',
+      q_obs4: 'Mendokumentasikan data subjektif dan objektif tanda komplikasi',
+      q_lisan1: 'Sebutkan batasan proteinuria pada preeklamsia ringan vs berat.',
+      q_lisan2: 'Bagaimana cara membedakan ikterus fisiologis dan patologis pada neonatus?',
+      q_tulis: 'Jelaskan patofisiologi preeklamsia dan klasifikasi risiko kehamilan berdasarkan skor Poedji Rochjati.',
+      dok1: 'Logbook Deteksi Risti Ibu Hamil',
+      dok2: 'Sertifikat Pelatihan Skrining Kehamilan Risiko Tinggi'
+    }
+  },
+  {
+    kode: 'KDB-08',
+    judul: 'Penanganan kegawatdaruratan maternal dan neonatal (PONED)',
+    keterangan: 'Penanganan eklamsia (MgSO4), perdarahan postpartum, resusitasi neonatus',
+    form02: {
+      elemen1: 'Melaksanakan penanganan awal kegawatdaruratan maternal',
+      k1_1: 'Mampu memberikan dosis inisial dan rumatan MgSO4 secara aman',
+      k1_2: 'Mampu melakukan Kompresi Bimanual Interna (KBI) dan Eksterna (KBE)',
+      k1_3: 'Mampu memasang tampon kondom kateter untuk perdarahan postpartum',
+      elemen2: 'Melaksanakan penanganan awal kegawatdaruratan neonatal',
+      k2_1: 'Mampu melakukan langkah awal resusitasi neonatus (stabilisasi, isap lendir)',
+      k2_2: 'Mampu melakukan Ventilasi Tekanan Positif (VTP) menggunakan balon-sungkup',
+      k2_3: 'Mampu mempersiapkan rujukan pasien gawat darurat dengan prinsip BAKSOKU'
+    },
+    form03: {
+      acuan: 'KDB-08 PENANGANAN KEGAWATDARURATAN MATERNAL DAN NEONATAL',
+      q_obs1: 'Melakukan simulasi pemberian MgSO4 sesuai syarat keamanan klinis',
+      q_obs2: 'Melakukan kompresi bimanual interna (KBI) pada phantom uterus',
+      q_obs3: 'Menerapkan siklus VTP pada phantom resusitasi bayi baru lahir',
+      q_obs4: 'Mengisi form rujukan BAKSOKU secara lengkap dan tepat',
+      q_lisan1: 'Sebutkan syarat-syarat mutlak sebelum menyuntikkan MgSO4 pada pasien preeklamsia/eklamsia.',
+      q_lisan2: 'Apa langkah penanganan awal jika terjadi retensio plasenta setelah MAK III?',
+      q_tulis: 'Jelaskan alur resusitasi neonatus menurut panduan IDAI terbaru.',
+      dok1: 'Logbook Penanganan Kasus Gadar Maternal/Neonatal',
+      dok2: 'Sertifikat Pelatihan APN / PONED / PONEK Aktif'
+    }
+  },
+  {
+    kode: 'KDB-09',
+    judul: 'Komunikasi interpersonal dan konseling dalam praktik kebidanan',
+    keterangan: 'Konseling masa kehamilan, KB, kesehatan reproduksi, breaking bad news',
+    form02: {
+      elemen1: 'Membina hubungan saling percaya dengan pasien/klien',
+      k1_1: 'Mampu menerapkan prinsip komunikasi verbal dan non-verbal yang hangat',
+      k1_2: 'Mampu mendengarkan keluhan pasien secara aktif tanpa menghakimi',
+      k1_3: 'Mampu mengklarifikasi pemahaman klien dengan metode re-call/re-phrase',
+      elemen2: 'Melakukan konseling kasus kebidanan',
+      k2_1: 'Mampu mendampingi ibu hamil dengan kecemasan tinggi menjelang persalinan',
+      k2_2: 'Mampu melakukan konseling pasca-keguguran dengan empati',
+      k2_3: 'Mampu menyampaikan berita buruk (breaking bad news) secara taktis'
+    },
+    form03: {
+      acuan: 'KDB-09 KOMUNIKASI INTERPERSONAL DAN KONSELING',
+      q_obs1: 'Menunjukkan empati dan kontak mata yang baik saat pasien konseling',
+      q_obs2: 'Menjelaskan pilihan kontrasepsi dengan seimbang dan tidak memihak',
+      q_obs3: 'Menyampaikan penjelasan tentang kondisi kehamilan berisiko kepada keluarga',
+      q_obs4: 'Melakukan dokumentasi catatan konseling secara rahasia',
+      q_lisan1: 'Bagaimana cara menyampaikan berita duka atau kematian janin kepada ibu hamil?',
+      q_lisan2: 'Jelaskan perbedaan mendasar antara penyuluhan kelompok dan konseling individual.',
+      q_tulis: 'Uraikan teknik-teknik komunikasi terapeutik untuk meredakan kecemasan ibu bersalin primigravida.',
+      dok1: 'Logbook Konseling Kebidanan',
+      dok2: 'Sertifikat Pelatihan Komunikasi Terapeutik / Konseling Kesehatan'
+    }
+  },
+  {
+    kode: 'KDB-10',
+    judul: 'Penerapan etika, hukum kesehatan, dan keselamatan pasien dalam pelayanan kebidanan',
+    keterangan: 'Informed consent, kewenangan bidan, hak reproduksi perempuan, keselamatan pasien',
+    form02: {
+      elemen1: 'Menerapkan prinsip etik dan hukum kebidanan',
+      k1_1: 'Mampu menghormati hak otonomi pasien dalam memilih metode melahirkan',
+      k1_2: 'Mampu bertindak sesuai kewenangan profesi bidan (PMK 21/2021)',
+      k1_3: 'Mampu menjelaskan aspek legal informed choice dan informed consent',
+      elemen2: 'Menerapkan sasaran keselamatan pasien kebidanan',
+      k2_1: 'Mampu verifikasi identitas pasien dengan benar sebelum pemberian obat',
+      k2_2: 'Mampu berkomunikasi efektif menggunakan metode SBAR dan Write down-Read back',
+      k2_3: 'Mampu mencegah risiko jatuh pada ibu pasca persalinan (early mobilization)'
+    },
+    form03: {
+      acuan: 'KDB-10 ETIKA HUKUM DAN KESELAMATAN PASIEN KEBIDANAN',
+      q_obs1: 'Meminta persetujuan lisan/tertulis sebelum melakukan pemeriksaan dalam (VT)',
+      q_obs2: 'Melakukan verifikasi identitas pasien menggunakan gelang identitas',
+      q_obs3: 'Melaporkan kondisi pasien kritis menggunakan format komunikasi SBAR',
+      q_obs4: 'Mendokumentasikan persetujuan tindakan medis dengan lengkap',
+      q_lisan1: 'Apa perbedaan antara informed choice dan informed consent dalam kebidanan?',
+      q_lisan2: 'Bagaimana batasan kewenangan bidan dalam penanganan kasus darurat di luar fasilitas?',
+      q_tulis: 'Jelaskan 6 Sasaran Keselamatan Pasien (SKP) dan aplikasinya di ruang bersalin.',
+      dok1: 'Surat Pernyataan Kode Etik Bidan RS',
+      dok2: 'Sertifikat Pelatihan Sasaran Keselamatan Pasien / Aspek Legal'
+    }
+  },
+  {
+    kode: 'KDB-11',
+    judul: 'Manajemen dan pelayanan kebidanan komunitas',
+    keterangan: 'Asuhan kebidanan di komunitas, imunisasi dasar, penyuluhan kesehatan, posyandu',
+    form02: {
+      elemen1: 'Melakukan asuhan kebidanan di wilayah komunitas',
+      k1_1: 'Mampu melakukan kunjungan rumah nifas (KF) dan neonatus (KN) di desa',
+      k1_2: 'Mampu mendeteksi masalah kesehatan ibu dan anak di tingkat komunitas',
+      k1_3: 'Mampu mengkoordinasikan rujukan ibu hamil risiko tinggi dari desa ke faskes',
+      elemen2: 'Mengelola pelayanan imunisasi dan penyuluhan',
+      k2_1: 'Mampu mempersiapkan cold chain dan logistik vaksin dengan benar',
+      k2_2: 'Mampu memberikan imunisasi dasar (BCG, DPT-HB-Hib, Polio, Campak)',
+      k2_3: 'Mampu menyelenggarakan penyuluhan gizi, ASI, dan KB di Posyandu'
+    },
+    form03: {
+      acuan: 'KDB-11 MANAJEMEN DAN PELAYANAN KEBIDANAN KOMUNITAS',
+      q_obs1: 'Melakukan teknik penyuntikan imunisasi dasar secara intramuskular dan intrakutan',
+      q_obs2: 'Melakukan pemantauan suhu lemari es penyimpanan vaksin (cold chain)',
+      q_obs3: 'Melakukan konseling KIA menggunakan lembar balik atau poster',
+      q_obs4: 'Mengisi buku registers imunisasi dan register KIA posyandu',
+      q_lisan1: 'Sebutkan jadwal dan jenis imunisasi dasar lengkap pada bayi usia 0-11 bulan.',
+      q_lisan2: 'Bagaimana cara menjaga rantai dingin vaksin (cold chain) di tingkat puskesmas pembantu?',
+      q_tulis: 'Jelaskan peran posyandu dan program PWS-KIA (Pemantauan Wilayah Setempat KIA) di komunitas.',
+      dok1: 'Logbook Kunjungan Rumah KIA',
+      dok2: 'Sertifikat Pelatihan Imunisasi / Kebidanan Komunitas'
+    }
+  },
+  {
+    kode: 'KDB-12',
+    judul: 'Penerapan pencegahan dan pengendalian infeksi (PPI) dalam pelayanan kebidanan',
+    keterangan: 'Dekontaminasi alat, APD, pembuangan limbah tajam, cuci tangan 6 langkah',
+    form02: {
+      elemen1: 'Menerapkan teknik kewaspadaan standar',
+      k1_1: 'Mampu mempraktikkan cuci tangan 6 langkah WHO pada 5 momen',
+      k1_2: 'Mampu mengenakan APD lengkap (celemek, masker, sarung tangan) dengan benar',
+      k1_3: 'Mampu melakukan dekontaminasi dan pencucian alat kebidanan bekas pakai',
+      elemen2: 'Mengelola limbah medis dan sterilisasi alat',
+      k2_1: 'Mampu melakukan pembuangan spuit bekas ke safety box (no recapping)',
+      k2_2: 'Mampu melakukan sterilisasi alat logam dan karet menggunakan autoclave',
+      k2_3: 'Mampu mengelola penanganan plasenta pasca persalinan secara hygienis'
+    },
+    form03: {
+      acuan: 'KDB-12 PENCEGAHAN DAN PENGENDALIAN INFEKSI (PPI)',
+      q_obs1: 'Mempraktikkan teknik mencuci tangan 6 langkah WHO di depan penguji',
+      q_obs2: 'Melakukan dekontaminasi alat bekas pakai menggunakan larutan klorin 0.5% selama 10 menit',
+      q_obs3: 'Membuang jarum suntik bekas ke safety box tanpa menutup kembali jarum',
+      q_obs4: 'Melakukan teknik pemakaian sarung tangan steril (handscoon steril) yang benar',
+      q_lisan1: 'Mengapa dilarang melakukan recapping (menutup kembali jarum) setelah menyuntik?',
+      q_lisan2: 'Jelaskan prosedur pengolahan alat bekas pakai mulai dari dekontaminasi, pencucian, hingga DTT/sterilisasi.',
+      q_tulis: 'Jelaskan perbedaan antara sterilisasi, desinfeksi tingkat tinggi (DTT), dan dekontaminasi.',
+      dok1: 'Sertifikat Pelatihan PPI (Pencegahan & Pengendalian Infeksi)',
+      dok2: 'Logbook Kepatuhan Hand Hygiene RS / Puskesmas'
+    }
+  }
+];
+
 const getCompetencyDetails = (comp) => {
   const code = comp?.kode_kompetensi || comp?.kode || 'KD-07';
   const name = comp?.nama_kompetensi || comp?.judul || comp?.nama || 'Memfasilitasi pemenuhan kebutuhan cairan dan elektrolit';
   const unit = comp?.unit || 'Keperawatan Umum';
   const category = comp?.kategori || 'Kompetensi Dasar';
 
-  const existing = LIST_12_KOMPETENSI.find(c => c.kode === code);
+  const existing = LIST_12_KOMPETENSI.find(c => c.kode === code) || LIST_12_KOMPETENSI_KEBIDANAN.find(c => c.kode === code);
   if (existing) return existing;
 
   return {
@@ -548,6 +1005,12 @@ const getDefaultForm03d = (comp) => ({
 });
 
 const getDefaultForm04 = () => ({
+  tujuanJelas: undefined,
+  standarJelas: undefined,
+  buktiDimengerti: undefined,
+  hakJelas: undefined,
+  bandingJelas: undefined,
+  kerahasiaanJelas: undefined,
   hariTanggal: '',
   waktu: '',
   tempat: '',
@@ -582,6 +1045,7 @@ const getDefaultForm09 = () => ({
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [filterStatusProses, setFilterStatusProses] = useState('Open');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [perawatData, setPerawatData] = useState([]);
@@ -595,6 +1059,8 @@ function App() {
       return null;
     }
   });
+  const API_URL = 'http://192.168.0.2/keperawatan/public/api';
+  const BASE_URL = API_URL.replace('/api', '');
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -615,14 +1081,14 @@ function App() {
 
   // Create Account states
   const [createAccountStep, setCreateAccountStep] = useState(1);
-  const [createAccountForm, setCreateAccountForm] = useState({ nik: '', id_perawat: '', nama: '', username: '', password: '', hp: '' });
+  const [createAccountForm, setCreateAccountForm] = useState({ nik: '', id_perawat: '', nama: '', username: '', password: '', hp: '', is_hp_validated: 0 });
 
   const handleCheckNikExisting = (e) => {
     e.preventDefault();
     if (!createAccountForm.nik) return;
     setIsRegistering(true);
     setRegisterError('');
-    fetch('http://localhost/keperawatan/public/api/register/check-nik-existing', {
+    fetch(API_URL + '/register/check-nik-existing', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nik: createAccountForm.nik })
@@ -647,7 +1113,7 @@ function App() {
     e.preventDefault();
     setIsRegistering(true);
     setRegisterError('');
-    fetch('http://localhost/keperawatan/public/api/register/create-account', {
+    fetch(API_URL + '/register/create-account', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(createAccountForm)
@@ -676,7 +1142,7 @@ function App() {
     if (!forgotPasswordForm.username) return;
     setIsRegistering(true);
     setRegisterError('');
-    fetch('http://localhost/keperawatan/public/api/auth/forgot-password-otp', {
+    fetch(API_URL + '/auth/forgot-password-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: forgotPasswordForm.username })
@@ -700,7 +1166,7 @@ function App() {
     e.preventDefault();
     setIsRegistering(true);
     setRegisterError('');
-    fetch('http://localhost/keperawatan/public/api/auth/reset-password', {
+    fetch(API_URL + '/auth/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(forgotPasswordForm)
@@ -721,7 +1187,7 @@ function App() {
   };
   const [registerStep, setRegisterStep] = useState(1);
   const [registerForm, setRegisterForm] = useState({
-    nik: '', nip: '', nama: '', tempat_lahir: '', tanggal_lahir: '', jk: 'L', alamat: '', hp: '', email: '', profesi: '', unit_kerja: '', pendidikan_terakhir: '', username: '', password: ''
+    nik: '', nip: '', nama: '', tempat_lahir: '', tanggal_lahir: '', jk: 'L', alamat: '', hp: '', email: '', profesi: '', unit_kerja: '', pendidikan_terakhir: '', username: '', password: '', is_hp_validated: 0
   });
   const [registerError, setRegisterError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
@@ -731,7 +1197,7 @@ function App() {
     if (!registerForm.nik) return;
     setIsRegistering(true);
     setRegisterError('');
-    fetch('http://localhost/keperawatan/public/api/register/check-nik', {
+    fetch(API_URL + '/register/check-nik', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nik: registerForm.nik })
@@ -755,7 +1221,7 @@ function App() {
     e.preventDefault();
     setIsRegistering(true);
     setRegisterError('');
-    fetch('http://localhost/keperawatan/public/api/register', {
+    fetch(API_URL + '/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(registerForm)
@@ -807,6 +1273,10 @@ function App() {
   // New certification application history and workflow states
   const [pengajuanHistoryList, setPengajuanHistoryList] = useState([]);
   const [activePengajuan, setActivePengajuan] = useState(null);
+  const [activeNurseCertificates, setActiveNurseCertificates] = useState([]);
+  const [activeNursePelatihan, setActiveNursePelatihan] = useState([]);
+  const [previewPhotoUrl, setPreviewPhotoUrl] = useState(null);
+  const [sertifikatData, setSertifikatData] = useState(null);
   const [isCreatingPengajuan, setIsCreatingPengajuan] = useState(false);
   const [newPengajuanForm, setNewPengajuanForm] = useState({
     jenis_sertifikasi: 'Kompetensi Dasar',
@@ -818,7 +1288,18 @@ function App() {
 
   // Exam States
   const [jadwalUjianInput, setJadwalUjianInput] = useState('');
+  const [batasAkhirUjianInput, setBatasAkhirUjianInput] = useState('');
+  const [cheatCount, setCheatCount] = useState(0);
+  const [cheatWarningModal, setCheatWarningModal] = useState({
+    show: false,
+    message: '',
+    count: 0,
+    isLast: false
+  });
   const [ujianData, setUjianData] = useState(null);
+  const [selectedPengajuanIds, setSelectedPengajuanIds] = useState([]);
+  const [kolektifJadwalMulai, setKolektifJadwalMulai] = useState('');
+  const [kolektifBatasAkhir, setKolektifBatasAkhir] = useState('');
   const [jawabanUjian, setJawabanUjian] = useState({});
   const [isSubmittingUjian, setIsSubmittingUjian] = useState(false);
   const [ujianTimeLeft, setUjianTimeLeft] = useState(0);
@@ -827,9 +1308,12 @@ function App() {
   const [finalNilai, setFinalNilai] = useState(0);
   const [detailHasilUjian, setDetailHasilUjian] = useState(null);
   const [isViewingHasilUjian, setIsViewingHasilUjian] = useState(false);
+  const [isAssessorModalOpen, setIsAssessorModalOpen] = useState(false);
+  const [selectedAssessorId, setSelectedAssessorId] = useState('');
+  const [selectedCoAssessorId, setSelectedCoAssessorId] = useState('');
 
   const fetchPengajuanHistory = () => {
-    fetch('http://localhost/keperawatan/public/api/pengajuan_sertifikasi')
+    fetch(API_URL + '/pengajuan_sertifikasi')
       .then(res => res.json())
       .then(data => {
         setPengajuanHistoryList(Array.isArray(data) ? data : []);
@@ -873,16 +1357,49 @@ function App() {
     setSertifikatSubTab('form_01');
   };
 
-  const handleUpdatePengajuanStatus = (id, newStatus) => {
+  React.useEffect(() => {
+    if (activePengajuan) {
+      // Input datetime-local expects format YYYY-MM-DDTHH:MM
+      setJadwalUjianInput(activePengajuan.jadwal_ujian ? activePengajuan.jadwal_ujian.replace(' ', 'T').substring(0, 16) : '');
+      setBatasAkhirUjianInput(activePengajuan.batas_akhir_ujian ? activePengajuan.batas_akhir_ujian.replace(' ', 'T').substring(0, 16) : '');
+    } else {
+      setJadwalUjianInput('');
+      setBatasAkhirUjianInput('');
+    }
+  }, [activePengajuan]);
+
+  const get12KompetensiForPerawat = (perawat) => {
+    if (!perawat) return LIST_12_KOMPETENSI;
+    const pendidikan = (perawat.pendidikan_terakhir || '').toLowerCase();
+    const profesi = (perawat.profesi || '').toLowerCase();
+    if (pendidikan.includes('kebidanan') || profesi === 'bidan') {
+      return LIST_12_KOMPETENSI_KEBIDANAN;
+    }
+    return LIST_12_KOMPETENSI;
+  };
+
+  const get12KompetensiForPengajuan = (pengajuan) => {
+    if (!pengajuan) return LIST_12_KOMPETENSI;
+    const perawat = perawatData.find(p => String(p.id_perawat) === String(pengajuan.id_perawat));
+    return get12KompetensiForPerawat(perawat);
+  };
+
+
+
+  const handleUpdatePengajuanStatus = (id, newStatus, idAsesor = null, idAsesorPendamping = null) => {
     setIsLoading(true);
-    fetch(`http://localhost/keperawatan/public/api/pengajuan_sertifikasi/${id}`, {
+    const bodyData = { status: newStatus };
+    if (idAsesor) bodyData.id_asesor = idAsesor;
+    if (idAsesorPendamping !== null && idAsesorPendamping !== undefined) {
+      bodyData.id_asesor_pendamping = idAsesorPendamping === '' ? null : idAsesorPendamping;
+    }
+
+    fetch(API_URL + `/pengajuan_sertifikasi/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        status: newStatus
-      })
+      body: JSON.stringify(bodyData)
     })
       .then(res => res.json())
       .then(updated => {
@@ -900,16 +1417,44 @@ function App() {
       });
   };
 
+  const handleUpdateStatusProses = (id, newStatusProses) => {
+    setIsLoading(true);
+    fetch(API_URL + `/pengajuan_sertifikasi/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        status_proses: newStatusProses
+      })
+    })
+      .then(res => res.json())
+      .then(updated => {
+        setIsLoading(false);
+        fetchPengajuanHistory();
+        if (activePengajuan && String(activePengajuan.id) === String(id)) {
+          setActivePengajuan(updated);
+        }
+        showToast(`Status proses sertifikasi berhasil diubah menjadi: ${newStatusProses}`, 'success');
+      })
+      .catch(err => {
+        setIsLoading(false);
+        console.error("Error updating status_proses:", err);
+        showToast("Gagal memperbarui status proses.", 'error');
+      });
+  };
+
   const handleSetJadwalUjian = (e) => {
     e.preventDefault();
-    if (!jadwalUjianInput || !activePengajuan) return;
+    if (!jadwalUjianInput || !batasAkhirUjianInput || !activePengajuan) return;
     setIsLoading(true);
-    fetch('http://localhost/keperawatan/public/api/ujian/set-jadwal', {
+    fetch(API_URL + '/ujian/set-jadwal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id_pengajuan: activePengajuan.id,
         jadwal_ujian: jadwalUjianInput,
+        batas_akhir_ujian: batasAkhirUjianInput,
         durasi_ujian: 120
       })
     })
@@ -918,7 +1463,7 @@ function App() {
         setIsLoading(false);
         if (data.success) {
           showToast('Jadwal ujian berhasil ditetapkan', 'success');
-          setActivePengajuan(prev => ({ ...prev, jadwal_ujian: jadwalUjianInput, durasi_ujian: 120, status_ujian: 'Belum' }));
+          setActivePengajuan(prev => ({ ...prev, jadwal_ujian: jadwalUjianInput, batas_akhir_ujian: batasAkhirUjianInput, durasi_ujian: 120, status_ujian: 'Belum' }));
           fetchPengajuanHistory();
         } else {
           showToast(data.message || 'Gagal set jadwal', 'error');
@@ -931,18 +1476,74 @@ function App() {
       });
   };
 
-  const handleMulaiUjian = () => {
-    if (!activePengajuan) return;
+  const handleSetJadwalKolektif = (e) => {
+    e.preventDefault();
+    if (!kolektifJadwalMulai || !kolektifBatasAkhir || selectedPengajuanIds.length === 0) return;
     setIsLoading(true);
-    fetch(`http://localhost/keperawatan/public/api/ujian/soal/${activePengajuan.id}`)
+    fetch(API_URL + '/ujian/set-jadwal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id_pengajuan: selectedPengajuanIds,
+        jadwal_ujian: kolektifJadwalMulai,
+        batas_akhir_ujian: kolektifBatasAkhir,
+        durasi_ujian: 120
+      })
+    })
       .then(res => res.json())
       .then(data => {
         setIsLoading(false);
         if (data.success) {
+          showToast(`Jadwal ujian untuk ${selectedPengajuanIds.length} pengajuan berhasil ditetapkan secara kolektif`, 'success');
+          setSelectedPengajuanIds([]);
+          if (activePengajuan && selectedPengajuanIds.includes(activePengajuan.id)) {
+            setActivePengajuan(prev => ({
+              ...prev,
+              jadwal_ujian: kolektifJadwalMulai,
+              batas_akhir_ujian: kolektifBatasAkhir,
+              durasi_ujian: 120,
+              status_ujian: 'Belum'
+            }));
+          }
+          fetchPengajuanHistory();
+        } else {
+          showToast(data.message || 'Gagal set jadwal kolektif', 'error');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        setIsLoading(false);
+        showToast('Terjadi kesalahan koneksi', 'error');
+      });
+  };
+
+  const handleMulaiUjian = () => {
+    if (!activePengajuan) return;
+    setIsLoading(true);
+    fetch(`${API_URL}/ujian/soal/${activePengajuan.id}`)
+      .then(res => res.json())
+      .then(data => {
+        setIsLoading(false);
+        if (data.success) {
+          // Check if there is an existing timer
+          const existingEndTime = localStorage.getItem('ujian_end_time');
+          let durationSeconds = data.durasi * 60;
+          if (existingEndTime && parseInt(existingEndTime) > Date.now()) {
+            durationSeconds = Math.floor((parseInt(existingEndTime) - Date.now()) / 1000);
+            const savedAnswers = JSON.parse(localStorage.getItem('ujian_answers') || '{}');
+            setJawabanUjian(savedAnswers);
+          } else {
+            const newEndTime = Date.now() + (data.durasi * 60 * 1000);
+            localStorage.setItem('ujian_end_time', newEndTime.toString());
+            localStorage.setItem('ujian_answers', JSON.stringify({}));
+            localStorage.setItem('ujian_active_pengajuan_id', activePengajuan.id.toString());
+            setJawabanUjian({});
+          }
+
           setUjianData(data.soal);
-          setUjianTimeLeft(data.durasi * 60); // in seconds
-          setJawabanUjian({});
+          setUjianTimeLeft(durationSeconds); // in seconds
           setCurrentUjianIndex(0);
+          setCheatCount(parseInt(localStorage.getItem('ujian_cheat_count') || '0'));
           setSertifikatSubTab('ujian_kompetensi');
         } else {
           showToast(data.messages?.error || data.message || 'Gagal memuat soal ujian', 'error');
@@ -955,21 +1556,47 @@ function App() {
       });
   };
 
-  const handleSubmitUjian = () => {
-    if (!activePengajuan || !ujianData) return;
+  const handleJawabanSelect = (idSoal, opt) => {
+    const updated = { ...jawabanUjian, [idSoal]: opt };
+    setJawabanUjian(updated);
+    localStorage.setItem('ujian_answers', JSON.stringify(updated));
+  };
+
+  const handleSubmitUjian = (isAuto = false) => {
+    // We might not have activePengajuan if it auto-submitted on refresh, but activePengajuan should be loaded by fetchPengajuanHistory
+    const targetId = activePengajuan?.id || localStorage.getItem('ujian_active_pengajuan_id');
+    if (!targetId || !ujianData) return;
+
+    if (!isAuto) {
+      const confirmSubmit = window.confirm("Apakah Anda yakin ingin mengakhiri dan mengirimkan jawaban ujian ini?");
+      if (!confirmSubmit) return;
+    }
+
     setIsSubmittingUjian(true);
-    fetch(`http://localhost/keperawatan/public/api/ujian/submit/${activePengajuan.id}`, {
+
+    // get answers from local state or localStorage
+    const submitAnswers = Object.keys(jawabanUjian).length > 0 ? jawabanUjian : JSON.parse(localStorage.getItem('ujian_answers') || '{}');
+
+    fetch(`${API_URL}/ujian/submit/${targetId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jawaban: jawabanUjian })
+      body: JSON.stringify({ jawaban: submitAnswers })
     })
       .then(res => res.json())
       .then(data => {
         setIsSubmittingUjian(false);
+        // Clear local storage exam state
+        localStorage.removeItem('ujian_end_time');
+        localStorage.removeItem('ujian_answers');
+        localStorage.removeItem('ujian_active_pengajuan_id');
+        localStorage.removeItem('ujian_cheat_count');
+
         if (data.success) {
           setFinalNilai(data.nilai);
           setShowNilaiModal(true);
-          setActivePengajuan(prev => ({ ...prev, status_ujian: 'Selesai', nilai_ujian: data.nilai }));
+          if (activePengajuan) {
+            setActivePengajuan(prev => ({ ...prev, status_ujian: 'Selesai', nilai_ujian: data.nilai }));
+          }
           fetchPengajuanHistory();
         } else {
           showToast(data.messages?.error || data.message || 'Gagal submit ujian', 'error');
@@ -985,7 +1612,7 @@ function App() {
   const handleLihatHasilUjian = () => {
     if (!activePengajuan) return;
     setIsLoading(true);
-    fetch(`http://localhost/keperawatan/public/api/ujian/hasil/${activePengajuan.id}`)
+    fetch(`${API_URL}/ujian/hasil/${activePengajuan.id}`)
       .then(res => res.json())
       .then(data => {
         setIsLoading(false);
@@ -1007,7 +1634,7 @@ function App() {
     if (!activePengajuan) return;
     if (!confirm('Apakah Anda yakin ingin me-reset ujian ini? Seluruh jawaban dan nilai peserta akan dihapus, dan peserta dapat memulai ujian kembali dari awal sesuai jadwal.')) return;
     setIsLoading(true);
-    fetch(`http://localhost/keperawatan/public/api/ujian/reset/${activePengajuan.id}`, { method: 'POST' })
+    fetch(`${API_URL}/ujian/reset/${activePengajuan.id}`, { method: 'POST' })
       .then(res => res.json())
       .then(data => {
         setIsLoading(false);
@@ -1042,6 +1669,10 @@ function App() {
 
     // Role-based lockout bypass: Asesor and Admin can access any tab
     if (currentUser?.role !== 'Perawat') {
+      return false;
+    }
+
+    if (tabId === 'form_03c') {
       return false;
     }
 
@@ -1082,6 +1713,108 @@ function App() {
     return pengajuanHistoryList.filter(p => String(p.id_perawat) === String(currentPerawatRecord.id_perawat));
   }, [pengajuanHistoryList, currentPerawatRecord]);
 
+  React.useEffect(() => {
+    let targetNurseId = null;
+    if (activePengajuan && activePengajuan.id_perawat) {
+      targetNurseId = activePengajuan.id_perawat;
+    } else if (isCreatingPengajuan) {
+      targetNurseId = currentUser?.role === 'Perawat' ? (currentPerawatRecord?.id_perawat) : newPengajuanForm.id_perawat;
+    }
+
+    if (targetNurseId) {
+      fetch(API_URL + '/sertifikat')
+        .then(res => res.json())
+        .then(data => {
+          const filtered = Array.isArray(data) ? data.filter(s => String(s.id_perawat) === String(targetNurseId)) : [];
+          setActiveNurseCertificates(filtered);
+        })
+        .catch(err => console.error("Error fetching active nurse certificates:", err));
+
+      fetch(API_URL + '/pelatihan')
+        .then(res => res.json())
+        .then(data => {
+          const filtered = Array.isArray(data) ? data.filter(p => String(p.id_perawat) === String(targetNurseId)) : [];
+          setActiveNursePelatihan(filtered);
+        })
+        .catch(err => console.error("Error fetching active nurse training:", err));
+    } else {
+      setActiveNurseCertificates([]);
+      setActiveNursePelatihan([]);
+    }
+  }, [activePengajuan, isCreatingPengajuan, newPengajuanForm.id_perawat, currentPerawatRecord]);
+
+  React.useEffect(() => {
+    if (activePengajuan && activeTab === 'sertifikasi' && sertifikatSubTab === 'sertifikat') {
+      fetch(`${API_URL}/riwayat_sertifikat`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            const existing = data.find(s => String(s.id_pengajuan) === String(activePengajuan.id));
+            if (existing) {
+              setSertifikatData(existing);
+            } else {
+              // Auto-save untuk mem-booking nomor sertifikat
+              const pejabatKabid = pejabatData?.find(p => p.jabatan.includes('Kepala Bidang'))?.id || null;
+              const pejabatKetua = pejabatData?.find(p => p.jabatan.includes('Ketua Panitia'))?.id || null;
+
+              const payload = {
+                id_pengajuan: activePengajuan.id,
+                id_perawat: activePengajuan.id_perawat,
+                jenjang: activePengajuan.jenjang_tujuan,
+                pejabat_1_id: pejabatKabid,
+                pejabat_2_id: pejabatKetua,
+                tanggal_terbit: new Date().toISOString().split('T')[0]
+              };
+
+              fetch(`${API_URL}/riwayat_sertifikat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              })
+                .then(res => res.json())
+                .then(savedData => setSertifikatData(savedData))
+                .catch(err => console.error("Error auto-saving sertifikat data:", err));
+            }
+          }
+        })
+        .catch(err => console.error("Error fetching sertifikat data:", err));
+    }
+  }, [activePengajuan, activeTab, sertifikatSubTab]);
+  const handleSimpanSertifikat = () => {
+    if (!activePengajuan) return;
+
+    // Temukan ID pejabat
+    const pejabatKabid = pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.id || null;
+    const pejabatKetua = pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.id || null;
+
+    const payload = {
+      id_pengajuan: activePengajuan.id,
+      id_perawat: activePengajuan.id_perawat,
+      jenjang: activePengajuan.jenjang_tujuan,
+      pejabat_1_id: pejabatKabid,
+      pejabat_2_id: pejabatKetua,
+      tanggal_terbit: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
+    };
+
+    fetch(`${API_URL}/riwayat_sertifikat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(data => {
+        // Setelah berhasil simpan, perbarui state
+        setSertifikatData(data);
+        // Wait for React to render the new state, then print
+        setTimeout(() => window.print(), 500);
+      })
+      .catch(err => {
+        console.error("Gagal menyimpan riwayat sertifikat", err);
+        showToast("Gagal menyimpan riwayat sertifikat, mencetak tetap dilanjutkan...", "error");
+        window.print();
+      });
+  };
+
   const handleSaveCompetencyForms = () => {
     if (!activePengajuan) {
       showToast("Tidak ada pengajuan aktif yang dipilih.", 'error');
@@ -1092,14 +1825,22 @@ function App() {
       return;
     }
 
+    let statusProsesToUpdate = activePengajuan.status_proses;
+    if (sertifikatSubTab === 'form_07' && form07Data?.keputusan === 'Kompeten') {
+      if (confirm("Rekomendasi kelulusan adalah Kompeten (K). Apakah Anda ingin menyimpan hasil asesmen sekaligus menutup (Close) status proses sertifikasi ini secara otomatis?")) {
+        statusProsesToUpdate = 'Closed';
+      }
+    }
+
     setIsLoading(true);
-    fetch(`http://localhost/keperawatan/public/api/pengajuan_sertifikasi/${activePengajuan.id}`, {
+    fetch(`${API_URL}/pengajuan_sertifikasi/${activePengajuan.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        form_data: JSON.stringify(competencyForms)
+        form_data: JSON.stringify(competencyForms),
+        status_proses: statusProsesToUpdate
       })
     })
       .then(res => res.json())
@@ -1143,7 +1884,7 @@ function App() {
 
     const emptyForms = {};
     newPengajuanForm.detail_kompetensi.forEach(code => {
-      const comp = LIST_12_KOMPETENSI.find(c => c.kode === code) || competencies.find(c => (c.kode_kompetensi || c.kode) === code) || { kode: code, judul: code };
+      const comp = LIST_12_KOMPETENSI.find(c => c.kode === code) || LIST_12_KOMPETENSI_KEBIDANAN.find(c => c.kode === code) || competencies.find(c => (c.kode_kompetensi || c.kode) === code) || { kode: code, judul: code };
       emptyForms[`${code}_form01`] = getDefaultForm01(comp);
       emptyForms[`${code}_form02`] = getDefaultForm02(comp);
       emptyForms[`${code}_form03`] = getDefaultForm03(comp);
@@ -1165,7 +1906,7 @@ function App() {
       payload.append('file_pendukung', newPengajuanFile);
     }
 
-    fetch('http://localhost/keperawatan/public/api/pengajuan_sertifikasi', {
+    fetch(API_URL + '/pengajuan_sertifikasi', {
       method: 'POST',
       body: payload
     })
@@ -1187,7 +1928,7 @@ function App() {
   const handleDeletePengajuan = (id) => {
     if (confirm("Apakah Anda yakin ingin menghapus riwayat pengajuan ini?")) {
       setIsLoading(true);
-      fetch(`http://localhost/keperawatan/public/api/pengajuan_sertifikasi/${id}`, {
+      fetch(`${API_URL}/pengajuan_sertifikasi/${id}`, {
         method: 'DELETE'
       })
         .then(() => {
@@ -1208,7 +1949,7 @@ function App() {
 
   // Helper to resolve active competency details
   const activeComp = React.useMemo(() => {
-    const fromList = LIST_12_KOMPETENSI.find(c => c.kode === selectedKompetensiKode);
+    const fromList = LIST_12_KOMPETENSI.find(c => c.kode === selectedKompetensiKode) || LIST_12_KOMPETENSI_KEBIDANAN.find(c => c.kode === selectedKompetensiKode);
     if (fromList) return fromList;
     const dbComp = competencies.find(c => c.kode_kompetensi === selectedKompetensiKode || c.kode === selectedKompetensiKode);
     return getCompetencyDetails(dbComp || { kode_kompetensi: selectedKompetensiKode });
@@ -1252,20 +1993,200 @@ function App() {
   const form01Data = getFormData('form01', getDefaultForm01);
   const setForm01Data = setFormDataWrapper('form01');
 
-  const form02Data = getFormData('form02', getDefaultForm02);
-  const setForm02Data = setFormDataWrapper('form02');
+  const form02Data = React.useMemo(() => {
+    if (competencyForms['global_form02']) {
+      return competencyForms['global_form02'];
+    }
+    const merged = {};
+    [...LIST_12_KOMPETENSI, ...LIST_12_KOMPETENSI_KEBIDANAN].forEach(komp => {
+      const legacyKey = `${komp.kode}_form02`;
+      if (competencyForms[legacyKey]) {
+        const legacyData = competencyForms[legacyKey];
+        if (legacyData.k1_1) merged[`${komp.kode}_k1_1`] = legacyData.k1_1;
+        if (legacyData.k1_2) merged[`${komp.kode}_k1_2`] = legacyData.k1_2;
+        if (legacyData.k1_3) merged[`${komp.kode}_k1_3`] = legacyData.k1_3;
+        if (legacyData.k2_1) merged[`${komp.kode}_k2_1`] = legacyData.k2_1;
+        if (legacyData.k2_2) merged[`${komp.kode}_k2_2`] = legacyData.k2_2;
+        if (legacyData.k2_3) merged[`${komp.kode}_k2_3`] = legacyData.k2_3;
+        if (legacyData.bukti_1) merged[`${komp.kode}_bukti`] = legacyData.bukti_1;
+        if (legacyData.rekomendasi) merged[`${komp.kode}_rekomendasi`] = legacyData.rekomendasi;
+      }
+    });
+    return merged;
+  }, [competencyForms]);
+
+  const setForm02Data = (newVal) => {
+    setCompetencyForms(prev => {
+      const current = prev['global_form02'] || form02Data;
+      const updated = typeof newVal === 'function' ? newVal(current) : newVal;
+      return {
+        ...prev,
+        global_form02: updated
+      };
+    });
+  };
 
   const form03Data = getFormData('form03', getDefaultForm03);
   const setForm03Data = setFormDataWrapper('form03');
 
-  const form03aData = getFormData('form03a', getDefaultForm03a);
-  const setForm03aData = setFormDataWrapper('form03a');
+  React.useEffect(() => {
+    if (activePengajuan && form03Data && !form03Data.pendekatan) {
+      setForm03Data({ ...form03Data, pendekatan: activePengajuan.jenjang_tujuan });
+    }
+  }, [activePengajuan]);
 
-  const form03bData = getFormData('form03b', getDefaultForm03b);
-  const setForm03bData = setFormDataWrapper('form03b');
+  const form03aData = React.useMemo(() => {
+    if (competencyForms['global_form03a']) {
+      return competencyForms['global_form03a'];
+    }
+    const merged = {};
+    Object.keys(competencyForms).forEach(key => {
+      if (key.endsWith('_form03a')) {
+        Object.assign(merged, competencyForms[key]);
+      }
+    });
+    return merged;
+  }, [competencyForms]);
+
+  const setForm03aData = (newVal) => {
+    setCompetencyForms(prev => {
+      const current = prev['global_form03a'] || form03aData;
+      const updated = typeof newVal === 'function' ? newVal(current) : newVal;
+      return {
+        ...prev,
+        global_form03a: updated
+      };
+    });
+  };
+
+  const form03bData = React.useMemo(() => {
+    if (competencyForms['global_form03b']) {
+      return competencyForms['global_form03b'];
+    }
+    const merged = {};
+    Object.keys(competencyForms).forEach(key => {
+      if (key.endsWith('_form03b')) {
+        Object.assign(merged, competencyForms[key]);
+      }
+    });
+    return merged;
+  }, [competencyForms]);
+
+  const setForm03bData = (newVal) => {
+    setCompetencyForms(prev => {
+      const current = prev['global_form03b'] || form03bData;
+      const updated = typeof newVal === 'function' ? newVal(current) : newVal;
+      return {
+        ...prev,
+        global_form03b: updated
+      };
+    });
+  };
 
   const form03cData = getFormData('form03c', getDefaultForm03c);
   const setForm03cData = setFormDataWrapper('form03c');
+
+  const [tulisExamDetails, setTulisExamDetails] = React.useState(null);
+
+  const mapDbCompToKd = (dbComp) => {
+    if (!dbComp) return null;
+    const clean = dbComp.trim().toUpperCase();
+    if (clean.includes('KDB-01')) return 'KDB-01';
+    if (clean.includes('KDB-02')) return 'KDB-02';
+    if (clean.includes('KDB-03')) return 'KDB-03';
+    if (clean.includes('KDB-04')) return 'KDB-04';
+    if (clean.includes('KDB-05')) return 'KDB-05';
+    if (clean.includes('KDB-06')) return 'KDB-06';
+    if (clean.includes('KDB-07')) return 'KDB-07';
+    if (clean.includes('KDB-08')) return 'KDB-08';
+    if (clean.includes('KDB-09')) return 'KDB-09';
+    if (clean.includes('KDB-10')) return 'KDB-10';
+    if (clean.includes('KDB-11')) return 'KDB-11';
+    if (clean.includes('KDB-12')) return 'KDB-12';
+    if (clean.includes('KD-01')) return 'KD-01';
+    if (clean.includes('KD-02')) return 'KD-02';
+    if (clean.includes('KD-03')) return 'KD-03';
+    if (clean.includes('KD-04')) return 'KD-04';
+    if (clean.includes('KD-05')) return 'KD-05';
+    if (clean.includes('KD-06')) return 'KD-06';
+    if (clean.includes('KD-07')) return 'KD-07';
+    if (clean.includes('KD-08')) return 'KD-08';
+    if (clean.includes('KD-09')) return 'KD-09';
+    if (clean.includes('KD-10')) return 'KD-10';
+    if (clean.includes('KD-11')) return 'KD-11';
+    if (clean.includes('KD-12')) return 'KD-12';
+    if (clean.includes('KOMUNIKASI')) return 'KD-01';
+    if (clean.includes('ETIKA') || clean.includes('LEGAL')) return 'KD-02';
+    if (clean.includes('VITAL') || clean.includes('TTV')) return 'KD-03';
+    if (clean.includes('SAFETY') || clean.includes('INFEKSI')) return 'KD-04';
+    if (clean.includes('LUKA')) return 'KD-05';
+    if (clean.includes('OKSIGEN')) return 'KD-06';
+    if (clean.includes('CAIRAN') || clean.includes('ELEKTROLIT')) return 'KD-07';
+    if (clean.includes('OBAT')) return 'KD-08';
+    if (clean.includes('ELIMINASI')) return 'KD-09';
+    if (clean.includes('NUTRISI')) return 'KD-10';
+    if (clean.includes('ISTIRAHAT') || clean.includes('TIDUR')) return 'KD-11';
+    if (clean.includes('MOBILISASI') || clean.includes('IMOBILISASI')) return 'KD-12';
+    return null;
+  };
+
+  React.useEffect(() => {
+    if (activePengajuan && activePengajuan.status_ujian === 'Selesai' && sertifikatSubTab === 'form_03c') {
+      if (!tulisExamDetails || String(tulisExamDetails.id_pengajuan) !== String(activePengajuan.id)) {
+        fetch(`${API_URL}/ujian/hasil/${activePengajuan.id}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              setTulisExamDetails({
+                id_pengajuan: activePengajuan.id,
+                soal: data.soal,
+                jawaban_user: data.jawaban_user,
+                nilai: data.nilai
+              });
+            }
+          })
+          .catch(err => console.error("Error loading tulis exam details:", err));
+      }
+    } else if (sertifikatSubTab !== 'form_03c') {
+      setTulisExamDetails(null);
+    }
+  }, [activePengajuan, sertifikatSubTab, tulisExamDetails]);
+
+  const compScores = React.useMemo(() => {
+    if (!tulisExamDetails || !tulisExamDetails.soal) return {};
+    const stats = {};
+    const currentList = get12KompetensiForPengajuan(activePengajuan);
+    currentList.forEach(c => {
+      stats[c.kode] = { correct: 0, total: 0 };
+    });
+    tulisExamDetails.soal.forEach(s => {
+      const kdCode = mapDbCompToKd(s.id_kompetensi);
+      if (kdCode && stats[kdCode]) {
+        stats[kdCode].total += 1;
+        const userAns = (tulisExamDetails.jawaban_user[s.id_soal] || '').trim().toUpperCase();
+        const correctAns = (s.jawaban_benar || '').trim().toUpperCase();
+        if (userAns === correctAns) {
+          stats[kdCode].correct += 1;
+        }
+      }
+    });
+    const scores = {};
+    currentList.forEach(c => {
+      const stat = stats[c.kode];
+      scores[c.kode] = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : null;
+    });
+    return scores;
+  }, [tulisExamDetails, activePengajuan, perawatData]);
+
+  React.useEffect(() => {
+    if (activePengajuan && activePengajuan.status_ujian === 'Selesai') {
+      const score = parseFloat(activePengajuan.nilai_ujian || '0');
+      const autoGrade = score >= 70 ? 'K' : 'BK';
+      if (form03cData.grade1 !== autoGrade) {
+        setForm03cData({ ...form03cData, grade1: autoGrade });
+      }
+    }
+  }, [activePengajuan, selectedKompetensiKode, form03cData.grade1]);
 
   const form03dData = getFormData('form03d', getDefaultForm03d);
   const setForm03dData = setFormDataWrapper('form03d');
@@ -1291,7 +2212,7 @@ function App() {
 
   const fetchUserData = () => {
     setIsLoading(true);
-    fetch('http://localhost/keperawatan/public/api/user')
+    fetch(API_URL + '/user')
       .then(res => res.json())
       .then(data => {
         setUserData(Array.isArray(data) ? data : []);
@@ -1307,7 +2228,7 @@ function App() {
     e.preventDefault();
     setLoginError('');
     setIsLoggingIn(true);
-    fetch('http://localhost/keperawatan/public/api/login', {
+    fetch(API_URL + '/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(loginForm)
@@ -1342,7 +2263,7 @@ function App() {
     e.preventDefault();
     setLoginError('');
     setIsLoggingIn(true);
-    fetch('http://localhost/keperawatan/public/api/login/verify-otp', {
+    fetch(API_URL + '/login/verify-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: tempUsername, otp: otpCode })
@@ -1371,9 +2292,48 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('lastActivityTime');
     setCurrentUser(null);
     setActiveTab('dashboard');
   };
+
+  // Auto-Logout after 30 minutes of inactivity
+  React.useEffect(() => {
+    if (!currentUser) {
+      localStorage.removeItem('lastActivityTime');
+      return;
+    }
+
+    // Set initial activity time if not present
+    if (!localStorage.getItem('lastActivityTime')) {
+      localStorage.setItem('lastActivityTime', Date.now().toString());
+    }
+
+    const resetTimer = () => {
+      localStorage.setItem('lastActivityTime', Date.now().toString());
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+    events.forEach(e => window.addEventListener(e, resetTimer));
+
+    // Check every 10 seconds
+    const interval = setInterval(() => {
+      const lastActivity = localStorage.getItem('lastActivityTime');
+      if (lastActivity) {
+        const elapsed = Date.now() - parseInt(lastActivity, 10);
+        const thirtyMinutes = 30 * 60 * 1000;
+        if (elapsed > thirtyMinutes) {
+          handleLogout();
+          showToast('Sesi Anda telah berakhir karena tidak ada aktivitas selama 30 menit.', 'error');
+        }
+      }
+    }, 10000);
+
+    return () => {
+      events.forEach(e => window.removeEventListener(e, resetTimer));
+      clearInterval(interval);
+    };
+  }, [currentUser]);
 
 
 
@@ -1414,8 +2374,8 @@ function App() {
   const handleUserSubmit = (e) => {
     e.preventDefault();
     const url = userModalMode === 'add'
-      ? 'http://localhost/keperawatan/public/api/user'
-      : `http://localhost/keperawatan/public/api/user/${userFormData.id}`;
+      ? API_URL + '/user'
+      : API_URL + `/user/${userFormData.id}`;
 
     const method = userModalMode === 'add' ? 'POST' : 'PUT';
 
@@ -1446,7 +2406,7 @@ function App() {
       return;
     }
     if (confirm(`Yakin ingin menghapus user "${username}"?`)) {
-      fetch(`http://localhost/keperawatan/public/api/user/${id}`, {
+      fetch(`${API_URL}/user/${id}`, {
         method: 'DELETE'
       })
         .then(async res => {
@@ -1468,16 +2428,23 @@ function App() {
   // Master states
   const [unitKerjaData, setUnitKerjaData] = useState([]);
   const [jabatanData, setJabatanData] = useState([]);
+  const [pendidikanData, setPendidikanData] = useState([]);
   const [grupData, setGrupData] = useState([]);
   const [newUnitKerja, setNewUnitKerja] = useState('');
   const [newJabatan, setNewJabatan] = useState('');
+  const [newPendidikan, setNewPendidikan] = useState('');
   const [editingUnitId, setEditingUnitId] = useState(null);
   const [editUnitName, setEditUnitName] = useState('');
   const [editingJabatanId, setEditingJabatanId] = useState(null);
   const [editJabatanName, setEditJabatanName] = useState('');
+  const [editingPendidikanId, setEditingPendidikanId] = useState(null);
+  const [editPendidikanName, setEditPendidikanName] = useState('');
 
   // Jenjang Jabatan master states
   const [jenjangJabatanData, setJenjangJabatanData] = useState([]);
+
+  // Pejabat master states
+  const [pejabatData, setPejabatData] = useState([]);
   const [newJenjangNama, setNewJenjangNama] = useState('');
   const [newJenjangPendidikan, setNewJenjangPendidikan] = useState('D3');
   const [newJenjangProfesi, setNewJenjangProfesi] = useState('Perawat');
@@ -1586,7 +2553,7 @@ function App() {
   const [isKdGroupExpanded, setIsKdGroupExpanded] = useState(false);
 
   const [formData, setFormData] = useState({
-    id_perawat: '', nip: '', nama: '', tempat_lahir: '', tanggal_lahir: '', jk: 'L',
+    id_perawat: '', nik: '', nip: '', nama: '', tempat_lahir: '', tanggal_lahir: '', jk: 'L',
     alamat: '', hp: '', email: '', profesi: '', unit_kerja: '', jabatan: '', status: 'A',
     pendidikan_terakhir: '', no_ijazah: '', grup: '',
     foto: null, file_str: null, file_sip: null,
@@ -1608,7 +2575,7 @@ function App() {
       showToast('Konfirmasi password tidak cocok!', 'error');
       return;
     }
-    fetch('http://localhost/keperawatan/public/api/user/ubah-password', {
+    fetch(API_URL + '/user/ubah-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1634,7 +2601,7 @@ function App() {
       showToast('Masukkan nomor WhatsApp terlebih dahulu.', 'error');
       return;
     }
-    fetch('http://localhost/keperawatan/public/api/user/send-otp-hp', {
+    fetch(API_URL + '/user/send-otp-hp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1661,7 +2628,7 @@ function App() {
       showToast('Masukkan kode OTP terlebih dahulu.', 'error');
       return;
     }
-    fetch('http://localhost/keperawatan/public/api/user/verify-otp-hp', {
+    fetch(API_URL + '/user/verify-otp-hp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1686,7 +2653,7 @@ function App() {
 
   const fetchPerawatData = () => {
     setIsLoading(true);
-    fetch('http://localhost/keperawatan/public/api/perawat')
+    fetch(`${API_URL}/perawat?t=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         setPerawatData(Array.isArray(data) ? data : []);
@@ -1700,7 +2667,7 @@ function App() {
 
   const fetchCompetencies = () => {
     setIsLoading(true);
-    fetch('http://localhost/keperawatan/public/api/kompetensi')
+    fetch(API_URL + '/kompetensi')
       .then(res => res.json())
       .then(data => {
         setCompetencies(Array.isArray(data) ? data : []);
@@ -1719,6 +2686,7 @@ function App() {
       fetchPerawatData();
       fetchUnitKerja();
       fetchJabatan();
+      fetchPendidikanData();
       fetchGrupData();
       fetchCompetencies();
       fetchJenjangJabatan();
@@ -1730,18 +2698,21 @@ function App() {
       }
     } else if (activeTab === 'kompetensi') {
       fetchCompetencies();
-    } else if (['pengaturan', 'master_unit_kerja', 'master_jabatan', 'master_jenjang_jabatan'].includes(activeTab)) {
+    } else if (['pengaturan', 'master_unit_kerja', 'master_jabatan', 'master_jenjang_jabatan', 'master_pendidikan'].includes(activeTab)) {
       fetchUnitKerja();
       fetchJabatan();
       fetchJenjangJabatan();
+      fetchPendidikanData();
     } else if (activeTab === 'master_user') {
       fetchUserData();
       fetchPerawatData();
     } else if (activeTab === 'sertifikasi') {
+      fetchUserData();
       fetchPerawatData();
       fetchCompetencies();
       fetchPengajuanHistory();
       fetchJenjangJabatan();
+      fetchPejabatData();
     } else if (activeTab === 'pelatihan') {
       fetchAllPelatihan();
       fetchPerawatData();
@@ -1771,50 +2742,118 @@ function App() {
         if (!selectedPerawat || selectedPerawat.id_perawat !== myRecord.id_perawat) {
           setSelectedPerawat(myRecord);
           fetchDetailData(myRecord.id_perawat);
+        } else if (
+          selectedPerawat.file_str !== myRecord.file_str ||
+          selectedPerawat.file_sip !== myRecord.file_sip ||
+          selectedPerawat.no_str !== myRecord.no_str ||
+          selectedPerawat.no_sip !== myRecord.no_sip ||
+          selectedPerawat.masa_berlaku_str !== myRecord.masa_berlaku_str ||
+          selectedPerawat.masa_berlaku_sip !== myRecord.masa_berlaku_sip ||
+          selectedPerawat.foto !== myRecord.foto ||
+          selectedPerawat.nama !== myRecord.nama
+        ) {
+          setSelectedPerawat(myRecord);
         }
       }
     }
-  }, [perawatData, currentUser, activeTab]);
+  }, [perawatData, currentUser, activeTab, selectedPerawat]);
 
   React.useEffect(() => {
     let timerId;
     if (sertifikatSubTab === 'ujian_kompetensi' && ujianTimeLeft > 0) {
       timerId = setInterval(() => {
-        setUjianTimeLeft(prev => {
-          if (prev <= 1) {
+        const existingEndTime = localStorage.getItem('ujian_end_time');
+        if (existingEndTime) {
+          const remaining = Math.max(0, Math.floor((parseInt(existingEndTime) - Date.now()) / 1000));
+          setUjianTimeLeft(remaining);
+          if (remaining <= 0) {
             clearInterval(timerId);
-            handleSubmitUjian(); // auto submit when time is up
-            return 0;
+            handleSubmitUjian(true); // auto submit when time is up
           }
-          return prev - 1;
-        });
+        } else {
+          setUjianTimeLeft(prev => {
+            if (prev <= 1) {
+              clearInterval(timerId);
+              handleSubmitUjian(true); // auto submit when time is up
+              return 0;
+            }
+            return prev - 1;
+          });
+        }
       }, 1000);
     }
     return () => clearInterval(timerId);
   }, [sertifikatSubTab, ujianTimeLeft]);
 
+  // Anti Cheat useEffect
+  React.useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (sertifikatSubTab === 'ujian_kompetensi' && document.visibilityState === 'hidden') {
+        const currentCount = parseInt(localStorage.getItem('ujian_cheat_count') || '0') + 1;
+        localStorage.setItem('ujian_cheat_count', currentCount.toString());
+        setCheatCount(currentCount);
+
+        if (currentCount >= 3) {
+          setCheatWarningModal({
+            show: true,
+            message: 'Anda telah melanggar aturan ujian sebanyak 3 kali dengan membuka tab/aplikasi lain. Ujian akan disubmit otomatis.',
+            count: currentCount,
+            isLast: true
+          });
+          handleSubmitUjian(true);
+        } else {
+          setCheatWarningModal({
+            show: true,
+            message: `Anda terdeteksi berpindah tab/aplikasi. Peringatan ke-${currentCount} dari 3. Jika mencapai 3 kali, ujian akan diakhiri otomatis.`,
+            count: currentCount,
+            isLast: false
+          });
+        }
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [sertifikatSubTab, jawabanUjian, ujianData]);
+
   const fetchUnitKerja = () => {
-    fetch('http://localhost/keperawatan/public/api/unit_kerja')
+    fetch(API_URL + '/unit_kerja')
       .then(res => res.json())
       .then(data => setUnitKerjaData(Array.isArray(data) ? data : []));
   };
 
   const fetchJabatan = () => {
-    fetch('http://localhost/keperawatan/public/api/jabatan')
+    fetch(API_URL + '/jabatan')
       .then(res => res.json())
       .then(data => setJabatanData(Array.isArray(data) ? data : []));
   };
 
   const fetchGrupData = () => {
-    fetch('http://localhost/keperawatan/public/api/grup')
+    fetch(API_URL + '/grup')
       .then(res => res.json())
       .then(data => setGrupData(Array.isArray(data) ? data : []));
+  };
+
+  const fetchPendidikanData = () => {
+    fetch(API_URL + '/pendidikan')
+      .then(res => res.json())
+      .then(data => setPendidikanData(Array.isArray(data) ? data : []))
+      .catch(err => console.error("Error fetching pendidikan:", err));
+  };
+
+  const fetchPejabatData = () => {
+    fetch(API_URL + '/pejabat')
+      .then(res => res.json())
+      .then(data => setPejabatData(Array.isArray(data) ? data : []))
+      .catch(err => console.error("Error fetching pejabat:", err));
   };
 
   const handleAddUnitKerja = (e) => {
     e.preventDefault();
     if (!newUnitKerja) return;
-    fetch('http://localhost/keperawatan/public/api/unit_kerja', {
+    fetch(API_URL + '/unit_kerja', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nama_unit: newUnitKerja })
     }).then(() => { fetchUnitKerja(); setNewUnitKerja(''); });
@@ -1823,7 +2862,7 @@ function App() {
   const handleAddJabatan = (e) => {
     e.preventDefault();
     if (!newJabatan) return;
-    fetch('http://localhost/keperawatan/public/api/jabatan', {
+    fetch(API_URL + '/jabatan', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nama_jabatan: newJabatan })
     }).then(() => { fetchJabatan(); setNewJabatan(''); });
@@ -1831,13 +2870,13 @@ function App() {
 
   const handleDeleteUnitKerja = (id) => {
     if (confirm('Yakin hapus unit kerja ini?')) {
-      fetch(`http://localhost/keperawatan/public/api/unit_kerja/${id}`, { method: 'DELETE' }).then(() => fetchUnitKerja());
+      fetch(`${API_URL}/unit_kerja/${id}`, { method: 'DELETE' }).then(() => fetchUnitKerja());
     }
   };
 
   const handleUpdateUnitKerja = (id, e) => {
     e.preventDefault();
-    fetch(`http://localhost/keperawatan/public/api/unit_kerja/${id}`, {
+    fetch(`${API_URL}/unit_kerja/${id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nama_unit: editUnitName })
     }).then(() => { fetchUnitKerja(); setEditingUnitId(null); });
@@ -1845,20 +2884,76 @@ function App() {
 
   const handleDeleteJabatan = (id) => {
     if (confirm('Yakin hapus jabatan ini?')) {
-      fetch(`http://localhost/keperawatan/public/api/jabatan/${id}`, { method: 'DELETE' }).then(() => fetchJabatan());
+      fetch(`${API_URL}/jabatan/${id}`, { method: 'DELETE' }).then(() => fetchJabatan());
     }
   };
 
   const handleUpdateJabatan = (id, e) => {
     e.preventDefault();
-    fetch(`http://localhost/keperawatan/public/api/jabatan/${id}`, {
+    fetch(`${API_URL}/jabatan/${id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nama_jabatan: editJabatanName })
     }).then(() => { fetchJabatan(); setEditingJabatanId(null); });
   };
 
+  const handleAddPendidikan = (e) => {
+    e.preventDefault();
+    if (!newPendidikan) return;
+    fetch(API_URL + '/pendidikan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nama_pendidikan: newPendidikan })
+    })
+      .then(res => res.json())
+      .then(() => {
+        fetchPendidikanData();
+        setNewPendidikan('');
+        showToast("Pendidikan berhasil ditambahkan!", "success");
+      })
+      .catch(err => {
+        console.error("Error adding pendidikan:", err);
+        showToast("Gagal menambahkan pendidikan", "error");
+      });
+  };
+
+  const handleUpdatePendidikan = (id, e) => {
+    e.preventDefault();
+    if (!editPendidikanName) return;
+    fetch(`${API_URL}/pendidikan/${id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nama_pendidikan: editPendidikanName, _method: 'PUT' })
+    })
+      .then(res => res.json())
+      .then(() => {
+        fetchPendidikanData();
+        setEditingPendidikanId(null);
+        showToast("Pendidikan berhasil diubah!", "success");
+      })
+      .catch(err => {
+        console.error("Error updating pendidikan:", err);
+        showToast("Gagal mengubah pendidikan", "error");
+      });
+  };
+
+  const handleDeletePendidikan = (id) => {
+    if (confirm('Yakin ingin menghapus data pendidikan ini?')) {
+      fetch(`${API_URL}/pendidikan/${id}`, {
+        method: 'DELETE'
+      })
+        .then(() => {
+          fetchPendidikanData();
+          showToast("Pendidikan berhasil dihapus!", "success");
+        })
+        .catch(err => {
+          console.error("Error deleting pendidikan:", err);
+          showToast("Gagal menghapus pendidikan", "error");
+        });
+    }
+  };
+
   const fetchJenjangJabatan = () => {
-    fetch('http://localhost/keperawatan/public/api/jenjang_jabatan')
+    fetch(API_URL + '/jenjang_jabatan')
       .then(res => res.json())
       .then(data => setJenjangJabatanData(Array.isArray(data) ? data : []))
       .catch(err => console.error("Error fetching jenjang jabatan:", err));
@@ -1867,7 +2962,7 @@ function App() {
   const handleAddJenjangJabatan = (e) => {
     e.preventDefault();
     if (!newJenjangNama) return;
-    fetch('http://localhost/keperawatan/public/api/jenjang_jabatan', {
+    fetch(API_URL + '/jenjang_jabatan', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nama_jenjang: newJenjangNama,
@@ -1887,7 +2982,7 @@ function App() {
 
   const handleDeleteJenjangJabatan = (id) => {
     if (confirm('Yakin hapus jenjang jabatan fungsional ini?')) {
-      fetch(`http://localhost/keperawatan/public/api/jenjang_jabatan/${id}`, { method: 'DELETE' }).then(res => {
+      fetch(`${API_URL}/jenjang_jabatan/${id}`, { method: 'DELETE' }).then(res => {
         if (res.ok) {
           showToast('Data jenjang jabatan berhasil dihapus.', 'success');
           fetchJenjangJabatan();
@@ -1900,7 +2995,7 @@ function App() {
 
   const handleUpdateJenjangJabatan = (id, e) => {
     e.preventDefault();
-    fetch(`http://localhost/keperawatan/public/api/jenjang_jabatan/${id}`, {
+    fetch(`${API_URL}/jenjang_jabatan/${id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nama_jenjang: editJenjangNama,
@@ -1923,7 +3018,7 @@ function App() {
     if (mode === 'edit' && data) {
       setFormData({ ...data, foto: null, file_str: null, file_sip: null, current_foto: data.foto, current_str: data.file_str, current_sip: data.file_sip });
     } else {
-      setFormData({ id_perawat: '', nip: '', nama: '', tempat_lahir: '', tanggal_lahir: '', jk: 'L', alamat: '', hp: '', email: '', profesi: '', unit_kerja: '', jabatan: '', pendidikan_terakhir: '', no_ijazah: '', grup: '', status: 'A', id_user: '', foto: null, file_str: null, file_sip: null, current_foto: null, current_str: null, current_sip: null, no_str: '', masa_berlaku_str: '', no_sip: '', masa_berlaku_sip: '' });
+      setFormData({ id_perawat: '', nik: '', nip: '', nama: '', tempat_lahir: '', tanggal_lahir: '', jk: 'L', alamat: '', hp: '', email: '', profesi: '', unit_kerja: '', jabatan: '', pendidikan_terakhir: '', no_ijazah: '', grup: '', status: 'A', id_user: '', foto: null, file_str: null, file_sip: null, current_foto: null, current_str: null, current_sip: null, no_str: '', masa_berlaku_str: '', no_sip: '', masa_berlaku_sip: '' });
     }
     setIsModalOpen(true);
   };
@@ -1943,14 +3038,19 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const url = modalMode === 'add'
-      ? 'http://localhost/keperawatan/public/api/perawat'
-      : `http://localhost/keperawatan/public/api/perawat/${formData.id_perawat}`;
+      ? API_URL + '/perawat'
+      : API_URL + `/perawat/${formData.id_perawat}`;
     const method = 'POST'; // We use POST for FormData so CI4 processes $_FILES natively
 
     const payload = new FormData();
     Object.keys(formData).forEach(key => {
-      if (formData[key] !== null) {
-        payload.append(key, formData[key]);
+      if (formData[key] !== null && formData[key] !== undefined) {
+        // Prevent empty or invalid id_user from causing foreign key errors
+        if (key === 'id_user' && (formData[key] === '' || formData[key] === '0' || formData[key] === 'null')) {
+          // Skip appending
+        } else {
+          payload.append(key, formData[key]);
+        }
       }
     });
 
@@ -1962,12 +3062,19 @@ function App() {
       method: method,
       body: payload
     })
-      .then(res => res.json())
       .then(res => {
+        if (!res.ok) {
+          throw new Error("HTTP error " + res.status);
+        }
+        return res.json();
+      })
+      .then(result => {
+        showToast("Data perawat berhasil disimpan!", "success");
         fetchPerawatData();
         setIsModalOpen(false);
-        if (activeTab === 'detail_perawat' && selectedPerawat) {
-          fetch(`http://localhost/keperawatan/public/api/perawat/${selectedPerawat.id_perawat}`)
+        const isSelfPerawat = activeTab === 'perawat' && currentUser?.role === 'Perawat';
+        if (selectedPerawat && (activeTab === 'detail_perawat' || isSelfPerawat)) {
+          fetch(`${API_URL}/perawat/${selectedPerawat.id_perawat}?t=${Date.now()}`)
             .then(r => r.json())
             .then(updated => {
               if (updated) setSelectedPerawat(updated);
@@ -1975,12 +3082,15 @@ function App() {
             .catch(err => console.error("Error updating detail nurse:", err));
         }
       })
-      .catch(err => console.error("Error saving data:", err));
+      .catch(err => {
+        console.error("Error saving data:", err);
+        showToast("Gagal menyimpan data perawat. Cek koneksi atau data input Anda.", "error");
+      });
   };
 
   const handleDelete = (id) => {
     if (confirm('Yakin ingin menghapus data ini?')) {
-      fetch(`http://localhost/keperawatan/public/api/perawat/${id}`, {
+      fetch(`${API_URL}/perawat/${id}`, {
         method: 'DELETE'
       })
         .then(res => res.json())
@@ -1991,7 +3101,7 @@ function App() {
 
   const fetchDetailData = (id_perawat) => {
     // Fetch assessments
-    fetch('http://localhost/keperawatan/public/api/assessment')
+    fetch(API_URL + '/assessment')
       .then(res => res.json())
       .then(data => {
         const filtered = Array.isArray(data) ? data.filter(a => String(a.id_perawat) === String(id_perawat)) : [];
@@ -2000,7 +3110,7 @@ function App() {
       .catch(err => console.error("Error fetching assessments:", err));
 
     // Fetch riwayat kerja
-    fetch('http://localhost/keperawatan/public/api/riwayat_kerja')
+    fetch(API_URL + '/riwayat_kerja')
       .then(res => res.json())
       .then(data => {
         const filtered = Array.isArray(data) ? data.filter(w => String(w.id_perawat) === String(id_perawat)) : [];
@@ -2009,7 +3119,7 @@ function App() {
       .catch(err => console.error("Error fetching riwayat kerja:", err));
 
     // Fetch competencies (cache)
-    fetch('http://localhost/keperawatan/public/api/kompetensi')
+    fetch(API_URL + '/kompetensi')
       .then(res => res.json())
       .then(data => {
         setCompetencies(Array.isArray(data) ? data : []);
@@ -2017,7 +3127,7 @@ function App() {
       .catch(err => console.error("Error fetching competencies:", err));
 
     // Fetch other documents / certificates
-    fetch('http://localhost/keperawatan/public/api/sertifikat')
+    fetch(API_URL + '/sertifikat')
       .then(res => res.json())
       .then(data => {
         const filtered = Array.isArray(data) ? data.filter(s => String(s.id_perawat) === String(id_perawat)) : [];
@@ -2026,7 +3136,7 @@ function App() {
       .catch(err => console.error("Error fetching sertifikat list:", err));
 
     // Fetch pelatihan history
-    fetch('http://localhost/keperawatan/public/api/pelatihan')
+    fetch(API_URL + '/pelatihan')
       .then(res => res.json())
       .then(data => {
         const filtered = Array.isArray(data) ? data.filter(p => String(p.id_perawat) === String(id_perawat)) : [];
@@ -2047,7 +3157,7 @@ function App() {
     payload.append('status', newStatus);
     payload.append('_method', 'PUT');
 
-    fetch(`http://localhost/keperawatan/public/api/perawat/${perawat.id_perawat}`, {
+    fetch(`${API_URL}/perawat/${perawat.id_perawat}`, {
       method: 'POST',
       body: payload
     })
@@ -2067,7 +3177,7 @@ function App() {
       id_perawat: selectedPerawat.id_perawat
     };
 
-    fetch('http://localhost/keperawatan/public/api/assessment', {
+    fetch(API_URL + '/assessment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
@@ -2095,7 +3205,7 @@ function App() {
       id_perawat: selectedPerawat.id_perawat
     };
 
-    fetch('http://localhost/keperawatan/public/api/riwayat_kerja', {
+    fetch(API_URL + '/riwayat_kerja', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
@@ -2114,6 +3224,32 @@ function App() {
       .catch(err => console.error("Error adding work history:", err));
   };
 
+  const handleDeleteRiwayatKerja = (id) => {
+    if (confirm('Yakin ingin menghapus data riwayat bekerja ini?')) {
+      fetch(`${API_URL}/riwayat_kerja/${id}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(() => {
+          if (selectedPerawat) {
+            fetchDetailData(selectedPerawat.id_perawat);
+          }
+        })
+        .catch(err => console.error("Error deleting work history:", err));
+    }
+  };
+
+  const handleDeleteCompetency = (id) => {
+    if (confirm('Yakin ingin menghapus riwayat asesmen kompetensi ini?')) {
+      fetch(`${API_URL}/assessment/${id}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(() => {
+          if (selectedPerawat) {
+            fetchDetailData(selectedPerawat.id_perawat);
+          }
+        })
+        .catch(err => console.error("Error deleting competency history:", err));
+    }
+  };
+
   const handleAddSertifikatSubmit = (e) => {
     e.preventDefault();
     if (!selectedPerawat) return;
@@ -2128,7 +3264,7 @@ function App() {
       payload.append('file', sertifikatForm.file);
     }
 
-    fetch('http://localhost/keperawatan/public/api/sertifikat', {
+    fetch(API_URL + '/sertifikat', {
       method: 'POST',
       body: payload
     })
@@ -2150,7 +3286,7 @@ function App() {
 
   const handleDeleteSertifikat = (id) => {
     if (confirm('Yakin ingin menghapus dokumen ini?')) {
-      fetch(`http://localhost/keperawatan/public/api/sertifikat/${id}`, {
+      fetch(`${API_URL}/sertifikat/${id}`, {
         method: 'DELETE'
       })
         .then(res => res.json())
@@ -2177,7 +3313,7 @@ function App() {
     payload.append('no_sertifikat', pelatihanForm.no_sertifikat);
     if (pelatihanForm.file) payload.append('file', pelatihanForm.file);
 
-    fetch('http://localhost/keperawatan/public/api/pelatihan', {
+    fetch(API_URL + '/pelatihan', {
       method: 'POST',
       body: payload
     })
@@ -2193,7 +3329,7 @@ function App() {
 
   const handleDeletePelatihan = (id) => {
     if (confirm('Yakin ingin menghapus data pelatihan ini?')) {
-      fetch(`http://localhost/keperawatan/public/api/pelatihan/${id}`, { method: 'DELETE' })
+      fetch(`${API_URL}/pelatihan/${id}`, { method: 'DELETE' })
         .then(res => res.json())
         .then(() => { if (selectedPerawat) fetchDetailData(selectedPerawat.id_perawat); })
         .catch(err => console.error("Error deleting pelatihan:", err));
@@ -2213,17 +3349,28 @@ function App() {
     if (strSipForm.file_str) payload.append('file_str', strSipForm.file_str);
     if (strSipForm.file_sip) payload.append('file_sip', strSipForm.file_sip);
 
-    fetch(`http://localhost/keperawatan/public/api/perawat/${selectedPerawat.id_perawat}`, {
+    fetch(`${API_URL}/perawat/${selectedPerawat.id_perawat}`, {
       method: 'POST',
       body: payload
     })
       .then(res => res.json())
-      .then(() => {
-        fetch(`http://localhost/keperawatan/public/api/perawat/${selectedPerawat.id_perawat}`)
+      .then(result => {
+        // 1. Merge updated fields directly to selectedPerawat state for instant UI update
+        if (result) {
+          setSelectedPerawat(prev => ({
+            ...prev,
+            ...result
+          }));
+        }
+
+        // 2. Fetch full updated perawat record with cache buster in background
+        fetch(`${API_URL}/perawat/${selectedPerawat.id_perawat}?t=${Date.now()}`)
           .then(r => r.json())
           .then(updated => {
             if (updated) setSelectedPerawat(updated);
-          });
+          })
+          .catch(err => console.error("Error background fetching perawat detail:", err));
+
         fetchPerawatData();
         setIsEditingStrSip(false);
       })
@@ -2232,7 +3379,7 @@ function App() {
 
   // Fetch all pelatihan for sidebar page
   const fetchAllPelatihan = () => {
-    fetch('http://localhost/keperawatan/public/api/pelatihan')
+    fetch(API_URL + '/pelatihan')
       .then(res => res.json())
       .then(data => setAllPelatihanData(Array.isArray(data) ? data : []))
       .catch(err => console.error("Error fetching all pelatihan:", err));
@@ -2252,8 +3399,8 @@ function App() {
   const handlePelatihanModalSubmit = (e) => {
     e.preventDefault();
     const url = pelatihanModalMode === 'add'
-      ? 'http://localhost/keperawatan/public/api/pelatihan'
-      : `http://localhost/keperawatan/public/api/pelatihan/${pelatihanModalForm.id}`;
+      ? API_URL + '/pelatihan'
+      : API_URL + `/pelatihan/${pelatihanModalForm.id}`;
     const payload = new FormData();
     if (pelatihanModalMode === 'edit') payload.append('_method', 'PUT');
     payload.append('id_perawat', pelatihanModalForm.id_perawat);
@@ -2273,7 +3420,7 @@ function App() {
 
   const handleDeletePelatihanSidebar = (id) => {
     if (confirm('Yakin ingin menghapus data pelatihan ini?')) {
-      fetch(`http://localhost/keperawatan/public/api/pelatihan/${id}`, { method: 'DELETE' })
+      fetch(`${API_URL}/pelatihan/${id}`, { method: 'DELETE' })
         .then(res => res.json())
         .then(() => fetchAllPelatihan())
         .catch(err => console.error("Error deleting pelatihan:", err));
@@ -2317,8 +3464,8 @@ function App() {
   const handleKompetensiSubmit = (e) => {
     e.preventDefault();
     const url = kompetensiModalMode === 'add'
-      ? 'http://localhost/keperawatan/public/api/kompetensi'
-      : `http://localhost/keperawatan/public/api/kompetensi/${kompetensiFormData.id}`;
+      ? API_URL + '/kompetensi'
+      : API_URL + `/kompetensi/${kompetensiFormData.id}`;
 
     const method = kompetensiModalMode === 'add' ? 'POST' : 'PUT';
 
@@ -2342,7 +3489,7 @@ function App() {
 
   const handleDeleteKompetensi = (id) => {
     if (confirm('Yakin ingin menghapus kompetensi ini?')) {
-      fetch(`http://localhost/keperawatan/public/api/kompetensi/${id}`, {
+      fetch(`${API_URL}/kompetensi/${id}`, {
         method: 'DELETE'
       })
         .then(res => res.json())
@@ -2367,6 +3514,7 @@ function App() {
     const matchesSearch = !query ||
       (p.nama && p.nama.toLowerCase().includes(query)) ||
       (p.nip && p.nip.toLowerCase().includes(query)) ||
+      (p.nik && p.nik.toLowerCase().includes(query)) ||
       (p.email && p.email.toLowerCase().includes(query)) ||
       (p.hp && p.hp.toLowerCase().includes(query));
 
@@ -2547,7 +3695,7 @@ function App() {
                     <div className="mt-6 text-center">
                       <p className="text-sm text-muted-foreground mb-2">
                         Belum punya akun?{' '}
-                        <button onClick={() => { setAuthMode('create_account'); setCreateAccountStep(1); setRegisterError(''); setCreateAccountForm({ nik: '', id_perawat: '', nama: '', username: '', password: '', hp: '' }); }} className="text-primary font-bold hover:underline">
+                        <button onClick={() => { setAuthMode('create_account'); setCreateAccountStep(1); setRegisterError(''); setCreateAccountForm({ nik: '', id_perawat: '', nama: '', username: '', password: '', hp: '', is_hp_validated: 0 }); }} className="text-primary font-bold hover:underline">
                           Buat Akun Pegawai
                         </button>
                       </p>
@@ -2665,6 +3813,10 @@ function App() {
                       <label className="block text-xs font-bold text-muted-foreground mb-1">No. HP (WhatsApp) *</label>
                       <input type="text" required value={createAccountForm.hp} onChange={e => setCreateAccountForm({ ...createAccountForm, hp: e.target.value })} placeholder="Cth: 0812..." className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm" />
                       <p className="text-[10px] text-muted-foreground mt-1">Digunakan untuk reset password atau keamanan ganda.</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <input type="checkbox" id="create_hp_validated" checked={createAccountForm.is_hp_validated === 1} onChange={e => setCreateAccountForm({ ...createAccountForm, is_hp_validated: e.target.checked ? 1 : 0 })} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
+                        <label htmlFor="create_hp_validated" className="text-xs font-medium text-foreground cursor-pointer select-none">Tandai nomor HP sebagai langsung tervalidasi</label>
+                      </div>
                     </div>
                     <button type="submit" disabled={isRegistering} className="w-full py-3.5 bg-primary text-primary-foreground font-bold hover:bg-primary/95 rounded-xl transition-all flex justify-center items-center gap-2 mt-6">
                       {isRegistering ? 'Menyimpan...' : 'Buat Akun'}
@@ -2845,6 +3997,10 @@ function App() {
                     <div>
                       <label className="block text-xs font-bold text-muted-foreground mb-1">No. HP (WhatsApp)</label>
                       <input type="text" value={registerForm.hp} onChange={e => setRegisterForm({ ...registerForm, hp: e.target.value })} placeholder="Cth: 0812..." className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm" />
+                      <div className="flex items-center gap-2 mt-2">
+                        <input type="checkbox" id="register_hp_validated" checked={registerForm.is_hp_validated === 1} onChange={e => setRegisterForm({ ...registerForm, is_hp_validated: e.target.checked ? 1 : 0 })} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
+                        <label htmlFor="register_hp_validated" className="text-xs font-medium text-foreground cursor-pointer select-none">Tandai nomor HP sebagai langsung tervalidasi</label>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-muted-foreground mb-1">Email</label>
@@ -2879,7 +4035,7 @@ function App() {
                       Data Anda telah berhasil disimpan. Saat ini akun Anda berstatus menunggu verifikasi oleh Admin. Silakan coba login secara berkala atau hubungi Admin.
                     </p>
                     <button
-                      onClick={() => { setAuthMode('login'); setRegisterStep(1); setRegisterForm({ nik: '', nip: '', nama: '', tempat_lahir: '', tanggal_lahir: '', jk: 'L', alamat: '', hp: '', email: '', profesi: '', unit_kerja: '', pendidikan_terakhir: '', username: '', password: '' }); }}
+                      onClick={() => { setAuthMode('login'); setRegisterStep(1); setRegisterForm({ nik: '', nip: '', nama: '', tempat_lahir: '', tanggal_lahir: '', jk: 'L', alamat: '', hp: '', email: '', profesi: '', unit_kerja: '', pendidikan_terakhir: '', username: '', password: '', is_hp_validated: 0 }); }}
                       className="w-full py-3 bg-primary text-primary-foreground font-bold hover:bg-primary/95 rounded-xl transition-all"
                     >
                       Kembali ke Halaman Login
@@ -2926,10 +4082,10 @@ function App() {
             <div className="space-y-1">
               <SidebarItem icon={LayoutDashboard} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
               <SidebarItem icon={Users} label={currentUser?.role === 'Perawat' ? 'Profil Saya' : 'Data Perawat'} active={activeTab === 'perawat'} onClick={() => setActiveTab('perawat')} />
-              {currentUser?.role !== 'Perawat' && (
+              {currentUser?.role === 'Admin' && (
                 <SidebarItem icon={Award} label="Kompetensi" active={activeTab === 'kompetensi'} onClick={() => setActiveTab('kompetensi')} />
               )}
-              {currentUser?.role !== 'Perawat' && (
+              {currentUser?.role === 'Admin' && (
                 <SidebarItem icon={GraduationCap} label="Pelatihan" active={activeTab === 'pelatihan'} onClick={() => setActiveTab('pelatihan')} />
               )}
             </div>
@@ -2938,11 +4094,10 @@ function App() {
           <div className="mb-6">
             <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Manajemen</p>
             <div className="space-y-1">
-              <SidebarItem icon={FileText} label="Sertifikasi" active={activeTab === 'sertifikasi'} onClick={() => setActiveTab('sertifikasi')} />
-              {currentUser?.role !== 'Perawat' && (
+              <SidebarItem icon={FileText} label="Asesmen Kompetensi" active={activeTab === 'sertifikasi'} onClick={() => { setActiveTab('sertifikasi'); setActivePengajuan(null); setIsCreatingPengajuan(false); }} />
+              {currentUser?.role === 'Admin' && (
                 <>
                   <SidebarItem icon={Stethoscope} label="Kredensial" active={activeTab === 'kredensial'} onClick={() => setActiveTab('kredensial')} />
-                  <SidebarItem icon={ClipboardCheck} label="Asesmen" active={activeTab === 'asesmen'} onClick={() => setActiveTab('asesmen')} />
                 </>
               )}
             </div>
@@ -2955,8 +4110,11 @@ function App() {
                 <SidebarItem icon={Building} label="Master Unit Kerja" active={activeTab === 'master_unit_kerja'} onClick={() => setActiveTab('master_unit_kerja')} />
                 <SidebarItem icon={Briefcase} label="Master Jabatan" active={activeTab === 'master_jabatan'} onClick={() => setActiveTab('master_jabatan')} />
                 <SidebarItem icon={Briefcase} label="Master Jenjang Jabatan" active={activeTab === 'master_jenjang_jabatan'} onClick={() => setActiveTab('master_jenjang_jabatan')} />
+                <SidebarItem icon={GraduationCap} label="Master Pendidikan" active={activeTab === 'master_pendidikan'} onClick={() => setActiveTab('master_pendidikan')} />
                 <SidebarItem icon={Tags} label="Master Kategori" active={activeTab === 'master_kategori'} onClick={() => setActiveTab('master_kategori')} />
                 <SidebarItem icon={User} label="Master User" active={activeTab === 'master_user'} onClick={() => setActiveTab('master_user')} />
+                <SidebarItem icon={FileText} label="Master Soal" active={activeTab === 'master_soal'} onClick={() => setActiveTab('master_soal')} />
+                <SidebarItem icon={User} label="Master Pejabat" active={activeTab === 'master_pejabat'} onClick={() => setActiveTab('master_pejabat')} />
               </div>
             </div>
           )}
@@ -3344,7 +4502,7 @@ function App() {
                         {/* Fast Navigation Buttons */}
                         <div className="pt-4 border-t border-border flex flex-col gap-2">
                           <button
-                            onClick={() => setActiveTab('sertifikasi')}
+                            onClick={() => { setActiveTab('sertifikasi'); setActivePengajuan(null); setIsCreatingPengajuan(false); }}
                             className="w-full py-2.5 bg-primary text-primary-foreground font-semibold rounded-lg text-xs hover:bg-primary/95 transition-all shadow-sm flex items-center justify-center gap-1.5"
                           >
                             <Award size={14} /> Isi Formulir Sertifikasi
@@ -3589,7 +4747,7 @@ function App() {
                       <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border">
                         <tr>
                           <th className="px-6 py-4 font-medium">Profil</th>
-                          <th className="px-6 py-4 font-medium">NIP</th>
+                          <th className="px-6 py-4 font-medium">NIP & NIK</th>
                           <th className="px-6 py-4 font-medium">Kontak</th>
                           <th className="px-6 py-4 font-medium">Unit & Jabatan</th>
                           <th className="px-6 py-4 font-medium">Status</th>
@@ -3609,7 +4767,7 @@ function App() {
                               <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
                                   {p.foto ? (
-                                    <img src={`http://localhost/keperawatan/public/${p.foto}`} alt={p.nama} className="w-10 h-10 rounded-full object-cover border border-border" />
+                                    <img src={`${BASE_URL}/${p.foto}`} alt={p.nama} className="w-10 h-10 rounded-full object-cover border border-border" />
                                   ) : (
                                     <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
                                       {p.nama.charAt(0)}
@@ -3621,7 +4779,10 @@ function App() {
                                   </div>
                                 </div>
                               </td>
-                              <td className="px-6 py-4 font-medium">{p.nip}</td>
+                              <td className="px-6 py-4 font-medium">
+                                <div className="text-foreground font-semibold text-sm">NIP: {p.nip || '-'}</div>
+                                <div className="text-[11px] text-muted-foreground font-mono">NIK: {p.nik || '-'}</div>
+                              </td>
                               <td className="px-6 py-4">
                                 <div className="text-sm">{p.hp || '-'}</div>
                                 <div className="text-xs text-muted-foreground">{p.email || '-'}</div>
@@ -3881,7 +5042,7 @@ function App() {
                       <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border">
                         <tr>
                           <th className="px-6 py-4 font-medium">Nama Perawat</th>
-                          <th className="px-6 py-4 font-medium">NIP & Unit</th>
+                          <th className="px-6 py-4 font-medium">NIP/NIK & Unit</th>
                           <th className="px-6 py-4 font-medium">Dokumen STR</th>
                           <th className="px-6 py-4 font-medium">Dokumen SIP</th>
                           <th className="px-6 py-4 font-medium text-right">Aksi</th>
@@ -3904,7 +5065,7 @@ function App() {
                                 <td className="px-6 py-4">
                                   <div className="flex items-center gap-3">
                                     {p.foto ? (
-                                      <img src={`http://localhost/keperawatan/public/${p.foto}`} alt={p.nama} className="w-10 h-10 rounded-full object-cover border border-border" />
+                                      <img src={`${BASE_URL}/${p.foto}`} alt={p.nama} className="w-10 h-10 rounded-full object-cover border border-border" />
                                     ) : (
                                       <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
                                         {p.nama.charAt(0)}
@@ -3917,8 +5078,9 @@ function App() {
                                   </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                  <div className="font-medium text-foreground">{p.nip}</div>
-                                  <div className="text-xs text-muted-foreground">
+                                  <div className="font-medium text-foreground">NIP: {p.nip || '-'}</div>
+                                  <div className="text-[10px] text-muted-foreground font-mono">NIK: {p.nik || '-'}</div>
+                                  <div className="text-xs text-muted-foreground mt-0.5">
                                     {p.profesi ? <span className="font-semibold text-primary">[{p.profesi}] </span> : ''}
                                     {p.unit_kerja || '-'}
                                   </div>
@@ -3943,7 +5105,7 @@ function App() {
                                         {strStatus.label}
                                       </span>
                                       {p.file_str && (
-                                        <a href={`http://localhost/keperawatan/public/${p.file_str}`} target="_blank" rel="noreferrer" className="text-[10px] text-primary hover:underline font-semibold flex items-center gap-0.5">
+                                        <a href={`${BASE_URL}/${p.file_str}`} target="_blank" rel="noreferrer" className="text-[10px] text-primary hover:underline font-semibold flex items-center gap-0.5">
                                           📄 Lihat File
                                         </a>
                                       )}
@@ -3965,7 +5127,7 @@ function App() {
                                         {sipStatus.label}
                                       </span>
                                       {p.file_sip && (
-                                        <a href={`http://localhost/keperawatan/public/${p.file_sip}`} target="_blank" rel="noreferrer" className="text-[10px] text-primary hover:underline font-semibold flex items-center gap-0.5">
+                                        <a href={`${BASE_URL}/${p.file_sip}`} target="_blank" rel="noreferrer" className="text-[10px] text-primary hover:underline font-semibold flex items-center gap-0.5">
                                           📄 Lihat File
                                         </a>
                                       )}
@@ -4060,6 +5222,20 @@ function App() {
               </div>
             )}
 
+            {activeTab === 'master_soal' && currentUser?.role === 'Admin' && (
+              <AdminSoal
+                API_URL={API_URL}
+                showToast={(msg, type) => setToast({ show: true, message: msg, type })}
+                LIST_12_KOMPETENSI={[...LIST_12_KOMPETENSI, ...LIST_12_KOMPETENSI_KEBIDANAN]}
+                SearchableSelect={SearchableSelect}
+                pendidikanData={pendidikanData}
+              />
+            )}
+
+            {activeTab === 'master_pejabat' && (
+              <AdminPejabat API_URL={API_URL} showToast={showToast} />
+            )}
+
             {activeTab === 'pengaturan' && currentUser?.role === 'Admin' && (
               <div className="space-y-6">
                 <div>
@@ -4114,6 +5290,73 @@ function App() {
                                 <div className="flex items-center justify-end space-x-2">
                                   <button onClick={() => { setEditingUnitId(u.id); setEditUnitName(u.nama_unit); }} className="p-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-md transition-colors flex items-center justify-center" title="Edit"><Edit2 size={16} /></button>
                                   <button onClick={() => handleDeleteUnitKerja(u.id)} className="p-1.5 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded-md transition-colors flex items-center justify-center" title="Hapus"><Trash2 size={16} /></button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'master_pendidikan' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight">Master Pendidikan</h2>
+                  <p className="text-muted-foreground text-sm mt-1">Kelola data referensi pendidikan terakhir untuk Perawat & Bidan.</p>
+                </div>
+
+                <div className="bg-card p-6 rounded-xl border border-border shadow-sm max-w-2xl">
+                  <form onSubmit={handleAddPendidikan} className="flex gap-2 mb-6">
+                    <input
+                      type="text"
+                      value={newPendidikan}
+                      onChange={e => setNewPendidikan(e.target.value)}
+                      placeholder="Nama Pendidikan Baru..."
+                      className="flex-1 px-4 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+                      required
+                    />
+                    <button type="submit" className="px-6 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">Simpan</button>
+                  </form>
+                  <div className="overflow-y-auto max-h-[500px] pr-2">
+                    <table className="w-full text-sm text-left">
+                      <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border">
+                        <tr>
+                          <th className="px-4 py-3 font-medium">Nama Pendidikan</th>
+                          <th className="px-4 py-3 font-medium text-right">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {pendidikanData.length === 0 ? (
+                          <tr><td colSpan="2" className="py-8 text-center text-muted-foreground">Belum ada data pendidikan.</td></tr>
+                        ) : pendidikanData.map(p => (
+                          <tr key={p.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                            <td className="py-3 px-4 font-medium text-foreground">
+                              {editingPendidikanId === p.id ? (
+                                <form onSubmit={(e) => handleUpdatePendidikan(p.id, e)} className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    autoFocus
+                                    value={editPendidikanName}
+                                    onChange={e => setEditPendidikanName(e.target.value)}
+                                    className="px-2 py-1 bg-background border border-border rounded text-sm w-full focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                                    required
+                                  />
+                                  <button type="submit" className="p-1.5 bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white rounded-md transition-colors" title="Simpan"><Check size={16} /></button>
+                                  <button type="button" onClick={() => setEditingPendidikanId(null)} className="p-1.5 bg-muted text-muted-foreground hover:bg-muted-foreground hover:text-background rounded-md transition-colors" title="Batal"><XCircle size={16} /></button>
+                                </form>
+                              ) : (
+                                p.nama_pendidikan
+                              )}
+                            </td>
+                            <td className="py-3 px-4">
+                              {editingPendidikanId !== p.id && (
+                                <div className="flex items-center justify-end space-x-2">
+                                  <button onClick={() => { setEditingPendidikanId(p.id); setEditPendidikanName(p.nama_pendidikan); }} className="p-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-md transition-colors flex items-center justify-center" title="Edit"><Edit2 size={16} /></button>
+                                  <button onClick={() => handleDeletePendidikan(p.id)} className="p-1.5 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground rounded-md transition-colors flex items-center justify-center" title="Hapus"><Trash2 size={16} /></button>
                                 </div>
                               )}
                             </td>
@@ -4369,7 +5612,12 @@ function App() {
                 <div className="bg-card rounded-xl border border-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-md transition-shadow">
                   <div className="flex items-center gap-6">
                     {selectedPerawat.foto ? (
-                      <img src={`http://localhost/keperawatan/public/${selectedPerawat.foto}`} alt={selectedPerawat.nama} className="w-20 h-20 rounded-full object-cover border-2 border-primary shadow-sm" />
+                      <img
+                        src={`${BASE_URL}/${selectedPerawat.foto}`}
+                        alt={selectedPerawat.nama}
+                        onClick={() => setPreviewPhotoUrl(`${BASE_URL}/${selectedPerawat.foto}`)}
+                        className="w-20 h-20 rounded-full object-cover border-2 border-primary shadow-sm cursor-zoom-in hover:opacity-90 transition-opacity"
+                      />
                     ) : (
                       <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-3xl border-2 border-primary/50 shadow-sm">
                         {selectedPerawat.nama.charAt(0)}
@@ -4452,7 +5700,11 @@ function App() {
                         <div className="space-y-4">
                           <div className="grid grid-cols-3 py-2 border-b border-border/40">
                             <span className="font-medium text-muted-foreground">NIP</span>
-                            <span className="col-span-2 text-foreground font-semibold">{selectedPerawat.nip}</span>
+                            <span className="col-span-2 text-foreground font-semibold">{selectedPerawat.nip || '-'}</span>
+                          </div>
+                          <div className="grid grid-cols-3 py-2 border-b border-border/40">
+                            <span className="font-medium text-muted-foreground">NIK</span>
+                            <span className="col-span-2 text-foreground font-semibold">{selectedPerawat.nik || '-'}</span>
                           </div>
                           <div className="grid grid-cols-3 py-2 border-b border-border/40">
                             <span className="font-medium text-muted-foreground">Nama Lengkap</span>
@@ -4551,7 +5803,7 @@ function App() {
                                 <label className="block font-medium mb-1 text-muted-foreground">Upload File STR (PDF, JPG, PNG)</label>
                                 <input type="file" onChange={e => setStrSipForm({ ...strSipForm, file_str: e.target.files[0] })} accept=".pdf,.jpg,.jpeg,.png" className="w-full px-2.5 py-2 bg-background border border-border rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-primary file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary" />
                               </div>
-                              {selectedPerawat.file_str && <a href={`http://localhost/keperawatan/public/${selectedPerawat.file_str}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline font-medium">📄 File STR saat ini</a>}
+                              {selectedPerawat.file_str && <a href={`${BASE_URL}/${selectedPerawat.file_str}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline font-medium">📄 File STR saat ini</a>}
                             </div>
                           </div>
                           {/* SIP Edit */}
@@ -4572,7 +5824,7 @@ function App() {
                                 <label className="block font-medium mb-1 text-muted-foreground">Upload File SIP (PDF, JPG, PNG)</label>
                                 <input type="file" onChange={e => setStrSipForm({ ...strSipForm, file_sip: e.target.files[0] })} accept=".pdf,.jpg,.jpeg,.png" className="w-full px-2.5 py-2 bg-background border border-border rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-primary file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-primary/10 file:text-primary" />
                               </div>
-                              {selectedPerawat.file_sip && <a href={`http://localhost/keperawatan/public/${selectedPerawat.file_sip}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline font-medium">📄 File SIP saat ini</a>}
+                              {selectedPerawat.file_sip && <a href={`${BASE_URL}/${selectedPerawat.file_sip}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline font-medium">📄 File SIP saat ini</a>}
                             </div>
                           </div>
                           <div className="md:col-span-2 flex justify-end">
@@ -4610,7 +5862,7 @@ function App() {
                               </div>
                             </div>
                             {selectedPerawat.file_str ? (
-                              <a href={`http://localhost/keperawatan/public/${selectedPerawat.file_str}`} target="_blank" rel="noreferrer" className="w-full text-center py-2.5 bg-primary/10 hover:bg-primary hover:text-white text-primary text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 border border-primary/20">
+                              <a href={`${BASE_URL}/${selectedPerawat.file_str}`} target="_blank" rel="noreferrer" className="w-full text-center py-2.5 bg-primary/10 hover:bg-primary hover:text-white text-primary text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 border border-primary/20">
                                 📄 Lihat Dokumen STR
                               </a>
                             ) : (
@@ -4647,7 +5899,7 @@ function App() {
                               </div>
                             </div>
                             {selectedPerawat.file_sip ? (
-                              <a href={`http://localhost/keperawatan/public/${selectedPerawat.file_sip}`} target="_blank" rel="noreferrer" className="w-full text-center py-2.5 bg-primary/10 hover:bg-primary hover:text-white text-primary text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 border border-primary/20">
+                              <a href={`${BASE_URL}/${selectedPerawat.file_sip}`} target="_blank" rel="noreferrer" className="w-full text-center py-2.5 bg-primary/10 hover:bg-primary hover:text-white text-primary text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 border border-primary/20">
                                 📄 Lihat Dokumen SIP
                               </a>
                             ) : (
@@ -4665,7 +5917,7 @@ function App() {
                   {activeDetailTab === 'kompetensi' && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       {/* Competency Assessment History List */}
-                      <div className={['Admin', 'Asesor'].includes(currentUser?.role) ? "lg:col-span-2 bg-card rounded-xl border border-border p-6 shadow-sm space-y-4 flex flex-col" : "lg:col-span-3 bg-card rounded-xl border border-border p-6 shadow-sm space-y-4 flex flex-col"}>
+                      <div className={['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) ? "lg:col-span-2 bg-card rounded-xl border border-border p-6 shadow-sm space-y-4 flex flex-col" : "lg:col-span-3 bg-card rounded-xl border border-border p-6 shadow-sm space-y-4 flex flex-col"}>
                         <h3 className="font-bold text-base text-foreground border-b border-border pb-2">
                           Daftar Riwayat Asesmen Kompetensi
                         </h3>
@@ -4678,6 +5930,9 @@ function App() {
                                 <th className="px-4 py-3 font-medium">Asesor</th>
                                 <th className="px-4 py-3 font-medium">Nilai</th>
                                 <th className="px-4 py-3 font-medium">Status</th>
+                                {['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) && (
+                                  <th className="px-4 py-3 font-medium text-right">Aksi</th>
+                                )}
                               </tr>
                             </thead>
                             <tbody>
@@ -4685,7 +5940,7 @@ function App() {
                                 if (assessments.length === 0) {
                                   return (
                                     <tr>
-                                      <td colSpan="5" className="px-4 py-8 text-center text-muted-foreground">
+                                      <td colSpan={['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) ? "6" : "5"} className="px-4 py-8 text-center text-muted-foreground">
                                         Belum ada riwayat kompetensi keperawatan.
                                       </td>
                                     </tr>
@@ -4721,6 +5976,17 @@ function App() {
                                         {a.status || 'Kompeten'}
                                       </span>
                                     </td>
+                                    {['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) && (
+                                      <td className="px-4 py-3 text-right">
+                                        <button
+                                          onClick={() => handleDeleteCompetency(a.id)}
+                                          className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors"
+                                          title="Hapus Asesmen"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </td>
+                                    )}
                                   </tr>
                                 );
 
@@ -4756,6 +6022,7 @@ function App() {
                                             {groupStatus}
                                           </span>
                                         </td>
+                                        {['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) && <td></td>}
                                       </tr>
                                       {isKdGroupExpanded && kdAssessments.map(a => renderRow(a, a.matchedComp, true))}
                                     </React.Fragment>
@@ -4774,7 +6041,7 @@ function App() {
                       </div>
 
                       {/* Add competency history form */}
-                      {['Admin', 'Asesor'].includes(currentUser?.role) && (
+                      {['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) && (
                         <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-4">
                           <h4 className="font-bold text-base text-foreground border-b border-border pb-2">
                             Tambah Asesmen Baru
@@ -4866,7 +6133,7 @@ function App() {
                   {activeDetailTab === 'riwayat_kerja' && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       {/* Work history listings */}
-                      <div className={['Admin', 'Asesor'].includes(currentUser?.role) ? "lg:col-span-2 bg-card rounded-xl border border-border p-6 shadow-sm space-y-6 flex flex-col" : "lg:col-span-3 bg-card rounded-xl border border-border p-6 shadow-sm space-y-6 flex flex-col"}>
+                      <div className={['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) ? "lg:col-span-2 bg-card rounded-xl border border-border p-6 shadow-sm space-y-6 flex flex-col" : "lg:col-span-3 bg-card rounded-xl border border-border p-6 shadow-sm space-y-6 flex flex-col"}>
                         <h3 className="font-bold text-base text-foreground border-b border-border pb-2">
                           Daftar Riwayat Bekerja
                         </h3>
@@ -4890,6 +6157,13 @@ function App() {
                                 {w.deskripsi && (
                                   <p className="text-[11px] text-muted-foreground mt-1 line-clamp-3">{w.deskripsi}</p>
                                 )}
+                                <div className="flex justify-end pt-2 border-t border-border/20 mt-2">
+                                  {['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) && (
+                                    <button onClick={() => handleDeleteRiwayatKerja(w.id)} className="p-1.5 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white rounded-lg transition-all" title="Hapus">
+                                      <Trash2 size={14} />
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             ))
                           )}
@@ -4897,7 +6171,7 @@ function App() {
                       </div>
 
                       {/* Add work history form */}
-                      {['Admin', 'Asesor'].includes(currentUser?.role) && (
+                      {['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) && (
                         <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-4">
                           <h4 className="font-bold text-base text-foreground border-b border-border pb-2">
                             Tambah Riwayat Kerja
@@ -4974,7 +6248,7 @@ function App() {
                   {/* RIWAYAT PELATIHAN */}
                   {activeDetailTab === 'riwayat_pelatihan' && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      <div className={['Admin', 'Asesor'].includes(currentUser?.role) ? "lg:col-span-2 bg-card rounded-xl border border-border p-6 shadow-sm space-y-6 flex flex-col" : "lg:col-span-3 bg-card rounded-xl border border-border p-6 shadow-sm space-y-6 flex flex-col"}>
+                      <div className={['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) ? "lg:col-span-2 bg-card rounded-xl border border-border p-6 shadow-sm space-y-6 flex flex-col" : "lg:col-span-3 bg-card rounded-xl border border-border p-6 shadow-sm space-y-6 flex flex-col"}>
                         <h3 className="font-bold text-base text-foreground border-b border-border pb-2">
                           Daftar Riwayat Pelatihan
                         </h3>
@@ -5017,11 +6291,11 @@ function App() {
                                 </div>
                                 <div className="flex justify-end gap-2 pt-2">
                                   {pel.file && (
-                                    <a href={`http://localhost/keperawatan/public/${pel.file}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg text-xs font-semibold transition-all flex items-center gap-1">
+                                    <a href={`${BASE_URL}/${pel.file}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg text-xs font-semibold transition-all flex items-center gap-1">
                                       <Eye size={13} /> Lihat
                                     </a>
                                   )}
-                                  {['Admin', 'Asesor'].includes(currentUser?.role) && (
+                                  {['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) && (
                                     <button onClick={() => handleDeletePelatihan(pel.id)} className="p-1.5 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white rounded-lg transition-all" title="Hapus">
                                       <Trash2 size={14} />
                                     </button>
@@ -5033,7 +6307,7 @@ function App() {
                         </div>
                       </div>
 
-                      {['Admin', 'Asesor'].includes(currentUser?.role) && (
+                      {['Admin', 'Asesor', 'Perawat'].includes(currentUser?.role) && (
                         <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-4">
                           <h4 className="font-bold text-base text-foreground border-b border-border pb-2">
                             Tambah Pelatihan Baru
@@ -5122,7 +6396,7 @@ function App() {
                                     <div className="flex items-center gap-2">
                                       {doc.file && (
                                         <a
-                                          href={`http://localhost/keperawatan/public/${doc.file}`}
+                                          href={`${BASE_URL}/${doc.file}`}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
@@ -5409,7 +6683,7 @@ function App() {
                                     <td className="px-6 py-4">{item.jumlah_jam ? `${item.jumlah_jam} Jam` : '-'}</td>
                                     <td className="px-6 py-4">
                                       {item.file ? (
-                                        <a href={`http://localhost/keperawatan/public/${item.file}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1 font-medium"><Eye size={14} /> Lihat</a>
+                                        <a href={`${BASE_URL}/${item.file}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1 font-medium"><Eye size={14} /> Lihat</a>
                                       ) : (
                                         <span className="text-muted-foreground">-</span>
                                       )}
@@ -5661,10 +6935,16 @@ function App() {
                       <button
                         onClick={() => {
                           setIsCreatingPengajuan(true);
+                          const isBidan = currentUser?.role === 'Perawat' && currentPerawatRecord && (
+                            (currentPerawatRecord.pendidikan_terakhir || '').toLowerCase().includes('kebidanan') || 
+                            (currentPerawatRecord.profesi || '').toLowerCase() === 'bidan'
+                          );
                           setNewPengajuanForm({
                             jenis_sertifikasi: 'Kompetensi Dasar',
                             id_perawat: currentUser?.role === 'Perawat' ? (currentPerawatRecord?.id_perawat || '') : '',
-                            detail_kompetensi: ['KD-01', 'KD-02', 'KD-03', 'KD-04', 'KD-05', 'KD-06', 'KD-07', 'KD-08', 'KD-09', 'KD-10', 'KD-11', 'KD-12']
+                            detail_kompetensi: isBidan 
+                              ? ['KDB-01', 'KDB-02', 'KDB-03', 'KDB-04', 'KDB-05', 'KDB-06', 'KDB-07', 'KDB-08', 'KDB-09', 'KDB-10', 'KDB-11', 'KDB-12']
+                              : ['KD-01', 'KD-02', 'KD-03', 'KD-04', 'KD-05', 'KD-06', 'KD-07', 'KD-08', 'KD-09', 'KD-10', 'KD-11', 'KD-12']
                           });
                         }}
                         className="px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/95 rounded-lg text-xs font-bold transition-all shadow-md flex items-center gap-2"
@@ -5683,7 +6963,9 @@ function App() {
                           <h4 className="text-xl font-bold text-foreground">
                             {currentUser?.role === 'Perawat'
                               ? pengajuanHistoryList.filter(p => currentPerawatRecord && String(p.id_perawat) === String(currentPerawatRecord.id_perawat)).length
-                              : pengajuanHistoryList.length}
+                              : currentUser?.role === 'Asesor'
+                                ? pengajuanHistoryList.filter(p => String(p.id_asesor) === String(currentUser.id) || String(p.id_asesor_pendamping) === String(currentUser.id)).length
+                                : pengajuanHistoryList.length}
                           </h4>
                         </div>
                       </div>
@@ -5694,7 +6976,9 @@ function App() {
                           <h4 className="text-xl font-bold text-foreground">
                             {currentUser?.role === 'Perawat'
                               ? pengajuanHistoryList.filter(p => currentPerawatRecord && String(p.id_perawat) === String(currentPerawatRecord.id_perawat) && p.status === 'Pending').length
-                              : pengajuanHistoryList.filter(p => p.status === 'Pending').length}
+                              : currentUser?.role === 'Asesor'
+                                ? pengajuanHistoryList.filter(p => (String(p.id_asesor) === String(currentUser.id) || String(p.id_asesor_pendamping) === String(currentUser.id)) && p.status === 'Pending').length
+                                : pengajuanHistoryList.filter(p => p.status === 'Pending').length}
                           </h4>
                         </div>
                       </div>
@@ -5705,7 +6989,9 @@ function App() {
                           <h4 className="text-xl font-bold text-foreground">
                             {currentUser?.role === 'Perawat'
                               ? pengajuanHistoryList.filter(p => currentPerawatRecord && String(p.id_perawat) === String(currentPerawatRecord.id_perawat) && p.status === 'Approved').length
-                              : pengajuanHistoryList.filter(p => p.status === 'Approved').length}
+                              : currentUser?.role === 'Asesor'
+                                ? pengajuanHistoryList.filter(p => (String(p.id_asesor) === String(currentUser.id) || String(p.id_asesor_pendamping) === String(currentUser.id)) && p.status === 'Approved').length
+                                : pengajuanHistoryList.filter(p => p.status === 'Approved').length}
                           </h4>
                         </div>
                       </div>
@@ -5716,23 +7002,94 @@ function App() {
                           <h4 className="text-xl font-bold text-foreground">
                             {currentUser?.role === 'Perawat'
                               ? pengajuanHistoryList.filter(p => currentPerawatRecord && String(p.id_perawat) === String(currentPerawatRecord.id_perawat) && p.status === 'Rejected').length
-                              : pengajuanHistoryList.filter(p => p.status === 'Rejected').length}
+                              : currentUser?.role === 'Asesor'
+                                ? pengajuanHistoryList.filter(p => (String(p.id_asesor) === String(currentUser.id) || String(p.id_asesor_pendamping) === String(currentUser.id)) && p.status === 'Rejected').length
+                                : pengajuanHistoryList.filter(p => p.status === 'Rejected').length}
                           </h4>
                         </div>
                       </div>
                     </div>
 
+                    {/* Card Set Jadwal Kolektif */}
+                    {selectedPengajuanIds.length > 0 && (
+                      <div className="mb-4 p-5 bg-primary/5 border border-primary/20 rounded-xl flex flex-col md:flex-row md:items-end justify-between gap-4 animate-fade-in shadow-sm">
+                        <div>
+                          <h4 className="font-bold text-sm text-primary mb-1">Set Jadwal Kolektif</h4>
+                          <p className="text-xs text-muted-foreground">{selectedPengajuanIds.length} pengajuan terpilih.</p>
+                        </div>
+                        <form onSubmit={handleSetJadwalKolektif} className="flex flex-wrap gap-3 items-end">
+                          <div>
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Jadwal Mulai</label>
+                            <input
+                              type="datetime-local"
+                              className="text-xs rounded bg-background border border-border p-2 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                              value={kolektifJadwalMulai}
+                              onChange={e => setKolektifJadwalMulai(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Batas Akhir</label>
+                            <input
+                              type="datetime-local"
+                              className="text-xs rounded bg-background border border-border p-2 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                              value={kolektifBatasAkhir}
+                              onChange={e => setKolektifBatasAkhir(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <button type="submit" className="px-4 py-2.5 bg-primary text-primary-foreground font-bold rounded text-xs hover:bg-primary/95 transition shadow-sm">
+                              Terapkan Jadwal
+                            </button>
+                            <button type="button" onClick={() => setSelectedPengajuanIds([])} className="px-3 py-2.5 bg-muted text-foreground font-bold rounded text-xs hover:bg-muted/80 transition">
+                              Batal
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
+
                     {/* History Table */}
                     <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
                       <div className="p-5 border-b border-border flex justify-between items-center bg-muted/10">
                         <h3 className="font-bold text-sm text-foreground">Daftar Riwayat Pengajuan</h3>
-                        <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded font-bold font-mono">LIVE DATABASE</span>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <label className="font-semibold text-muted-foreground">Status Proses:</label>
+                            <select
+                              value={filterStatusProses}
+                              onChange={(e) => setFilterStatusProses(e.target.value)}
+                              className="px-2.5 py-1 rounded bg-background border border-border text-foreground font-bold text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                            >
+                              <option value="Open">Open</option>
+                              <option value="Closed">Closed</option>
+                              <option value="Semua">Semua</option>
+                            </select>
+                          </div>
+                          <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded font-bold font-mono">LIVE DATABASE</span>
+                        </div>
                       </div>
                       <div className="overflow-x-auto">
                         {(() => {
-                          const filteredList = currentUser?.role === 'Perawat'
+                          let filteredList = currentUser?.role === 'Perawat'
                             ? pengajuanHistoryList.filter(p => currentPerawatRecord && String(p.id_perawat) === String(currentPerawatRecord.id_perawat))
-                            : pengajuanHistoryList;
+                            : currentUser?.role === 'Asesor'
+                              ? pengajuanHistoryList.filter(p => String(p.id_asesor) === String(currentUser.id) || String(p.id_asesor_pendamping) === String(currentUser.id))
+                              : pengajuanHistoryList;
+
+                          if (filterStatusProses !== 'Semua') {
+                            filteredList = filteredList.filter(p => (p.status_proses || 'Open') === filterStatusProses);
+                          }
+
+                          if (currentUser?.role === 'Admin') {
+                            filteredList = [...filteredList].sort((a, b) => {
+                              const valA = a.id_asesor === null || a.id_asesor === undefined ? -1 : Number(a.id_asesor);
+                              const valB = b.id_asesor === null || b.id_asesor === undefined ? -1 : Number(b.id_asesor);
+                              if (valA !== valB) return valA - valB;
+                              return Number(b.id) - Number(a.id);
+                            });
+                          }
 
                           if (filteredList.length === 0) {
                             return (
@@ -5743,23 +7100,78 @@ function App() {
                             );
                           }
 
+                          const selectableItems = filteredList.filter(item => item.status === 'Approved' && item.status_ujian !== 'Selesai');
+
+                          let currentAssessorGroupColorIndex = 0;
+                          let lastAssessorId = undefined;
+
                           return (
                             <table className="w-full text-xs text-left border-collapse">
                               <thead className="bg-muted/30 border-b border-border font-bold text-muted-foreground uppercase tracking-wider">
                                 <tr>
+                                  {currentUser?.role !== 'Perawat' && (
+                                    <th className="px-5 py-3.5 w-10 text-center">
+                                      <input
+                                        type="checkbox"
+                                        disabled={selectableItems.length === 0}
+                                        checked={selectableItems.length > 0 && selectableItems.every(item => selectedPengajuanIds.includes(item.id))}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            setSelectedPengajuanIds(selectableItems.map(item => item.id));
+                                          } else {
+                                            setSelectedPengajuanIds([]);
+                                          }
+                                        }}
+                                        className="rounded text-primary focus:ring-primary border-muted-foreground/30 w-4 h-4 cursor-pointer disabled:opacity-50"
+                                      />
+                                    </th>
+                                  )}
                                   <th className="px-5 py-3.5 w-12 text-center">No.</th>
                                   {currentUser?.role !== 'Perawat' && <th className="px-5 py-3.5">Asesi (Perawat)</th>}
                                   <th className="px-5 py-3.5">Jenis Sertifikasi</th>
                                   <th className="px-5 py-3.5">Tanggal Pengajuan</th>
                                   <th className="px-5 py-3.5 w-40">Status</th>
+                                  <th className="px-5 py-3.5">Tim Asesor</th>
                                   <th className="px-5 py-3.5 w-36 text-center">Aksi</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {filteredList.map((item, idx) => {
                                   const nurse = perawatData.find(p => String(p.id_perawat) === String(item.id_perawat)) || { nama: 'Nurse', nip: '-' };
+                                  
+                                  if (item.id_asesor !== lastAssessorId) {
+                                    currentAssessorGroupColorIndex = (currentAssessorGroupColorIndex + 1) % 2;
+                                    lastAssessorId = item.id_asesor;
+                                  }
+                                  
+                                  const rowBgClass = currentUser?.role === 'Admin'
+                                    ? (currentAssessorGroupColorIndex === 1 
+                                        ? 'bg-primary/[0.03] dark:bg-primary/[0.015] hover:bg-primary/[0.07] border-l-2 border-l-primary/40' 
+                                        : 'bg-background hover:bg-muted/10')
+                                    : 'hover:bg-muted/20';
+
                                   return (
-                                    <tr key={item.id} className="border-b border-border hover:bg-muted/20 transition-colors">
+                                    <tr key={item.id} className={`border-b border-border transition-colors ${rowBgClass}`}>
+                                      {currentUser?.role !== 'Perawat' && (
+                                        <td className="px-5 py-4 text-center">
+                                          {item.status === 'Approved' && item.status_ujian !== 'Selesai' ? (
+                                            <input
+                                              type="checkbox"
+                                              checked={selectedPengajuanIds.includes(item.id)}
+                                              onChange={(e) => {
+                                                if (e.target.checked) {
+                                                  setSelectedPengajuanIds(prev => [...prev, item.id]);
+                                                } else {
+                                                  setSelectedPengajuanIds(prev => prev.filter(id => id !== item.id));
+                                                }
+                                              }}
+                                              className="rounded text-primary focus:ring-primary border-muted-foreground/30 w-4 h-4 cursor-pointer"
+                                            />
+                                          ) : (
+                                            <span className="text-muted-foreground/30 font-bold">-</span>
+                                          )}
+                                        </td>
+                                      )}
                                       <td className="px-5 py-4 text-center font-semibold text-muted-foreground">{idx + 1}</td>
                                       {currentUser?.role !== 'Perawat' && (
                                         <td className="px-5 py-4">
@@ -5770,12 +7182,33 @@ function App() {
                                       <td className="px-5 py-4 font-bold text-foreground">{item.jenis_sertifikasi}</td>
                                       <td className="px-5 py-4 text-muted-foreground">{item.tanggal_pengajuan || '-'}</td>
                                       <td className="px-5 py-4">
-                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase ${item.status === 'Approved' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
-                                          item.status === 'Rejected' ? 'bg-destructive/10 text-destructive border border-destructive/20' :
-                                            'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
-                                          }`}>
-                                          {item.status || 'Pending'}
-                                        </span>
+                                        <div className="flex flex-col gap-1.5 items-start">
+                                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${item.status === 'Approved' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+                                            item.status === 'Rejected' ? 'bg-destructive/10 text-destructive border border-destructive/20' :
+                                              'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
+                                            }`}>
+                                            {item.status || 'Pending'}
+                                          </span>
+                                          <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${item.status_proses === 'Closed' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>
+                                            {item.status_proses || 'Open'}
+                                          </span>
+                                        </div>
+                                      </td>
+                                      <td className="px-5 py-4">
+                                        {item.id_asesor ? (
+                                          <div className="space-y-1">
+                                            <div className="font-semibold text-foreground text-xs">
+                                              Utama: {userData.find(u => String(u.id) === String(item.id_asesor))?.nama || '-'}
+                                            </div>
+                                            {item.id_asesor_pendamping && (
+                                              <div className="text-[10px] text-muted-foreground">
+                                                Pendamping: {userData.find(u => String(u.id) === String(item.id_asesor_pendamping))?.nama || '-'}
+                                              </div>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <span className="text-muted-foreground italic text-xs">-</span>
+                                        )}
                                       </td>
                                       <td className="px-5 py-4 text-center">
                                         <div className="flex items-center justify-center gap-2">
@@ -5786,13 +7219,27 @@ function App() {
                                             Buka Formulir
                                           </button>
                                           {currentUser?.role === 'Admin' && (
-                                            <button
-                                              onClick={() => handleDeletePengajuan(item.id)}
-                                              className="p-1.5 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white rounded transition-all"
-                                              title="Hapus Pengajuan"
-                                            >
-                                              <Trash2 size={13} />
-                                            </button>
+                                            <>
+                                              <button
+                                                onClick={() => {
+                                                  setActivePengajuan(item);
+                                                  setSelectedAssessorId(item.id_asesor || '');
+                                                  setSelectedCoAssessorId(item.id_asesor_pendamping || '');
+                                                  setIsAssessorModalOpen(true);
+                                                }}
+                                                className="px-3 py-1.5 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white font-bold rounded transition-all"
+                                                title="Ubah Asesor"
+                                              >
+                                                Ubah Asesor
+                                              </button>
+                                              <button
+                                                onClick={() => handleDeletePengajuan(item.id)}
+                                                className="p-1.5 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white rounded transition-all"
+                                                title="Hapus Pengajuan"
+                                              >
+                                                <Trash2 size={13} />
+                                              </button>
+                                            </>
                                           )}
                                         </div>
                                       </td>
@@ -5839,7 +7286,25 @@ function App() {
                               <select
                                 required
                                 value={newPengajuanForm.id_perawat}
-                                onChange={e => setNewPengajuanForm({ ...newPengajuanForm, id_perawat: e.target.value })}
+                                onChange={e => {
+                                  const pId = e.target.value;
+                                  const nurse = perawatData.find(p => String(p.id_perawat) === String(pId));
+                                  const isBidan = nurse && (
+                                    (nurse.pendidikan_terakhir || '').toLowerCase().includes('kebidanan') || 
+                                    (nurse.profesi || '').toLowerCase() === 'bidan'
+                                  );
+                                  let comps = newPengajuanForm.detail_kompetensi;
+                                  if (newPengajuanForm.jenis_sertifikasi === 'Kompetensi Dasar') {
+                                    comps = isBidan 
+                                      ? ['KDB-01', 'KDB-02', 'KDB-03', 'KDB-04', 'KDB-05', 'KDB-06', 'KDB-07', 'KDB-08', 'KDB-09', 'KDB-10', 'KDB-11', 'KDB-12']
+                                      : ['KD-01', 'KD-02', 'KD-03', 'KD-04', 'KD-05', 'KD-06', 'KD-07', 'KD-08', 'KD-09', 'KD-10', 'KD-11', 'KD-12'];
+                                  }
+                                  setNewPengajuanForm({
+                                    ...newPengajuanForm,
+                                    id_perawat: pId,
+                                    detail_kompetensi: comps
+                                  });
+                                }}
                                 className="w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-xs font-semibold"
                               >
                                 <option value="">-- Pilih Perawat --</option>
@@ -5849,7 +7314,7 @@ function App() {
                               </select>
                             )}
                           </div>
-
+ 
                           <div>
                             <label className="block font-bold text-muted-foreground mb-1 uppercase tracking-wide">Jenis Sertifikasi</label>
                             <select
@@ -5858,7 +7323,15 @@ function App() {
                                 const jenis = e.target.value;
                                 let comps = [];
                                 if (jenis === 'Kompetensi Dasar') {
-                                  comps = ['KD-01', 'KD-02', 'KD-03', 'KD-04', 'KD-05', 'KD-06', 'KD-07', 'KD-08', 'KD-09', 'KD-10', 'KD-11', 'KD-12'];
+                                  const targetId = currentUser?.role === 'Perawat' ? (currentPerawatRecord?.id_perawat) : newPengajuanForm.id_perawat;
+                                  const nurse = perawatData.find(p => String(p.id_perawat) === String(targetId));
+                                  const isBidan = nurse && (
+                                    (nurse.pendidikan_terakhir || '').toLowerCase().includes('kebidanan') || 
+                                    (nurse.profesi || '').toLowerCase() === 'bidan'
+                                  );
+                                  comps = isBidan 
+                                    ? ['KDB-01', 'KDB-02', 'KDB-03', 'KDB-04', 'KDB-05', 'KDB-06', 'KDB-07', 'KDB-08', 'KDB-09', 'KDB-10', 'KDB-11', 'KDB-12']
+                                    : ['KD-01', 'KD-02', 'KD-03', 'KD-04', 'KD-05', 'KD-06', 'KD-07', 'KD-08', 'KD-09', 'KD-10', 'KD-11', 'KD-12'];
                                 }
                                 setNewPengajuanForm({
                                   ...newPengajuanForm,
@@ -5868,13 +7341,13 @@ function App() {
                               }}
                               className="w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-xs font-semibold"
                             >
-                              <option value="Kompetensi Dasar">Kompetensi Dasar Perawat (12 Kompetensi)</option>
+                              <option value="Kompetensi Dasar">Kompetensi Dasar (12 Kompetensi)</option>
                               <option value="Kompetensi Khusus">Kompetensi Khusus Klinis</option>
                               <option value="Kredensial Baru">Kredensial Baru</option>
                               <option value="Kredensial Ulang">Kredensial Ulang</option>
                             </select>
                           </div>
-
+ 
                           <div>
                             <label className="block font-bold text-muted-foreground mb-1 uppercase tracking-wide">Unggah Dokumen Pendukung Baru (Opsional)</label>
                             <input
@@ -5886,57 +7359,72 @@ function App() {
                             <p className="text-[10px] text-muted-foreground mt-1">Gunakan ini jika ingin melampirkan berkas PDF khusus pengajuan ini.</p>
                           </div>
                         </div>
-
+ 
                         {/* Right column: checkmarks / warnings */}
                         <div className="space-y-4">
                           <div>
                             <label className="block font-bold text-muted-foreground mb-2 uppercase tracking-wide">Pilih Unit Kompetensi Yang Diajukan</label>
-                            {newPengajuanForm.jenis_sertifikasi === 'Kompetensi Dasar' ? (
-                              <div className="p-4 bg-muted/20 border border-border rounded-xl space-y-2">
-                                <p className="font-bold text-primary mb-1">Membundel 12 Kompetensi Dasar Keperawatan:</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] font-semibold text-foreground">
-                                  {LIST_12_KOMPETENSI.map(k => (
-                                    <div key={k.kode} className="flex items-center gap-1.5">
-                                      <CheckCircle size={13} className="text-green-500" />
-                                      <span>{k.kode} - {k.judul.substring(0, 30)}...</span>
+                            {(() => {
+                              const targetId = currentUser?.role === 'Perawat' ? (currentPerawatRecord?.id_perawat) : newPengajuanForm.id_perawat;
+                              const selectedNurse = perawatData.find(p => String(p.id_perawat) === String(targetId));
+                              const isBidan = selectedNurse && (
+                                (selectedNurse.pendidikan_terakhir || '').toLowerCase().includes('kebidanan') || 
+                                (selectedNurse.profesi || '').toLowerCase() === 'bidan'
+                              );
+                              const list12 = isBidan ? LIST_12_KOMPETENSI_KEBIDANAN : LIST_12_KOMPETENSI;
+                              const labelText = isBidan ? "Kebidanan" : "Keperawatan";
+ 
+                              if (newPengajuanForm.jenis_sertifikasi === 'Kompetensi Dasar') {
+                                return (
+                                  <div className="p-4 bg-muted/20 border border-border rounded-xl space-y-2">
+                                    <p className="font-bold text-primary mb-1">Membundel 12 Kompetensi Dasar {labelText}:</p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] font-semibold text-foreground">
+                                      {list12.map(k => (
+                                        <div key={k.kode} className="flex items-center gap-1.5">
+                                          <CheckCircle size={13} className="text-green-500" />
+                                          <span>{k.kode} - {k.judul.substring(0, 30)}...</span>
+                                        </div>
+                                      ))}
                                     </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="p-4 bg-muted/20 border border-border rounded-xl space-y-2 max-h-56 overflow-y-auto pr-2">
-                                <p className="text-muted-foreground font-bold mb-2">Pilih unit kompetensi klinis:</p>
-                                {[
-                                  ...LIST_12_KOMPETENSI,
-                                  ...competencies.filter(c => !LIST_12_KOMPETENSI.some(k => k.kode === (c.kode_kompetensi || c.kode)))
-                                    .map(c => ({ kode: c.kode_kompetensi || c.kode, judul: c.nama_kompetensi || c.nama }))
-                                ].map(k => {
-                                  const isChecked = newPengajuanForm.detail_kompetensi.includes(k.kode);
-                                  return (
-                                    <label key={k.kode} className="flex items-start gap-2.5 p-2 rounded border border-border bg-background hover:bg-muted/10 cursor-pointer">
-                                      <input
-                                        type="checkbox"
-                                        checked={isChecked}
-                                        onChange={e => {
-                                          let updated = [...newPengajuanForm.detail_kompetensi];
-                                          if (e.target.checked) {
-                                            if (!updated.includes(k.kode)) updated.push(k.kode);
-                                          } else {
-                                            updated = updated.filter(code => code !== k.kode);
-                                          }
-                                          setNewPengajuanForm({ ...newPengajuanForm, detail_kompetensi: updated });
-                                        }}
-                                        className="rounded border-border text-primary focus:ring-primary mt-0.5"
-                                      />
-                                      <div>
-                                        <span className="font-bold text-foreground">{k.kode}</span>
-                                        <p className="text-[10px] text-muted-foreground mt-0.5">{k.judul}</p>
-                                      </div>
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            )}
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <div className="p-4 bg-muted/20 border border-border rounded-xl space-y-2 max-h-56 overflow-y-auto pr-2">
+                                    <p className="text-muted-foreground font-bold mb-2">Pilih unit kompetensi klinis:</p>
+                                    {[
+                                      ...list12,
+                                      ...competencies.filter(c => !list12.some(k => k.kode === (c.kode_kompetensi || c.kode)))
+                                        .map(c => ({ kode: c.kode_kompetensi || c.kode, judul: c.nama_kompetensi || c.nama }))
+                                    ].map(k => {
+                                      const isChecked = newPengajuanForm.detail_kompetensi.includes(k.kode);
+                                      return (
+                                        <label key={k.kode} className="flex items-start gap-2.5 p-2 rounded border border-border bg-background hover:bg-muted/10 cursor-pointer">
+                                          <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={e => {
+                                              let updated = [...newPengajuanForm.detail_kompetensi];
+                                              if (e.target.checked) {
+                                                if (!updated.includes(k.kode)) updated.push(k.kode);
+                                              } else {
+                                                updated = updated.filter(code => code !== k.kode);
+                                              }
+                                              setNewPengajuanForm({ ...newPengajuanForm, detail_kompetensi: updated });
+                                            }}
+                                            className="rounded border-border text-primary focus:ring-primary mt-0.5"
+                                          />
+                                          <div>
+                                            <span className="font-bold text-foreground">{k.kode}</span>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5">{k.judul}</p>
+                                          </div>
+                                        </label>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              }
+                            })()}
                           </div>
                         </div>
                       </div>
@@ -5952,7 +7440,7 @@ function App() {
                           <div className="bg-muted/20 border border-border p-5 rounded-xl space-y-3.5">
                             <h4 className="font-bold text-xs text-foreground uppercase tracking-wide border-b border-border pb-1.5">Verifikasi Kelengkapan Dokumen Profil Perawat</h4>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               {/* STR Document Check */}
                               <div className="p-3 rounded-lg bg-background border border-border flex flex-col justify-between min-h-[90px]">
                                 <div className="flex justify-between items-start gap-2">
@@ -5970,7 +7458,7 @@ function App() {
                                 </div>
                                 {nurse.file_str ? (
                                   <a
-                                    href={`http://localhost/keperawatan/public/${nurse.file_str}`}
+                                    href={`${BASE_URL}/${nurse.file_str}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-xs text-primary hover:underline font-bold mt-2 flex items-center gap-1"
@@ -5999,7 +7487,7 @@ function App() {
                                 </div>
                                 {nurse.file_sip ? (
                                   <a
-                                    href={`http://localhost/keperawatan/public/${nurse.file_sip}`}
+                                    href={`${BASE_URL}/${nurse.file_sip}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-xs text-primary hover:underline font-bold mt-2 flex items-center gap-1"
@@ -6009,6 +7497,46 @@ function App() {
                                 ) : (
                                   <p className="text-[10px] text-destructive italic mt-2 font-medium">SIP belum diunggah. Silakan lengkapi di menu Data Perawat &rarr; STR &amp; SIP.</p>
                                 )}
+                              </div>
+
+                              {/* Other Documents & Trainings Check */}
+                              <div className="p-3 rounded-lg bg-background border border-border flex flex-col justify-between min-h-[90px]">
+                                <div className="flex justify-between items-start gap-2">
+                                  <div>
+                                    <span className="font-bold text-[11px] text-foreground">Sertifikat &amp; Pelatihan Lainnya</span>
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                                      Terunggah di profil perawat
+                                    </p>
+                                  </div>
+                                  <span className="text-[10px] px-2 py-0.5 bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 rounded font-semibold uppercase">
+                                    {(activeNurseCertificates?.length || 0) + (activeNursePelatihan?.length || 0)} File
+                                  </span>
+                                </div>
+                                <div className="space-y-1.5 mt-2 max-h-[70px] overflow-y-auto pr-1">
+                                  {activeNurseCertificates.map((doc, idx) => (
+                                    <div key={`cert-cr-${idx}`} className="flex justify-between items-center text-[9px] py-0.5 border-b border-border/40 last:border-0 gap-2">
+                                      <span className="truncate flex-grow font-medium text-foreground text-left">{doc.nama_sertifikat}</span>
+                                      {doc.file ? (
+                                        <a href={`${BASE_URL}/${doc.file}`} target="_blank" rel="noreferrer" className="text-primary hover:underline font-bold shrink-0">Buka</a>
+                                      ) : (
+                                        <span className="text-muted-foreground text-[8px] shrink-0">No File</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                  {activeNursePelatihan.map((train, idx) => (
+                                    <div key={`train-cr-${idx}`} className="flex justify-between items-center text-[9px] py-0.5 border-b border-border/40 last:border-0 gap-2">
+                                      <span className="truncate flex-grow font-medium text-foreground text-left">{train.nama_pelatihan}</span>
+                                      {train.file ? (
+                                        <a href={`${BASE_URL}/${train.file}`} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline font-bold shrink-0">Buka</a>
+                                      ) : (
+                                        <span className="text-muted-foreground text-[8px] shrink-0">No File</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                  {activeNurseCertificates.length === 0 && activeNursePelatihan.length === 0 && (
+                                    <span className="text-[9px] text-muted-foreground italic">Belum ada file lain</span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -6053,6 +7581,22 @@ function App() {
                             }`}>
                             Status: {activePengajuan.status || 'Pending'}
                           </span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ml-2 ${activePengajuan.status_proses === 'Closed' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>
+                            Proses: {activePengajuan.status_proses || 'Open'}
+                          </span>
+                          {(currentUser?.role === 'Admin' || currentUser?.role === 'Asesor') && (
+                            <div className="inline-flex items-center gap-1 ml-3 bg-secondary/50 border border-border px-2 py-0.5 rounded">
+                              <label className="text-[10px] text-muted-foreground font-semibold">Ubah Proses:</label>
+                              <select
+                                value={activePengajuan.status_proses || 'Open'}
+                                onChange={(e) => handleUpdateStatusProses(activePengajuan.id, e.target.value)}
+                                className="text-[10px] font-bold rounded bg-background border-none p-0 focus:ring-0 text-foreground cursor-pointer"
+                              >
+                                <option value="Open">Open</option>
+                                <option value="Closed">Closed</option>
+                              </select>
+                            </div>
+                          )}
                         </div>
                         <h2 className="text-lg font-bold text-foreground mt-2">
                           Asesmen Sertifikasi: {activePengajuan.jenis_sertifikasi}
@@ -6065,13 +7609,27 @@ function App() {
                             </p>
                           );
                         })()}
+                        {(activePengajuan.id_asesor || activePengajuan.id_asesor_pendamping) && (
+                          <div className="text-xs text-muted-foreground mt-0.5 font-medium space-y-0.5">
+                            {activePengajuan.id_asesor && (
+                              <p>Asesor Utama: <strong className="text-foreground">{userData.find(u => String(u.id) === String(activePengajuan.id_asesor))?.nama || 'Data Asesor Tidak Ditemukan'}</strong></p>
+                            )}
+                            {activePengajuan.id_asesor_pendamping && (
+                              <p>Asesor Pendamping: <strong className="text-foreground">{userData.find(u => String(u.id) === String(activePengajuan.id_asesor_pendamping))?.nama || 'Data Asesor Tidak Ditemukan'}</strong></p>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       {/* Approval Actions for Admin/Asesor */}
                       {(currentUser?.role === 'Admin' || currentUser?.role === 'Asesor') && activePengajuan.status === 'Pending' && (
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleUpdatePengajuanStatus(activePengajuan.id, 'Approved')}
+                            onClick={() => {
+                              setSelectedAssessorId('');
+                              setSelectedCoAssessorId('');
+                              setIsAssessorModalOpen(true);
+                            }}
                             className="px-3.5 py-2 bg-green-500 text-white font-bold hover:bg-green-600 rounded-lg text-xs transition-all shadow flex items-center gap-1.5"
                           >
                             <Check size={14} />
@@ -6121,12 +7679,23 @@ function App() {
                             {(currentUser?.role === 'Admin' || currentUser?.role === 'Asesor') && activePengajuan.status_ujian !== 'Selesai' && (
                               <form onSubmit={handleSetJadwalUjian} className="flex gap-2 items-end mt-2">
                                 <div className="flex-1">
-                                  <label className="text-xs font-bold text-muted-foreground block mb-1">Set/Ubah Jadwal Ujian</label>
+                                  <label className="text-xs font-bold text-muted-foreground block mb-1">Jadwal Mulai</label>
                                   <input
                                     type="datetime-local"
                                     className="w-full text-sm rounded bg-background border border-border p-2"
                                     value={jadwalUjianInput}
                                     onChange={e => setJadwalUjianInput(e.target.value)}
+                                    required
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <label className="text-xs font-bold text-muted-foreground block mb-1">Batas Akhir</label>
+                                  <input
+                                    type="datetime-local"
+                                    className="w-full text-sm rounded bg-background border border-border p-2"
+                                    value={batasAkhirUjianInput}
+                                    onChange={e => setBatasAkhirUjianInput(e.target.value)}
+                                    required
                                   />
                                 </div>
                                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-bold rounded text-sm hover:bg-blue-700">
@@ -6141,8 +7710,11 @@ function App() {
                                 <div>
                                   <p className="text-xs text-muted-foreground font-medium">Jadwal Ujian:</p>
                                   <p className="font-bold text-foreground">{activePengajuan.jadwal_ujian ? new Date(activePengajuan.jadwal_ujian).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }) : 'Belum ditetapkan'}</p>
+                                  {activePengajuan.batas_akhir_ujian && (
+                                    <p className="text-xs text-muted-foreground font-medium mt-1">s/d {new Date(activePengajuan.batas_akhir_ujian).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' })}</p>
+                                  )}
                                 </div>
-                                {activePengajuan.jadwal_ujian && activePengajuan.status_ujian !== 'Selesai' && new Date() >= new Date(activePengajuan.jadwal_ujian) && (
+                                {activePengajuan.jadwal_ujian && activePengajuan.status_ujian !== 'Selesai' && new Date() >= new Date(activePengajuan.jadwal_ujian) && (!activePengajuan.batas_akhir_ujian || new Date() <= new Date(activePengajuan.batas_akhir_ujian)) && (
                                   <button onClick={handleMulaiUjian} className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg shadow transition-all">
                                     Mulai Ujian Sekarang
                                   </button>
@@ -6150,6 +7722,11 @@ function App() {
                                 {activePengajuan.jadwal_ujian && activePengajuan.status_ujian !== 'Selesai' && new Date() < new Date(activePengajuan.jadwal_ujian) && (
                                   <p className="text-xs text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100 dark:bg-yellow-900/30 px-3 py-1.5 rounded">
                                     Menunggu jadwal ujian tiba...
+                                  </p>
+                                )}
+                                {activePengajuan.batas_akhir_ujian && activePengajuan.status_ujian !== 'Selesai' && new Date() > new Date(activePengajuan.batas_akhir_ujian) && (
+                                  <p className="text-xs text-destructive font-bold bg-destructive/10 px-3 py-1.5 rounded">
+                                    Jadwal ujian telah berakhir.
                                   </p>
                                 )}
                               </div>
@@ -6171,11 +7748,12 @@ function App() {
                       }
                       if (!Array.isArray(codes)) codes = [];
 
+                      const current12 = get12KompetensiForPengajuan(activePengajuan);
                       const combined = [
-                        ...LIST_12_KOMPETENSI,
+                        ...current12,
                         ...competencies.filter(c => {
                           const code = c.kode_kompetensi || c.kode;
-                          return !LIST_12_KOMPETENSI.some(item => item.kode === code);
+                          return !current12.some(item => item.kode === code);
                         }).map(c => ({
                           kode: c.kode_kompetensi || c.kode,
                           judul: c.nama_kompetensi || c.judul || c.nama,
@@ -6231,17 +7809,25 @@ function App() {
                           { id: 'form_01', name: 'FORM-01', label: 'Permohonan' },
                           { id: 'form_02', name: 'FORM-02', label: 'Asesmen Mandiri' },
                           { id: 'form_03', name: 'FORM-03', label: 'Rencana Asesmen' },
-                          { id: 'form_03a', name: 'FORM-03 A', label: 'Obs (Observasi)' },
+                          { id: 'form_03c', name: 'FORM-03 A', label: 'Uji Tulis' },
                           { id: 'form_03b', name: 'FORM-03 B', label: 'Uji Lisan' },
-                          { id: 'form_03c', name: 'FORM-03 C', label: 'Uji Tulis' },
+                          { id: 'form_03a', name: 'FORM-03 C', label: 'Obs (Observasi)' },
                           { id: 'form_03d', name: 'FORM-03 D', label: 'Portofolio' },
                           { id: 'form_04', name: 'FORM-04', label: 'Persetujuan' },
                           { id: 'form_05', name: 'FORM-05', label: 'Pra Asesmen' },
                           { id: 'form_06', name: 'FORM-06', label: 'Pelaksanaan' },
                           { id: 'form_07', name: 'FORM-07', label: 'Rekomendasi' },
                           { id: 'form_08', name: 'FORM-08', label: 'Umpan Balik' },
-                          { id: 'form_09', name: 'FORM-09', label: 'Kaji Ulang' }
-                        ].map(tab => (
+                          { id: 'form_09', name: 'FORM-09', label: 'Kaji Ulang' },
+                          ...(form07Data?.keputusan === 'Kompeten' ? [{ id: 'sertifikat', name: 'Sertifikat', label: 'Cetak' }] : [])
+
+                        ].filter(tab => {
+                          if (currentUser?.role === 'Perawat') {
+                            const allowedTabs = ['form_01', 'form_02', 'form_03c', 'form_04', 'form_07', 'form_08', 'sertifikat'];
+                            return allowedTabs.includes(tab.id);
+                          }
+                          return true;
+                        }).map(tab => (
                           <button
                             key={tab.id}
                             disabled={isTabLocked(tab.id)}
@@ -6300,7 +7886,7 @@ function App() {
                         const matchesProfesi = j.profesi.toLowerCase() === 'semua' || j.profesi.toLowerCase() === nurseProfesi;
                         if (!matchesProfesi) return false;
 
-                        const isD3 = nurseEdu.includes('d3') || nurseEdu.includes('d-iii') || nurseEdu.includes('d iii');
+                        const isD3 = nurseEdu.includes('d3') || nurseEdu.includes('d-iii') || nurseEdu.includes('d iii') || nurseEdu.includes('diii');
                         if (isD3) {
                           return j.kategori_pendidikan.toLowerCase() === 'd3' || j.kategori_pendidikan.toLowerCase() === 'semua';
                         } else {
@@ -6335,11 +7921,12 @@ function App() {
                       }
                       if (!Array.isArray(codes)) codes = [];
 
+                      const current12 = get12KompetensiForPengajuan(activePengajuan);
                       const combined = [
-                        ...LIST_12_KOMPETENSI,
+                        ...current12,
                         ...competencies.filter(c => {
                           const code = c.kode_kompetensi || c.kode;
-                          return !LIST_12_KOMPETENSI.some(item => item.kode === code);
+                          return !current12.some(item => item.kode === code);
                         }).map(c => ({
                           kode: c.kode_kompetensi || c.kode,
                           judul: c.nama_kompetensi || c.judul || c.nama,
@@ -6367,21 +7954,40 @@ function App() {
                                 {/* Personal Details */}
                                 <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-3">
                                   <h4 className="font-bold text-xs text-foreground border-b border-border pb-1.5 uppercase tracking-wide">a. Data Pribadi</h4>
-                                  <div className="grid grid-cols-3 text-xs gap-y-2">
-                                    <span className="text-muted-foreground">Nama Lengkap</span>
-                                    <span className="col-span-2 font-semibold text-foreground">: {activeNurse.nama}</span>
+                                  <div className="flex flex-col sm:flex-row gap-4">
+                                    {/* Left side: Photo */}
+                                    <div className="flex flex-col items-center shrink-0">
+                                      {activeNurse.foto ? (
+                                        <img
+                                          src={`${BASE_URL}/${activeNurse.foto}`}
+                                          alt={activeNurse.nama}
+                                          onClick={() => setPreviewPhotoUrl(`${BASE_URL}/${activeNurse.foto}`)}
+                                          className="w-24 h-24 rounded-lg object-cover border border-border shadow-sm cursor-zoom-in hover:opacity-90 transition-opacity"
+                                        />
+                                      ) : (
+                                        <div className="w-24 h-24 rounded-lg bg-primary/10 border border-border flex flex-col items-center justify-center text-primary font-bold text-3xl select-none">
+                                          {activeNurse.nama ? activeNurse.nama.charAt(0) : 'N'}
+                                        </div>
+                                      )}
+                                      <span className="text-[10px] text-muted-foreground font-semibold mt-1">Foto Profil</span>
+                                    </div>
+                                    {/* Right side: Fields */}
+                                    <div className="grid grid-cols-3 text-xs gap-y-2 flex-grow">
+                                      <span className="text-muted-foreground">Nama Lengkap</span>
+                                      <span className="col-span-2 font-semibold text-foreground">: {activeNurse.nama}</span>
 
-                                    <span className="text-muted-foreground">TTL</span>
-                                    <span className="col-span-2 text-foreground">: {activeNurse.tempat_lahir || '-'}, {activeNurse.tanggal_lahir || '-'}</span>
+                                      <span className="text-muted-foreground">TTL</span>
+                                      <span className="col-span-2 text-foreground">: {activeNurse.tempat_lahir || '-'}, {activeNurse.tanggal_lahir || '-'}</span>
 
-                                    <span className="text-muted-foreground">Jenis Kelamin</span>
-                                    <span className="col-span-2 text-foreground">: {activeNurse.jk === 'L' ? 'Laki-laki' : 'Wanita'}</span>
+                                      <span className="text-muted-foreground">Jenis Kelamin</span>
+                                      <span className="col-span-2 text-foreground">: {activeNurse.jk === 'L' ? 'Laki-laki' : 'Wanita'}</span>
 
-                                    <span className="text-muted-foreground">Alamat Rumah</span>
-                                    <span className="col-span-2 text-foreground text-wrap">: {activeNurse.alamat || '-'}</span>
+                                      <span className="text-muted-foreground">Alamat Rumah</span>
+                                      <span className="col-span-2 text-foreground text-wrap">: {activeNurse.alamat || '-'}</span>
 
-                                    <span className="text-muted-foreground">HP / Email</span>
-                                    <span className="col-span-2 text-foreground">: {activeNurse.hp || '-'} / {activeNurse.email || '-'}</span>
+                                      <span className="text-muted-foreground">HP / Email</span>
+                                      <span className="col-span-2 text-foreground">: {activeNurse.hp || '-'} / {activeNurse.email || '-'}</span>
+                                    </div>
                                   </div>
                                 </div>
 
@@ -6492,10 +8098,145 @@ function App() {
                                 </div>
                               </div>
 
+                              {/* Dokumen Lampiran Profil Perawat */}
+                              <div className="space-y-3 pt-2">
+                                <h4 className="font-bold text-xs text-foreground border-b border-border pb-1">Dokumen Lampiran Profil Perawat (Untuk Verifikasi Asesor)</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {/* STR & SIP Card */}
+                                  <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-3">
+                                    <h5 className="font-bold text-xs text-foreground border-b border-border pb-1.5 flex items-center gap-1.5 uppercase tracking-wide">
+                                      <Shield size={14} className="text-primary" /> Dokumen Legalitas (STR &amp; SIP)
+                                    </h5>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                      {/* STR */}
+                                      <div className="p-3 bg-background border border-border rounded-lg flex flex-col justify-between min-h-[100px]">
+                                        <div>
+                                          <div className="flex justify-between items-start gap-1">
+                                            <span className="font-bold text-[10px] text-foreground block">Surat Tanda Registrasi (STR)</span>
+                                            {activeNurse.file_str ? (
+                                              <span className="text-[8px] px-1.5 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20 rounded font-semibold uppercase shrink-0">Ada</span>
+                                            ) : (
+                                              <span className="text-[8px] px-1.5 py-0.5 bg-destructive/10 text-destructive border border-destructive/20 rounded font-semibold uppercase shrink-0 animate-pulse">Kosong</span>
+                                            )}
+                                          </div>
+                                          <p className="text-[10px] text-muted-foreground mt-1.5 font-medium">
+                                            No: {activeNurse.no_str || "-"}
+                                          </p>
+                                          <p className="text-[9px] text-muted-foreground mt-0.5 font-medium">
+                                            Berlaku: {activeNurse.masa_berlaku_str || "-"}
+                                          </p>
+                                        </div>
+                                        {activeNurse.file_str ? (
+                                          <a
+                                            href={`${BASE_URL}/${activeNurse.file_str}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[10px] text-primary hover:underline font-bold mt-2 flex items-center gap-1"
+                                          >
+                                            <Eye size={10} /> Lihat File STR
+                                          </a>
+                                        ) : (
+                                          <p className="text-[9px] text-destructive italic mt-2 font-medium">Belum diupload</p>
+                                        )}
+                                      </div>
+
+                                      {/* SIP */}
+                                      <div className="p-3 bg-background border border-border rounded-lg flex flex-col justify-between min-h-[100px]">
+                                        <div>
+                                          <div className="flex justify-between items-start gap-1">
+                                            <span className="font-bold text-[10px] text-foreground block">Surat Izin Praktik (SIP)</span>
+                                            {activeNurse.file_sip ? (
+                                              <span className="text-[8px] px-1.5 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20 rounded font-semibold uppercase shrink-0">Ada</span>
+                                            ) : (
+                                              <span className="text-[8px] px-1.5 py-0.5 bg-destructive/10 text-destructive border border-destructive/20 rounded font-semibold uppercase shrink-0 animate-pulse">Kosong</span>
+                                            )}
+                                          </div>
+                                          <p className="text-[10px] text-muted-foreground mt-1.5 font-medium">
+                                            No: {activeNurse.no_sip || "-"}
+                                          </p>
+                                          <p className="text-[9px] text-muted-foreground mt-0.5 font-medium">
+                                            Berlaku: {activeNurse.masa_berlaku_sip || "-"}
+                                          </p>
+                                        </div>
+                                        {activeNurse.file_sip ? (
+                                          <a
+                                            href={`${BASE_URL}/${activeNurse.file_sip}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[10px] text-primary hover:underline font-bold mt-2 flex items-center gap-1"
+                                          >
+                                            <Eye size={10} /> Lihat File SIP
+                                          </a>
+                                        ) : (
+                                          <p className="text-[9px] text-destructive italic mt-2 font-medium">Belum diupload</p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Additional Certificates & Training Card */}
+                                  <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-3">
+                                    <h5 className="font-bold text-xs text-foreground border-b border-border pb-1.5 flex items-center gap-1.5 uppercase tracking-wide">
+                                      <Award size={14} className="text-primary" /> Sertifikat Pelatihan &amp; Kompetensi Lainnya
+                                    </h5>
+                                    <div className="space-y-2 max-h-[110px] overflow-y-auto pr-1">
+                                      {activeNurseCertificates.length === 0 && activeNursePelatihan.length === 0 ? (
+                                        <div className="p-4 text-center bg-background border border-dashed border-border rounded-lg text-[10px] text-muted-foreground font-medium">
+                                          Belum ada dokumen sertifikat atau pelatihan tambahan yang diunggah.
+                                        </div>
+                                      ) : (
+                                        <>
+                                          {activeNurseCertificates.map((doc, idx) => (
+                                            <div key={`cert-${idx}`} className="p-2 bg-background border border-border rounded-lg flex items-center justify-between text-[10px] gap-2">
+                                              <div className="truncate flex-grow">
+                                                <span className="font-bold text-foreground block truncate">{doc.nama_sertifikat}</span>
+                                                <span className="text-muted-foreground text-[9px]">No: {doc.nomor || '-'}</span>
+                                              </div>
+                                              {doc.file ? (
+                                                <a
+                                                  href={`${BASE_URL}/${doc.file}`}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="px-2 py-1 bg-primary/10 text-primary rounded font-bold hover:bg-primary hover:text-white transition-colors shrink-0"
+                                                >
+                                                  Lihat File
+                                                </a>
+                                              ) : (
+                                                <span className="text-[9px] text-muted-foreground shrink-0">Tidak ada file</span>
+                                              )}
+                                            </div>
+                                          ))}
+                                          {activeNursePelatihan.map((train, idx) => (
+                                            <div key={`train-${idx}`} className="p-2 bg-background border border-border rounded-lg flex items-center justify-between text-[10px] gap-2">
+                                              <div className="truncate flex-grow">
+                                                <span className="font-bold text-foreground block truncate">{train.nama_pelatihan}</span>
+                                                <span className="text-muted-foreground text-[9px]">Penyelenggara: {train.penyelenggara || '-'}</span>
+                                              </div>
+                                              {train.file ? (
+                                                <a
+                                                  href={`${BASE_URL}/${train.file}`}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="px-2 py-1 bg-indigo-500/10 text-indigo-600 rounded font-bold hover:bg-indigo-600 hover:text-white transition-colors shrink-0"
+                                                >
+                                                  Lihat File
+                                                </a>
+                                              ) : (
+                                                <span className="text-[9px] text-muted-foreground shrink-0">Tidak ada file</span>
+                                              )}
+                                            </div>
+                                          ))}
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
                               <div className="pt-4 border-t border-border flex justify-end gap-3">
                                 {activePengajuan.file_pendukung && (
                                   <a
-                                    href={`http://localhost/keperawatan/public/${activePengajuan.file_pendukung}`}
+                                    href={`${BASE_URL}/${activePengajuan.file_pendukung}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="px-4 py-2 bg-secondary text-foreground hover:bg-secondary/80 border border-border font-bold rounded-lg text-xs transition-all flex items-center gap-1"
@@ -6530,115 +8271,138 @@ function App() {
 
                               <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-xs space-y-2 text-foreground">
                                 <p className="font-bold text-primary uppercase tracking-wide text-[10px]">Petunjuk Pengisian:</p>
-                                <p>Tentukan tingkat kemampuan klinis Anda terhadap Kriteria Unjuk Kerja (KUK) di bawah ini dengan mencentang pilihan **K** (Kompeten) atau **BK** (Belum Kompeten).</p>
+                                <p>Tentukan tingkat kemampuan klinis Anda terhadap Kriteria Unjuk Kerja (KUK) pada 12 Kompetensi Dasar di bawah ini dengan mencentang pilihan <strong>K</strong> (Kompeten) atau <strong>BK</strong> (Belum Kompeten).</p>
                               </div>
 
-                              <div className="space-y-4">
-                                <div className="overflow-x-auto rounded-lg border border-border">
-                                  <table className="w-full text-xs text-left">
-                                    <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
-                                      <tr>
-                                        <th className="px-4 py-3">Pertanyaan Asesmen Mandiri</th>
-                                        <th className="px-4 py-3 text-center w-24">Kompeten (K)</th>
-                                        <th className="px-4 py-3 text-center w-36">Belum Kompeten (BK)</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {/* Elemen 1 */}
-                                      <tr className="bg-muted/20 font-bold border-b border-border">
-                                        <td colSpan="3" className="px-4 py-2.5">Elemen 1: {activeComp.form02.elemen1}</td>
-                                      </tr>
-                                      {[
-                                        { key: 'k1_1', label: `1. ${activeComp.form02.k1_1}` },
-                                        { key: 'k1_2', label: `2. ${activeComp.form02.k1_2}` },
-                                        { key: 'k1_3', label: `3. ${activeComp.form02.k1_3}` }
-                                      ].map(item => (
-                                        <tr key={item.key} className="border-b border-border last:border-0 hover:bg-muted/10">
-                                          <td className="px-4 py-3 text-foreground">{item.label}</td>
-                                          <td className="px-4 py-3 text-center">
-                                            <input
-                                              type="radio"
-                                              name={item.key}
-                                              disabled={isFormLocked || currentUser?.role !== 'Perawat'}
-                                              checked={form02Data[item.key] === 'K'}
-                                              onChange={() => setForm02Data({ ...form02Data, [item.key]: 'K' })}
-                                              className="text-primary focus:ring-primary w-4 h-4"
-                                            />
-                                          </td>
-                                          <td className="px-4 py-3 text-center">
-                                            <input
-                                              type="radio"
-                                              name={item.key}
-                                              disabled={isFormLocked || currentUser?.role !== 'Perawat'}
-                                              checked={form02Data[item.key] === 'BK'}
-                                              onChange={() => setForm02Data({ ...form02Data, [item.key]: 'BK' })}
-                                              className="text-destructive focus:ring-destructive w-4 h-4"
-                                            />
-                                          </td>
-                                        </tr>
-                                      ))}
+                              <div className="space-y-6">
+                                {get12KompetensiForPengajuan(activePengajuan).map((komp, idx) => {
+                                  const k1_1Key = `${komp.kode}_k1_1`;
+                                  const k1_2Key = `${komp.kode}_k1_2`;
+                                  const k1_3Key = `${komp.kode}_k1_3`;
+                                  const k2_1Key = `${komp.kode}_k2_1`;
+                                  const k2_2Key = `${komp.kode}_k2_2`;
+                                  const k2_3Key = `${komp.kode}_k2_3`;
+                                  const buktiKey = `${komp.kode}_bukti`;
+                                  const rekomKey = `${komp.kode}_rekomendasi`;
 
-                                      {/* Elemen 2 */}
-                                      <tr className="bg-muted/20 font-bold border-b border-border">
-                                        <td colSpan="3" className="px-4 py-2.5">Elemen 2: {activeComp.form02.elemen2}</td>
-                                      </tr>
-                                      {[
-                                        { key: 'k2_1', label: `1. ${activeComp.form02.k2_1}` },
-                                        { key: 'k2_2', label: `2. ${activeComp.form02.k2_2}` },
-                                        { key: 'k2_3', label: `3. ${activeComp.form02.k2_3}` }
-                                      ].map(item => (
-                                        <tr key={item.key} className="border-b border-border last:border-0 hover:bg-muted/10">
-                                          <td className="px-4 py-3 text-foreground">{item.label}</td>
-                                          <td className="px-4 py-3 text-center">
-                                            <input
-                                              type="radio"
-                                              name={item.key}
-                                              disabled={isFormLocked || currentUser?.role !== 'Perawat'}
-                                              checked={form02Data[item.key] === 'K'}
-                                              onChange={() => setForm02Data({ ...form02Data, [item.key]: 'K' })}
-                                              className="text-primary focus:ring-primary w-4 h-4"
-                                            />
-                                          </td>
-                                          <td className="px-4 py-3 text-center">
-                                            <input
-                                              type="radio"
-                                              name={item.key}
-                                              disabled={isFormLocked || currentUser?.role !== 'Perawat'}
-                                              checked={form02Data[item.key] === 'BK'}
-                                              onChange={() => setForm02Data({ ...form02Data, [item.key]: 'BK' })}
-                                              className="text-destructive focus:ring-destructive w-4 h-4"
-                                            />
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
+                                  return (
+                                    <div key={komp.kode} className="bg-card border border-border/60 rounded-xl p-5 shadow-sm space-y-4">
+                                      <div className="flex justify-between items-start gap-4 pb-3 border-b border-border">
+                                        <div>
+                                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded border border-primary/20">{komp.kode}</span>
+                                          <h4 className="font-bold text-sm text-foreground mt-1.5">{komp.judul}</h4>
+                                          <p className="text-[10px] text-muted-foreground mt-0.5">{komp.keterangan}</p>
+                                        </div>
+                                      </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="block text-xs font-semibold mb-1">Bukti-bukti Kompetensi Terkait</label>
-                                    <input
-                                      type="text"
-                                      disabled={isFormLocked || currentUser?.role !== 'Perawat'}
-                                      value={form02Data.bukti_1 || ''}
-                                      onChange={e => setForm02Data({ ...form02Data, bukti_1: e.target.value })}
-                                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                      placeholder="Contoh: Sertifikat pelatihan terkait, logbook..."
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="block text-xs font-semibold mb-1">Rekomendasi (Diisi Asesor / Admin)</label>
-                                    <input
-                                      type="text"
-                                      disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                      value={form02Data.rekomendasi || ''}
-                                      onChange={e => setForm02Data({ ...form02Data, rekomendasi: e.target.value })}
-                                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                      placeholder="Rekomendasi kelanjutan asesmen mandiri..."
-                                    />
-                                  </div>
-                                </div>
+                                      <div className="overflow-x-auto rounded-lg border border-border">
+                                        <table className="w-full text-xs text-left">
+                                          <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                                            <tr>
+                                              <th className="px-4 py-2.5">Kriteria Unjuk Kerja (KUK)</th>
+                                              <th className="px-4 py-2.5 text-center w-24">Kompeten (K)</th>
+                                              <th className="px-4 py-2.5 text-center w-36">Belum Kompeten (BK)</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {/* Elemen 1 */}
+                                            <tr className="bg-muted/10 font-bold border-b border-border text-[11px] text-foreground">
+                                              <td colSpan="3" className="px-4 py-2">Elemen 1: {komp.form02.elemen1}</td>
+                                            </tr>
+                                            {[
+                                              { key: k1_1Key, label: `1.1 ${komp.form02.k1_1}` },
+                                              { key: k1_2Key, label: `1.2 ${komp.form02.k1_2}` },
+                                              { key: k1_3Key, label: `1.3 ${komp.form02.k1_3}` }
+                                            ].map(item => (
+                                              <tr key={item.key} className="border-b border-border last:border-0 hover:bg-muted/5">
+                                                <td className="px-4 py-2.5 text-foreground font-medium">{item.label}</td>
+                                                <td className="px-4 py-2.5 text-center">
+                                                  <input
+                                                    type="radio"
+                                                    name={`${komp.kode}_k1_${item.key}`}
+                                                    disabled={isFormLocked || currentUser?.role !== 'Perawat'}
+                                                    checked={form02Data[item.key] === 'K'}
+                                                    onChange={() => setForm02Data({ ...form02Data, [item.key]: 'K' })}
+                                                    className="text-primary focus:ring-primary w-4 h-4 cursor-pointer"
+                                                  />
+                                                </td>
+                                                <td className="px-4 py-2.5 text-center">
+                                                  <input
+                                                    type="radio"
+                                                    name={`${komp.kode}_k1_${item.key}`}
+                                                    disabled={isFormLocked || currentUser?.role !== 'Perawat'}
+                                                    checked={form02Data[item.key] === 'BK'}
+                                                    onChange={() => setForm02Data({ ...form02Data, [item.key]: 'BK' })}
+                                                    className="text-destructive focus:ring-destructive w-4 h-4 cursor-pointer"
+                                                  />
+                                                </td>
+                                              </tr>
+                                            ))}
+
+                                            {/* Elemen 2 */}
+                                            <tr className="bg-muted/10 font-bold border-b border-border text-[11px] text-foreground">
+                                              <td colSpan="3" className="px-4 py-2">Elemen 2: {komp.form02.elemen2}</td>
+                                            </tr>
+                                            {[
+                                              { key: k2_1Key, label: `2.1 ${komp.form02.k2_1}` },
+                                              { key: k2_2Key, label: `2.2 ${komp.form02.k2_2}` },
+                                              { key: k2_3Key, label: `2.3 ${komp.form02.k2_3}` }
+                                            ].map(item => (
+                                              <tr key={item.key} className="border-b border-border last:border-0 hover:bg-muted/5">
+                                                <td className="px-4 py-2.5 text-foreground font-medium">{item.label}</td>
+                                                <td className="px-4 py-2.5 text-center">
+                                                  <input
+                                                    type="radio"
+                                                    name={`${komp.kode}_k2_${item.key}`}
+                                                    disabled={isFormLocked || currentUser?.role !== 'Perawat'}
+                                                    checked={form02Data[item.key] === 'K'}
+                                                    onChange={() => setForm02Data({ ...form02Data, [item.key]: 'K' })}
+                                                    className="text-primary focus:ring-primary w-4 h-4 cursor-pointer"
+                                                  />
+                                                </td>
+                                                <td className="px-4 py-2.5 text-center">
+                                                  <input
+                                                    type="radio"
+                                                    name={`${komp.kode}_k2_${item.key}`}
+                                                    disabled={isFormLocked || currentUser?.role !== 'Perawat'}
+                                                    checked={form02Data[item.key] === 'BK'}
+                                                    onChange={() => setForm02Data({ ...form02Data, [item.key]: 'BK' })}
+                                                    className="text-destructive focus:ring-destructive w-4 h-4 cursor-pointer"
+                                                  />
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                        <div>
+                                          <label className="block text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">Bukti-bukti Kompetensi Terkait</label>
+                                          <input
+                                            type="text"
+                                            disabled={isFormLocked || currentUser?.role !== 'Perawat'}
+                                            value={form02Data[buktiKey] || ''}
+                                            onChange={e => setForm02Data({ ...form02Data, [buktiKey]: e.target.value })}
+                                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                            placeholder="Cth: Sertifikat pelatihan terkait, logbook..."
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="block text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">Rekomendasi Asesor / Admin</label>
+                                          <input
+                                            type="text"
+                                            disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                            value={form02Data[rekomKey] || ''}
+                                            onChange={e => setForm02Data({ ...form02Data, [rekomKey]: e.target.value })}
+                                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                            placeholder="Rekomendasi kelanjutan asesmen mandiri..."
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                               </div>
 
                               <div className="pt-4 border-t border-border flex justify-end">
@@ -6778,8 +8542,8 @@ function App() {
                             <div className="space-y-6">
                               <div className="border-b border-border pb-4 flex justify-between items-center">
                                 <div>
-                                  <h3 className="text-lg font-bold text-primary">FORM-03 A. CEKLIST OBSERVASI DEMONSTRASI KLINIS</h3>
-                                  <p className="text-xs text-muted-foreground mt-0.5">Lembar checklist penilaian unjuk kerja langsung di lapangan</p>
+                                  <h3 className="text-lg font-bold text-primary">FORM-03 C. CEKLIST OBSERVASI DEMONSTRASI KLINIS</h3>
+                                  <p className="text-xs text-muted-foreground mt-0.5">Lembar checklist penilaian unjuk kerja langsung untuk 12 kompetensi dasar</p>
                                 </div>
                                 <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded font-bold">OBSERVASI</span>
                               </div>
@@ -6788,75 +8552,62 @@ function App() {
                                 <table className="w-full text-xs text-left">
                                   <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
                                     <tr>
-                                      <th className="px-4 py-3">Kriteria Unjuk Kerja (KUK) Observasi</th>
-                                      <th className="px-4 py-3 text-center w-24">Kompeten (K)</th>
-                                      <th className="px-4 py-3 text-center w-36">Belum Kompeten (BK)</th>
+                                      <th className="px-4 py-3 text-center w-12">NO</th>
+                                      <th className="px-4 py-3">KOMPETENSI</th>
+                                      <th className="px-4 py-3 w-1/3">KETERANGAN</th>
+                                      <th className="px-4 py-3 text-center w-48">NILAI</th>
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    <tr className="bg-muted/20 font-bold border-b border-border">
-                                      <td colSpan="3" className="px-4 py-2.5">Tindakan Persiapan Asesi</td>
-                                    </tr>
-                                    {[
-                                      { key: 'q1', label: `1. Melakukan verifikasi identitas pasien dengan minimal 2 cara` },
-                                      { key: 'q2', label: `2. Mempersiapkan alat pelindung diri dan instrumen asuhan medis secara higienis` }
-                                    ].map(item => (
-                                      <tr key={item.key} className="border-b border-border last:border-0 hover:bg-muted/10">
-                                        <td className="px-4 py-3 text-foreground">{item.label}</td>
-                                        <td className="px-4 py-3 text-center">
-                                          <input
-                                            type="radio"
-                                            name={item.key}
-                                            disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                            checked={form03aData[item.key] === 'K'}
-                                            onChange={() => setForm03aData({ ...form03aData, [item.key]: 'K' })}
-                                            className="text-primary focus:ring-primary w-4 h-4"
-                                          />
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                          <input
-                                            type="radio"
-                                            name={item.key}
-                                            disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                            checked={form03aData[item.key] === 'BK'}
-                                            onChange={() => setForm03aData({ ...form03aData, [item.key]: 'BK' })}
-                                            className="text-destructive focus:ring-destructive w-4 h-4"
-                                          />
-                                        </td>
-                                      </tr>
-                                    ))}
-
-                                    <tr className="bg-muted/20 font-bold border-b border-border">
-                                      <td colSpan="3" className="px-4 py-2.5">Prosedur Inti & Pasca Tindakan</td>
-                                    </tr>
-                                    {[
-                                      { key: 'q3', label: `3. Mengaplikasikan langkah klinis utama asuhan keperawatan: ${activeComp.judul}` },
-                                      { key: 'q4', label: `4. Melakukan cuci tangan 6 langkah pasca tindakan klinis dan merapikan alat medis` }
-                                    ].map(item => (
-                                      <tr key={item.key} className="border-b border-border last:border-0 hover:bg-muted/10">
-                                        <td className="px-4 py-3 text-foreground">{item.label}</td>
-                                        <td className="px-4 py-3 text-center">
-                                          <input
-                                            type="radio"
-                                            name={item.key}
-                                            disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                            checked={form03aData[item.key] === 'K'}
-                                            onChange={() => setForm03aData({ ...form03aData, [item.key]: 'K' })}
-                                            className="text-primary focus:ring-primary w-4 h-4"
-                                          />
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                          <input
-                                            type="radio"
-                                            name={item.key}
-                                            disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                            checked={form03aData[item.key] === 'BK'}
-                                            onChange={() => setForm03aData({ ...form03aData, [item.key]: 'BK' })}
-                                            className="text-destructive focus:ring-destructive w-4 h-4"
-                                          />
-                                        </td>
-                                      </tr>
-                                    ))}
+                                    {get12KompetensiForPengajuan(activePengajuan).map((komp, idx) => {
+                                      const nilaiKey = `${komp.kode}_nilai`;
+                                      const ketKey = `${komp.kode}_ket`;
+                                      return (
+                                        <tr key={komp.kode} className="border-b border-border last:border-0 hover:bg-muted/10">
+                                          <td className="px-4 py-3 text-center font-semibold text-muted-foreground">{idx + 1}.</td>
+                                          <td className="px-4 py-3">
+                                            <div className="font-bold text-foreground">{komp.kode}</div>
+                                            <div className="text-[10px] text-muted-foreground font-medium mt-0.5">{komp.judul}</div>
+                                          </td>
+                                          <td className="px-4 py-3">
+                                            <input
+                                              type="text"
+                                              disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                              value={form03aData[ketKey] || ''}
+                                              onChange={e => setForm03aData({ ...form03aData, [ketKey]: e.target.value })}
+                                              className="w-full px-2.5 py-1.5 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                              placeholder="Tulis keterangan observasi..."
+                                            />
+                                          </td>
+                                          <td className="px-4 py-3 text-center">
+                                            <div className="flex justify-center gap-4">
+                                              <label className="flex items-center gap-1.5 cursor-pointer">
+                                                <input
+                                                  type="radio"
+                                                  name={`${komp.kode}_obs_nilai`}
+                                                  disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                                  checked={form03aData[nilaiKey] === 'K'}
+                                                  onChange={() => setForm03aData({ ...form03aData, [nilaiKey]: 'K' })}
+                                                  className="text-primary focus:ring-primary w-4 h-4"
+                                                />
+                                                <span className="font-semibold text-foreground text-xs">K</span>
+                                              </label>
+                                              <label className="flex items-center gap-1.5 cursor-pointer">
+                                                <input
+                                                  type="radio"
+                                                  name={`${komp.kode}_obs_nilai`}
+                                                  disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                                  checked={form03aData[nilaiKey] === 'BK'}
+                                                  onChange={() => setForm03aData({ ...form03aData, [nilaiKey]: 'BK' })}
+                                                  className="text-destructive focus:ring-destructive w-4 h-4"
+                                                />
+                                                <span className="font-semibold text-foreground text-xs">BK</span>
+                                              </label>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
                                   </tbody>
                                 </table>
                               </div>
@@ -6880,7 +8631,7 @@ function App() {
                                   onClick={handleSaveCompetencyForms}
                                   className="px-5 py-2 bg-primary text-primary-foreground font-bold hover:bg-primary/95 rounded-lg text-xs transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  Simpan Hasil Observasi (FORM-03 A)
+                                  Simpan Hasil Observasi (FORM-03 C)
                                 </button>
                               </div>
                             </div>
@@ -6892,93 +8643,73 @@ function App() {
                               <div className="border-b border-border pb-4 flex justify-between items-center">
                                 <div>
                                   <h3 className="text-lg font-bold text-primary">FORM-03 B. INSTRUMEN PENILAIAN LISAN</h3>
-                                  <p className="text-xs text-muted-foreground mt-0.5">Pertanyaan lisan pendalaman klinis untuk mengukur pemahaman teori</p>
+                                  <p className="text-xs text-muted-foreground mt-0.5">Penilaian wawancara lisan 12 unit kompetensi dasar</p>
                                 </div>
                                 <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded font-bold">LISAN</span>
                               </div>
 
-                              <div className="space-y-4 text-xs">
-                                <div className="p-4 bg-muted/30 border border-border rounded-xl space-y-3">
-                                  <h4 className="font-bold text-foreground">Pertanyaan Lisan 1:</h4>
-                                  <p className="italic text-muted-foreground">{activeComp.form03.q_lisan1}</p>
-                                  <div className="mt-2.5">
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Tanggapan/Jawaban Peserta</label>
-                                    <textarea
-                                      rows="3"
-                                      disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                      value={form03bData.q1 || ''}
-                                      onChange={e => setForm03bData({ ...form03bData, q1: e.target.value })}
-                                      className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                      placeholder="Tulis tanggapan lisan peserta..."
-                                    />
-                                  </div>
-                                  <div className="flex items-center gap-4 mt-2">
-                                    <span className="font-semibold text-muted-foreground text-[10px] uppercase">Penilaian:</span>
-                                    <label className="flex items-center gap-1.5 cursor-pointer">
-                                      <input
-                                        type="radio"
-                                        name="grade1"
-                                        disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                        checked={form03bData.grade1 === 'K'}
-                                        onChange={() => setForm03bData({ ...form03bData, grade1: 'K' })}
-                                        className="text-primary focus:ring-primary w-4 h-4"
-                                      />
-                                      <span className="font-semibold text-foreground text-xs">Kompeten (K)</span>
-                                    </label>
-                                    <label className="flex items-center gap-1.5 cursor-pointer">
-                                      <input
-                                        type="radio"
-                                        name="grade1"
-                                        disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                        checked={form03bData.grade1 === 'BK'}
-                                        onChange={() => setForm03bData({ ...form03bData, grade1: 'BK' })}
-                                        className="text-destructive focus:ring-destructive w-4 h-4"
-                                      />
-                                      <span className="font-semibold text-foreground text-xs">Belum Kompeten (BK)</span>
-                                    </label>
-                                  </div>
-                                </div>
-
-                                <div className="p-4 bg-muted/30 border border-border rounded-xl space-y-3">
-                                  <h4 className="font-bold text-foreground">Pertanyaan Lisan 2:</h4>
-                                  <p className="italic text-muted-foreground">{activeComp.form03.q_lisan2}</p>
-                                  <div className="mt-2.5">
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Tanggapan/Jawaban Peserta</label>
-                                    <textarea
-                                      rows="3"
-                                      disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                      value={form03bData.q2 || ''}
-                                      onChange={e => setForm03bData({ ...form03bData, q2: e.target.value })}
-                                      className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                      placeholder="Tulis tanggapan lisan peserta..."
-                                    />
-                                  </div>
-                                  <div className="flex items-center gap-4 mt-2">
-                                    <span className="font-semibold text-muted-foreground text-[10px] uppercase">Penilaian:</span>
-                                    <label className="flex items-center gap-1.5 cursor-pointer">
-                                      <input
-                                        type="radio"
-                                        name="grade2"
-                                        disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                        checked={form03bData.grade2 === 'K'}
-                                        onChange={() => setForm03bData({ ...form03bData, grade2: 'K' })}
-                                        className="text-primary focus:ring-primary w-4 h-4"
-                                      />
-                                      <span className="font-semibold text-foreground text-xs">Kompeten (K)</span>
-                                    </label>
-                                    <label className="flex items-center gap-1.5 cursor-pointer">
-                                      <input
-                                        type="radio"
-                                        name="grade2"
-                                        disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                        checked={form03bData.grade2 === 'BK'}
-                                        onChange={() => setForm03bData({ ...form03bData, grade2: 'BK' })}
-                                        className="text-destructive focus:ring-destructive w-4 h-4"
-                                      />
-                                      <span className="font-semibold text-foreground text-xs">Belum Kompeten (BK)</span>
-                                    </label>
-                                  </div>
-                                </div>
+                              <div className="overflow-x-auto rounded-lg border border-border">
+                                <table className="w-full text-xs text-left">
+                                  <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                                    <tr>
+                                      <th className="px-4 py-3 text-center w-12">NO</th>
+                                      <th className="px-4 py-3">KOMPETENSI</th>
+                                      <th className="px-4 py-3 w-1/3">KETERANGAN</th>
+                                      <th className="px-4 py-3 text-center w-48">NILAI</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {get12KompetensiForPengajuan(activePengajuan).map((komp, idx) => {
+                                      const nilaiKey = `${komp.kode}_nilai`;
+                                      const ketKey = `${komp.kode}_ket`;
+                                      return (
+                                        <tr key={komp.kode} className="border-b border-border last:border-0 hover:bg-muted/10">
+                                          <td className="px-4 py-3 text-center font-semibold text-muted-foreground">{idx + 1}.</td>
+                                          <td className="px-4 py-3">
+                                            <div className="font-bold text-foreground">{komp.kode}</div>
+                                            <div className="text-[10px] text-muted-foreground font-medium mt-0.5">{komp.judul}</div>
+                                          </td>
+                                          <td className="px-4 py-3">
+                                            <input
+                                              type="text"
+                                              disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                              value={form03bData[ketKey] || ''}
+                                              onChange={e => setForm03bData({ ...form03bData, [ketKey]: e.target.value })}
+                                              className="w-full px-2.5 py-1.5 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                              placeholder="Tulis keterangan lisan..."
+                                            />
+                                          </td>
+                                          <td className="px-4 py-3 text-center">
+                                            <div className="flex justify-center gap-4">
+                                              <label className="flex items-center gap-1.5 cursor-pointer">
+                                                <input
+                                                  type="radio"
+                                                  name={`${komp.kode}_lisan_nilai`}
+                                                  disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                                  checked={form03bData[nilaiKey] === 'K'}
+                                                  onChange={() => setForm03bData({ ...form03bData, [nilaiKey]: 'K' })}
+                                                  className="text-primary focus:ring-primary w-4 h-4"
+                                                />
+                                                <span className="font-semibold text-foreground text-xs">K</span>
+                                              </label>
+                                              <label className="flex items-center gap-1.5 cursor-pointer">
+                                                <input
+                                                  type="radio"
+                                                  name={`${komp.kode}_lisan_nilai`}
+                                                  disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                                  checked={form03bData[nilaiKey] === 'BK'}
+                                                  onChange={() => setForm03bData({ ...form03bData, [nilaiKey]: 'BK' })}
+                                                  className="text-destructive focus:ring-destructive w-4 h-4"
+                                                />
+                                                <span className="font-semibold text-foreground text-xs">BK</span>
+                                              </label>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
                               </div>
 
                               <div className="pt-4 border-t border-border flex justify-end">
@@ -6999,52 +8730,143 @@ function App() {
                             <div className="space-y-6">
                               <div className="border-b border-border pb-4 flex justify-between items-center">
                                 <div>
-                                  <h3 className="text-lg font-bold text-primary">FORM-03 C. INSTRUMEN PENILAIAN PENGETAHUAN TULIS</h3>
-                                  <p className="text-xs text-muted-foreground mt-0.5">Ujian esai/tulis pendalaman teori asuhan klinis terstandarisasi</p>
+                                  <h3 className="text-lg font-bold text-primary">FORM-03 A. INSTRUMEN PENILAIAN PENGETAHUAN TULIS</h3>
+                                  <p className="text-xs text-muted-foreground mt-0.5">Hasil ujian kompetensi tertulis sistem online</p>
                                 </div>
                                 <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded font-bold">TULIS</span>
                               </div>
 
-                              <div className="p-4 bg-muted/30 border border-border rounded-xl space-y-3 text-xs">
-                                <h4 className="font-bold text-foreground">Soal Esai Komprehensif:</h4>
-                                <p className="italic text-muted-foreground">{activeComp.form03.q_tulis}</p>
-                                <div className="mt-2.5">
-                                  <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Lembar Jawaban Esai Peserta (Diisi Perawat / Asesi)</label>
-                                  <textarea
-                                    rows="5"
-                                    disabled={isFormLocked || currentUser?.role !== 'Perawat'}
-                                    value={form03cData.essay1 || ''}
-                                    onChange={e => setForm03cData({ ...form03cData, essay1: e.target.value })}
-                                    className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                    placeholder="Tuliskan jawaban tertulis secara komprehensif..."
-                                  />
+                              <div className="p-6 bg-blue-500/5 border border-blue-500/20 dark:bg-blue-950/20 dark:border-blue-500/30 rounded-xl space-y-4 text-xs shadow-sm">
+                                <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+                                  <Clock size={16} className="text-blue-500" /> Hasil Ujian Tertulis Asesi
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                  <div className="space-y-3">
+                                    <div>
+                                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block mb-1">Status Ujian Online</span>
+                                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase ${
+                                        activePengajuan?.status_ujian === 'Selesai'
+                                          ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400'
+                                          : 'bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400'
+                                      }`}>
+                                        {activePengajuan?.status_ujian || 'Belum'}
+                                      </span>
+                                    </div>
+                                    {activePengajuan?.status_ujian === 'Selesai' && (
+                                      <div>
+                                        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block mb-1">Nilai Akhir Ujian</span>
+                                        <span className="text-2xl font-black text-foreground">
+                                          {activePengajuan?.nilai_ujian}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="space-y-3">
+                                    <div>
+                                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block mb-1">Hasil Kelulusan Asesor</span>
+                                      <div className="flex items-center gap-4 mt-2">
+                                        <label className="flex items-center gap-1.5 cursor-pointer">
+                                          <input
+                                            type="radio"
+                                            name="essayGrade"
+                                            disabled={true}
+                                            checked={form03cData.grade1 === 'K'}
+                                            className="text-primary focus:ring-primary w-4 h-4"
+                                          />
+                                          <span className="font-semibold text-foreground text-xs">Kompeten (K) (Nilai &gt;= 70)</span>
+                                        </label>
+                                        <label className="flex items-center gap-1.5 cursor-pointer">
+                                          <input
+                                            type="radio"
+                                            name="essayGrade"
+                                            disabled={true}
+                                            checked={form03cData.grade1 === 'BK'}
+                                            className="text-destructive focus:ring-destructive w-4 h-4"
+                                          />
+                                          <span className="font-semibold text-foreground text-xs">Belum Kompeten (BK) (Nilai &lt; 70)</span>
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="flex items-center gap-4 mt-2">
-                                  <span className="font-semibold text-muted-foreground text-[10px] uppercase">Hasil Koreksi Asesor:</span>
-                                  <label className="flex items-center gap-1.5 cursor-pointer">
-                                    <input
-                                      type="radio"
-                                      name="essayGrade"
-                                      disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                      checked={form03cData.grade1 === 'K'}
-                                      onChange={() => setForm03cData({ ...form03cData, grade1: 'K' })}
-                                      className="text-primary focus:ring-primary w-4 h-4"
-                                    />
-                                    <span className="font-semibold text-foreground text-xs">Lulus / Kompeten (K)</span>
-                                  </label>
-                                  <label className="flex items-center gap-1.5 cursor-pointer">
-                                    <input
-                                      type="radio"
-                                      name="essayGrade"
-                                      disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                      checked={form03cData.grade1 === 'BK'}
-                                      onChange={() => setForm03cData({ ...form03cData, grade1: 'BK' })}
-                                      className="text-destructive focus:ring-destructive w-4 h-4"
-                                    />
-                                    <span className="font-semibold text-foreground text-xs">Belum Kompeten (BK)</span>
-                                  </label>
-                                </div>
+                                {activePengajuan?.status_ujian !== 'Selesai' && (
+                                  <div className="bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400 p-3 rounded-lg border border-yellow-500/20 mt-2 font-semibold">
+                                    Perawat belum menyelesaikan ujian tertulis online. Penilaian akan tersedia otomatis setelah ujian disubmit.
+                                  </div>
+                                )}
                               </div>
+
+                              {activePengajuan?.status_ujian === 'Selesai' && (
+                                <div className="space-y-4">
+                                  <h4 className="font-bold text-foreground text-sm flex items-center gap-2 mt-2">
+                                    <ClipboardCheck size={16} className="text-primary" /> Rincian Nilai 12 Kompetensi Dasar
+                                  </h4>
+                                  <div className="overflow-x-auto rounded-lg border border-border">
+                                    <table className="w-full text-xs text-left">
+                                      <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                                        <tr>
+                                          <th className="px-4 py-3 text-center w-12">NO</th>
+                                          <th className="px-4 py-3">KOMPETENSI</th>
+                                          <th className="px-4 py-3 text-center w-32">SKOR</th>
+                                          <th className="px-4 py-3 text-center w-48">STATUS KELULUSAN</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {get12KompetensiForPengajuan(activePengajuan).map((komp, idx) => {
+                                          const score = compScores[komp.kode];
+                                          const isTested = score !== null && score !== undefined;
+                                          let statusLabel = '-';
+                                          let statusClass = 'text-muted-foreground';
+
+                                          if (isTested) {
+                                            if (score >= 70) {
+                                              statusLabel = 'Lolos';
+                                              statusClass = 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-500/20';
+                                            } else {
+                                              statusLabel = 'Belum Lolos';
+                                              statusClass = 'bg-destructive/10 text-destructive border border-destructive/20';
+                                            }
+                                          }
+
+                                          return (
+                                            <tr key={komp.kode} className="border-b border-border last:border-0 hover:bg-muted/10">
+                                              <td className="px-4 py-3 text-center font-semibold text-muted-foreground">{idx + 1}.</td>
+                                              <td className="px-4 py-3">
+                                                <div className="font-bold text-foreground">{komp.kode}</div>
+                                                <div className="text-[10px] text-muted-foreground font-medium mt-0.5">{komp.judul}</div>
+                                              </td>
+                                              <td className="px-4 py-3 text-center font-bold text-sm">
+                                                {isTested ? `${score}%` : '-'}
+                                              </td>
+                                              <td className="px-4 py-3 text-center">
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase ${statusClass}`}>
+                                                  {statusLabel}
+                                                </span>
+                                              </td>
+                                            </tr>
+                                          );
+                                        })}
+                                        {/* Total Score Row */}
+                                        <tr className="bg-muted/30 font-bold border-t border-border">
+                                          <td colSpan={2} className="px-4 py-4 text-right text-sm">TOTAL SKOR:</td>
+                                          <td className="px-4 py-4 text-center text-base font-black text-foreground">
+                                            {activePengajuan?.nilai_ujian}%
+                                          </td>
+                                          <td className="px-4 py-4 text-center">
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase ${
+                                              parseFloat(activePengajuan?.nilai_ujian || '0') >= 70
+                                                ? 'bg-green-500 text-white'
+                                                : 'bg-destructive text-white'
+                                            }`}>
+                                              {parseFloat(activePengajuan?.nilai_ujian || '0') >= 70 ? 'KOMPETEN (K)' : 'BELUM KOMPETEN (BK)'}
+                                            </span>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              )}
 
                               <div className="pt-4 border-t border-border flex justify-end">
                                 <button
@@ -7053,7 +8875,7 @@ function App() {
                                   onClick={handleSaveCompetencyForms}
                                   className="px-5 py-2 bg-primary text-primary-foreground font-bold hover:bg-primary/95 rounded-lg text-xs transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  Simpan Lembar Ujian Tulis (FORM-03 C)
+                                  Simpan Lembar Ujian Tulis (FORM-03 A)
                                 </button>
                               </div>
                             </div>
@@ -7185,45 +9007,83 @@ function App() {
                                 </div>
                               </div>
 
+                              <div className="bg-muted/10 border border-border rounded-xl overflow-hidden text-xs my-4">
+                                <table className="w-full text-left border-collapse">
+                                  <thead>
+                                    <tr className="bg-muted/30 border-b border-border">
+                                      <th className="px-3 py-2 w-10 text-center font-bold">No</th>
+                                      <th className="px-3 py-2 font-bold">Pertanyaan</th>
+                                      <th className="px-3 py-2 w-16 text-center font-bold">Ya</th>
+                                      <th className="px-3 py-2 w-16 text-center font-bold">Tidak</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-border">
+                                    {[
+                                      { key: 'tujuanJelas', no: 1, label: 'Apakah tujuan asesmen dan konsekuensi sudah dijelaskan dengan benar?' },
+                                      { key: 'standarJelas', no: 2, label: 'Apakah asesi telah menerima dan dijelaskan standar kompetensi yang akan di asess?' },
+                                      { key: 'buktiDimengerti', no: 3, label: 'Apakah asesi mengerti bukti apa saja yang akan dikumpulkan?' },
+                                      { key: 'hakJelas', no: 4, label: 'Apakah hak-hak asesi selama asesmen telah di jelaskan dengan rinci?' },
+                                      { key: 'bandingJelas', no: 5, label: 'Apakah asesi telah dijelaskan dengan rinci proses banding terhadap asesmen?' },
+                                      { key: 'kerahasiaanJelas', no: 6, label: 'Apakah asesi telah mengetahui bahwa bukti-bukti informasi yang dikumpulkan hanya untuk kepentingan assesmen dan disimpan serta di akses hanya oleh orang tertentu?' },
+                                    ].map((q) => (
+                                      <tr key={q.key} className="hover:bg-muted/5 transition-colors">
+                                        <td className="px-3 py-2 text-center text-muted-foreground">{q.no}</td>
+                                        <td className="px-3 py-2 text-foreground font-medium">{q.label}</td>
+                                        <td className="px-3 py-2 text-center">
+                                          <input
+                                            type="radio"
+                                            name={`form04_${q.key}`}
+                                            disabled={isFormLocked || currentUser?.role !== 'Perawat'}
+                                            checked={form04Data[q.key] === true}
+                                            onChange={() => setForm04Data({ ...form04Data, [q.key]: true })}
+                                            className="w-4 h-4 text-primary focus:ring-primary cursor-pointer"
+                                          />
+                                        </td>
+                                        <td className="px-3 py-2 text-center">
+                                          <input
+                                            type="radio"
+                                            name={`form04_${q.key}`}
+                                            disabled={isFormLocked || currentUser?.role !== 'Perawat'}
+                                            checked={form04Data[q.key] === false}
+                                            onChange={() => setForm04Data({ ...form04Data, [q.key]: false })}
+                                            className="w-4 h-4 text-primary focus:ring-primary cursor-pointer"
+                                          />
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+
                               <div className="p-4 bg-muted/20 border border-border rounded-xl text-xs space-y-4">
                                 <h4 className="font-bold text-foreground border-b border-border pb-1">Tanda Tangan Pernyataan Komitmen Asesmen</h4>
-                                <div className="grid grid-cols-2 gap-6 text-center">
-                                  <div className="p-4 border border-border bg-background rounded-lg flex flex-col justify-between items-center min-h-[140px]">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
+                                  {/* Asesi Signature Box */}
+                                  <div className="p-4 border border-border bg-background rounded-lg flex flex-col justify-between items-center min-h-[200px] space-y-3">
                                     <span className="font-bold text-muted-foreground uppercase text-[10px]">Tanda Tangan Asesi (Perawat)</span>
-                                    {form04Data.asesiSign ? (
-                                      <span className="text-green-500 font-bold flex items-center gap-1 text-xs my-3">
-                                        <CheckCircle size={14} /> Terverifikasi Digital
-                                      </span>
-                                    ) : (
-                                      <button
-                                        type="button"
-                                        disabled={isFormLocked || currentUser?.role !== 'Perawat'}
-                                        onClick={() => setForm04Data({ ...form04Data, asesiSign: true })}
-                                        className="my-3 px-4 py-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/95 rounded-lg text-[10px] uppercase transition-all shadow"
-                                      >
-                                        Bubuhkan Tanda Tangan
-                                      </button>
-                                    )}
+                                    <SignaturePad
+                                      value={typeof form04Data.asesiSign === 'string' && form04Data.asesiSign.startsWith('data:image') ? form04Data.asesiSign : null}
+                                      onChange={(base64) => setForm04Data({ ...form04Data, asesiSign: base64 })}
+                                      onClear={() => setForm04Data({ ...form04Data, asesiSign: null })}
+                                      disabled={isFormLocked || currentUser?.role !== 'Perawat'}
+                                      label="Tanda Tangan Asesi"
+                                    />
                                     <span className="text-xs font-bold text-foreground">{activeNurse.nama}</span>
                                   </div>
 
-                                  <div className="p-4 border border-border bg-background rounded-lg flex flex-col justify-between items-center min-h-[140px]">
+                                  {/* Asesor Signature Box */}
+                                  <div className="p-4 border border-border bg-background rounded-lg flex flex-col justify-between items-center min-h-[200px] space-y-3">
                                     <span className="font-bold text-muted-foreground uppercase text-[10px]">Tanda Tangan Asesor</span>
-                                    {form04Data.asesorSign ? (
-                                      <span className="text-green-500 font-bold flex items-center gap-1 text-xs my-3">
-                                        <CheckCircle size={14} /> Terverifikasi Digital
-                                      </span>
-                                    ) : (
-                                      <button
-                                        type="button"
-                                        disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                        onClick={() => setForm04Data({ ...form04Data, asesorSign: true })}
-                                        className="my-3 px-4 py-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/95 rounded-lg text-[10px] uppercase transition-all shadow"
-                                      >
-                                        Bubuhkan Tanda Tangan
-                                      </button>
-                                    )}
-                                    <span className="text-xs font-bold text-foreground">Asesor Pilihan RS</span>
+                                    <SignaturePad
+                                      value={typeof form04Data.asesorSign === 'string' && form04Data.asesorSign.startsWith('data:image') ? form04Data.asesorSign : null}
+                                      onChange={(base64) => setForm04Data({ ...form04Data, asesorSign: base64 })}
+                                      onClear={() => setForm04Data({ ...form04Data, asesorSign: null })}
+                                      disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                      label="Tanda Tangan Asesor"
+                                    />
+                                    <span className="text-xs font-bold text-foreground">
+                                      {userData.find(u => String(u.id) === String(activePengajuan?.id_asesor))?.nama || 'Asesor Pilihan RS'}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -7579,7 +9439,7 @@ function App() {
                                                   name={`soal_${soal.id_soal}`}
                                                   value={opt}
                                                   checked={jawabanUjian[soal.id_soal] === opt}
-                                                  onChange={() => setJawabanUjian(prev => ({ ...prev, [soal.id_soal]: opt }))}
+                                                  onChange={() => handleJawabanSelect(soal.id_soal, opt)}
                                                   className="mt-1 w-5 h-5 text-primary focus:ring-primary border-muted-foreground/30"
                                                 />
                                                 <span className="text-sm font-medium text-foreground leading-relaxed">
@@ -7612,7 +9472,7 @@ function App() {
                                             <button
                                               type="button"
                                               disabled={isSubmittingUjian}
-                                              onClick={handleSubmitUjian}
+                                              onClick={() => handleSubmitUjian(false)}
                                               className="px-6 py-2.5 bg-green-600 text-white font-bold hover:bg-green-700 rounded-lg text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-2"
                                             >
                                               {isSubmittingUjian ? 'Menyimpan...' : 'Selesai'}
@@ -7657,11 +9517,162 @@ function App() {
                                       <button
                                         type="button"
                                         disabled={isSubmittingUjian}
-                                        onClick={handleSubmitUjian}
+                                        onClick={() => handleSubmitUjian(false)}
                                         className="w-full px-4 py-2 bg-green-600 text-white font-bold hover:bg-green-700 rounded-lg text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
                                       >
                                         <CheckCircle size={16} /> {isSubmittingUjian ? 'Menyimpan...' : 'Submit Ujian'}
                                       </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          {sertifikatSubTab === 'sertifikat' && (
+                            <div className="space-y-6">
+                              <div className="border-b border-border pb-4 flex justify-between items-center print:hidden">
+                                <div>
+                                  <h3 className="text-lg font-bold text-primary flex items-center gap-2"><Award size={20} /> Sertifikat Kompetensi</h3>
+                                  <p className="text-xs text-muted-foreground mt-0.5">Pratinjau dan cetak sertifikat asesi.</p>
+                                </div>
+                                <button
+                                  onClick={handleSimpanSertifikat}
+                                  className="px-4 py-2 bg-primary text-white text-sm font-bold rounded flex items-center gap-2"
+                                >
+                                  Simpan & Cetak Sertifikat
+                                </button>
+                              </div>
+
+                              <style>
+                                {`
+                                  @media print {
+                                    @page { size: landscape; margin: 10mm; }
+                                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                                  }
+                                `}
+                              </style>
+                              <div className="bg-white text-black p-8 sm:p-12 border border-gray-300 mx-auto w-[297mm] min-h-[210mm] max-w-full font-serif print:p-0 print:border-none print:shadow-none relative print:w-full print:max-w-none print:min-h-0" id="print-area">
+                                {/* BACKGROUND WATERMARK */}
+                                <div
+                                  className="absolute inset-0 z-0 opacity-100 pointer-events-none print:opacity-100"
+                                  style={{ backgroundImage: `url(${certificateBackground})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+                                ></div>
+
+                                <div className="relative z-10 px-16 py-12 sm:px-24 sm:py-16 print:pt-[160px] print:px-[140px] print:pb-[80px] h-full flex flex-col justify-center">
+                                  {/* KOP SURAT */}
+                                  <div className="flex justify-between items-center border-b-[3px] border-black pb-4 mb-4">
+                                    <div className="w-28 sm:w-32 flex justify-start">
+                                      <img src={logoKudus} alt="Logo Pemkab" className="h-32 sm:h-40 w-auto object-contain" />
+                                    </div>
+                                    <div className="text-center flex-1 px-4">
+                                      <h1 className="text-lg sm:text-xl font-bold uppercase tracking-wide">Pemerintah Kabupaten Kudus</h1>
+                                      <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-wide mt-1">Rumah Sakit Umum Daerah dr.LOEKMONO HADI</h2>
+                                      <p className="text-sm mt-2">Jl. dr. Lukmonohadi No. 19 Kudus 59348 ☎ (0291) 444001 📠 (0291) 438195</p>
+                                      <p className="text-sm">Email : rsuddrloekmonohadi@kuduskab.go.id ; rsudkudus@yahoo.co.id</p>
+                                      <p className="text-sm">Website : www.rsuddrloekmonohadi.kuduskab.go.id</p>
+                                    </div>
+                                    <div className="w-28 sm:w-32 flex justify-end">
+                                      <img src={logoRS} alt="Logo RS" className="h-32 sm:h-40 w-auto object-contain" />
+                                    </div>
+                                  </div>
+
+                                  {/* JUDUL */}
+                                  <div className="text-center mb-2 mt-4">
+                                    <h3 style={{ fontFamily: '"Great Vibes", cursive' }} className="text-6xl font-normal mb-2">Sertifikat Kompetensi</h3>
+                                  </div>
+
+                                  <div className="text-center mb-2 text-sm">
+                                    Nomor : {sertifikatData?.nomor_sertifikat || "11/.../ASKOM/BIDKEP/" + new Date().getFullYear()}
+                                  </div>
+
+                                  <div className="space-y-3 text-base leading-relaxed">
+                                    <p className="text-center">Menyatakan bahwa :</p>
+                                    <h2 className="text-3xl font-bold text-center uppercase tracking-wide">{activeNurse?.nama || activePengajuan?.nama_pemohon}</h2>
+                                    <p className="text-center">
+                                      Lahir di {activeNurse?.tempat_lahir || '................'}, Tanggal : {activeNurse?.tanggal_lahir ? new Date(activeNurse.tanggal_lahir).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '................'}
+                                    </p>
+
+                                    <div className="text-center py-6">
+                                      <h2 className="text-4xl font-bold tracking-widest text-primary print:text-black">KOMPETEN</h2>
+                                    </div>
+
+                                    <p className="text-center">
+                                      Sebagai <strong>{form03Data?.pendekatan || activePengajuan?.jenjang_tujuan}</strong> <br />
+                                      Setelah dilakukan asesmen kompetensi {form03Data?.pendekatan || activePengajuan?.jenjang_tujuan} <br />
+                                      pada tanggal {activePengajuan?.created_at ? new Date(activePengajuan.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '...'} s/d {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} <br />
+                                      ( Daftar unit kompetensi terlampir pada halaman 2 )
+                                    </p>
+                                    <p className="text-center font-bold">Sertifikat ini berlaku 3 ( tiga ) tahun</p>
+                                  </div>
+
+                                  <div className="mt-16 flex justify-end">
+                                    <div className="text-center w-64">
+                                      <p className="text-left">Ditetapkan di : KUDUS</p>
+                                      <p className="text-left mb-6">Pada Tanggal : {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+
+                                      <p className="font-bold mb-2">{pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.jabatan || 'Kepala Bidang Keperawatan'}</p>
+
+                                      {pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip ? (
+                                        <img
+                                          src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip}`}
+                                          alt="QR Code"
+                                          className="mx-auto w-20 h-20 mb-2"
+                                        />
+                                      ) : (
+                                        <div className="h-20"></div>
+                                      )}
+
+                                      <p className="font-bold underline decoration-1 underline-offset-4">{pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nama || '................................'}</p>
+                                      <p>NIP. {pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip || '................................'}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* HALAMAN 2 */}
+                              <div className="bg-white text-black p-8 sm:p-12 border border-gray-300 mx-auto w-[297mm] min-h-[210mm] max-w-full font-serif print:p-0 print:border-none print:shadow-none relative print:w-full print:max-w-none print:h-[210mm] print:min-h-0 overflow-hidden mt-8 print:mt-0" style={{ pageBreakBefore: 'always', breakBefore: 'page' }}>
+                                <div
+                                  className="absolute inset-0 z-0 opacity-100 pointer-events-none print:opacity-100"
+                                  style={{ backgroundImage: `url(${certificateBackground})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+                                ></div>
+                                <div className="relative z-10 h-full flex flex-col pt-8 px-16 pb-12 sm:px-24 sm:pb-16 print:pt-[160px] print:px-[140px] print:pb-[80px]">
+                                  <h3 className="text-xl font-bold text-center mb-6 uppercase">Daftar Unit Kompetensi {activePengajuan?.jenjang_tujuan}</h3>
+
+                                  <table className="w-full border-collapse border border-black text-sm mb-16 relative bg-white/90">
+                                    <thead>
+                                      <tr>
+                                        <th className="border border-black p-2 w-12 text-center">NO</th>
+                                        <th className="border border-black p-2 text-left">KOMPETENSI</th>
+                                        <th className="border border-black p-2 w-32 text-center">HASIL</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {get12KompetensiForPengajuan(activePengajuan).map((komp, idx) => (
+                                        <tr key={idx}>
+                                          <td className="border border-black p-2 text-center">{idx + 1}.</td>
+                                          <td className="border border-black p-2">{komp.judul}</td>
+                                          <td className="border border-black p-2 text-center font-bold">Kompeten</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+
+                                  <div className="flex justify-end relative z-10 bg-white/80 p-2">
+                                    <div className="text-center w-72">
+                                      <p className="font-bold mb-2">{pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.jabatan || 'Ketua Panitia Asesmen'}</p>
+
+                                      {pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip ? (
+                                        <img
+                                          src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip}`}
+                                          alt="QR Code"
+                                          className="mx-auto w-20 h-20 mb-2"
+                                        />
+                                      ) : (
+                                        <div className="h-20"></div>
+                                      )}
+
+                                      <p className="font-bold underline decoration-1 underline-offset-4">{pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nama || '................................'}</p>
+                                      <p>NIP. {pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip || '................................'}</p>
                                     </div>
                                   </div>
                                 </div>
@@ -7862,6 +9873,77 @@ function App() {
                 </div>
               </div>
             )}
+
+            {/* Modal Pilih Asesor */}
+            {isAssessorModalOpen && activePengajuan && (
+              <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="bg-card w-full max-w-md rounded-2xl shadow-xl border border-border overflow-hidden">
+                  <div className="p-5 border-b border-border bg-muted/20">
+                    <h3 className="font-bold text-lg flex items-center gap-2">
+                      <CheckCircle className="text-green-500" size={20} />
+                      Setujui & Tugaskan Asesor
+                    </h3>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase">Pilih Asesor Utama *</label>
+                      <select
+                        className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-xs font-medium text-foreground"
+                        value={selectedAssessorId}
+                        onChange={(e) => {
+                          setSelectedAssessorId(e.target.value);
+                          if (e.target.value === selectedCoAssessorId) {
+                            setSelectedCoAssessorId('');
+                          }
+                        }}
+                      >
+                        <option value="">-- Pilih Asesor Utama --</option>
+                        {userData.filter(u => u.role === 'Asesor').map(u => (
+                          <option key={u.id} value={u.id}>{u.nama}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase">Pilih Asesor Pendamping (Opsional)</label>
+                      <select
+                        className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-xs font-medium text-foreground"
+                        value={selectedCoAssessorId}
+                        onChange={(e) => setSelectedCoAssessorId(e.target.value)}
+                      >
+                        <option value="">-- Pilih Asesor Pendamping --</option>
+                        {userData.filter(u => u.role === 'Asesor' && String(u.id) !== String(selectedAssessorId)).map(u => (
+                          <option key={u.id} value={u.id}>{u.nama}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-normal mt-2">
+                      Tugaskan Asesor Utama dan Asesor Pendamping untuk melakukan penilaian kompetensi pada asesi ini.
+                    </p>
+                  </div>
+                  <div className="p-4 border-t border-border bg-muted/10 flex justify-end gap-3">
+                    <button
+                      onClick={() => setIsAssessorModalOpen(false)}
+                      className="px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-muted/80 transition-colors"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!selectedAssessorId) {
+                          showToast('Pilih Asesor Utama terlebih dahulu', 'error');
+                          return;
+                        }
+                        setIsAssessorModalOpen(false);
+                        handleUpdatePengajuanStatus(activePengajuan.id, activePengajuan.status === 'Pending' ? 'Approved' : activePengajuan.status, selectedAssessorId, selectedCoAssessorId);
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-bold hover:bg-green-600 transition-colors shadow"
+                    >
+                      Simpan & Setujui
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
@@ -7892,7 +9974,7 @@ function App() {
                   {formData.foto ? (
                     <img src={URL.createObjectURL(formData.foto)} className="w-28 h-28 rounded-full object-cover border-2 border-primary shadow-md" alt="Preview Foto" />
                   ) : formData.current_foto ? (
-                    <img src={`http://localhost/keperawatan/public/${formData.current_foto}`} className="w-28 h-28 rounded-full object-cover border-2 border-primary shadow-md" alt="Foto Perawat" />
+                    <img src={`${BASE_URL}/${formData.current_foto}`} className="w-28 h-28 rounded-full object-cover border-2 border-primary shadow-md" alt="Foto Perawat" />
                   ) : (
                     <div className="w-28 h-28 rounded-full bg-primary/10 border-2 border-dashed border-primary/30 flex flex-col items-center justify-center text-primary">
                       <Users size={32} className="opacity-60 mb-1" />
@@ -7915,10 +9997,17 @@ function App() {
                 {/* Kolom 1: Info Pribadi */}
                 <div className="space-y-4">
                   <h4 className="font-semibold text-primary border-b border-border pb-2">Informasi Pribadi</h4>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">NIP</label>
-                    <input type="text" name="nip" value={formData.nip || ''} onChange={handleChange} required
-                      className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">NIK</label>
+                      <input type="text" name="nik" value={formData.nik || ''} onChange={handleChange} required
+                        className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">NIP</label>
+                      <input type="text" name="nip" value={formData.nip || ''} onChange={handleChange} required
+                        className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Nama Lengkap</label>
@@ -7997,12 +10086,9 @@ function App() {
                     <select name="pendidikan_terakhir" value={formData.pendidikan_terakhir || ''} onChange={handleChange} required
                       className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                       <option value="">Pilih Pendidikan Terakhir</option>
-                      <option value="D3 Keperawatan">D3 Keperawatan</option>
-                      <option value="D4 Keperawatan">D4 Keperawatan</option>
-                      <option value="S1 Keperawatan">S1 Keperawatan</option>
-                      <option value="S1 Keperawatan + Ners">S1 Keperawatan + Ners</option>
-                      <option value="S2 Keperawatan">S2 Keperawatan</option>
-                      <option value="S3 Keperawatan">S3 Keperawatan</option>
+                      {pendidikanData.map(p => (
+                        <option key={p.id} value={p.nama_pendidikan}>{p.nama_pendidikan}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
@@ -8058,7 +10144,7 @@ function App() {
                         {formData.current_str && <span className="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full font-medium">Terunggah</span>}
                       </div>
                       {formData.current_str && (
-                        <a href={`http://localhost/keperawatan/public/${formData.current_str}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline block mb-2 font-medium">📄 Lihat File Saat Ini</a>
+                        <a href={`${BASE_URL}/${formData.current_str}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline block mb-2 font-medium">📄 Lihat File Saat Ini</a>
                       )}
                       <div className="space-y-2 mb-3">
                         <div>
@@ -8081,7 +10167,7 @@ function App() {
                         {formData.current_sip && <span className="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full font-medium">Terunggah</span>}
                       </div>
                       {formData.current_sip && (
-                        <a href={`http://localhost/keperawatan/public/${formData.current_sip}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline block mb-2 font-medium">📄 Lihat File Saat Ini</a>
+                        <a href={`${BASE_URL}/${formData.current_sip}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline block mb-2 font-medium">📄 Lihat File Saat Ini</a>
                       )}
                       <div className="space-y-2 mb-3">
                         <div>
@@ -8444,6 +10530,37 @@ function App() {
         </div>
       )}
 
+      {/* Modal Peringatan Kecurangan */}
+      {cheatWarningModal.show && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-md rounded-2xl border border-destructive/30 shadow-2xl overflow-hidden animate-fade-in flex flex-col items-center p-6 text-center">
+            <div className="p-4 bg-destructive/10 rounded-full text-destructive mb-4 animate-bounce">
+              <AlertTriangle size={48} />
+            </div>
+            <h3 className="text-xl font-bold text-destructive mb-2">
+              {cheatWarningModal.isLast ? 'Ujian Dihentikan!' : 'Peringatan Kecurangan!'}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6 leading-relaxed text-foreground">
+              {cheatWarningModal.message}
+            </p>
+            {!cheatWarningModal.isLast && (
+              <div className="w-full bg-muted dark:bg-muted/50 rounded-lg p-3 mb-6 flex justify-around text-xs font-semibold text-foreground">
+                <span className={cheatWarningModal.count >= 1 ? "text-destructive font-bold" : "text-muted-foreground"}>Peringatan 1 {cheatWarningModal.count >= 1 ? "⚠️" : "⚪"}</span>
+                <span className={cheatWarningModal.count >= 2 ? "text-destructive font-bold" : "text-muted-foreground"}>Peringatan 2 {cheatWarningModal.count >= 2 ? "⚠️" : "⚪"}</span>
+                <span className="text-muted-foreground">Otomatis Submit ⛔</span>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setCheatWarningModal(prev => ({ ...prev, show: false }))}
+              className="w-full py-2.5 px-4 bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-lg text-sm font-semibold transition-colors shadow-md focus:outline-none"
+            >
+              {cheatWarningModal.isLast ? 'Selesai' : 'Saya Mengerti'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Toast Notification */}
       {toast.show && (
         <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3.5 rounded-xl border shadow-xl backdrop-blur-md animate-slide-in transition-all duration-300 ${toast.type === 'success'
@@ -8463,6 +10580,33 @@ function App() {
           >
             <X size={14} />
           </button>
+        </div>
+      )}
+
+      {/* Modal Preview Foto Profil (Lebih Besar) */}
+      {previewPhotoUrl && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-md z-[99999] flex items-center justify-center p-4 cursor-zoom-out animate-in fade-in duration-200"
+          onClick={() => setPreviewPhotoUrl(null)}
+        >
+          <div 
+            className="relative max-w-full max-h-[85vh] bg-card/40 border border-white/10 rounded-2xl overflow-hidden shadow-2xl p-2 animate-in zoom-in-95 duration-200"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button 
+              type="button"
+              onClick={() => setPreviewPhotoUrl(null)}
+              className="absolute top-4 right-4 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors z-10 shadow-md"
+            >
+              <X size={20} />
+            </button>
+            <img 
+              src={previewPhotoUrl} 
+              alt="Preview Foto Profil" 
+              className="max-w-[90vw] md:max-w-[40vw] max-h-[75vh] object-contain rounded-xl shadow-inner bg-muted/20"
+            />
+          </div>
         </div>
       )}
     </div>
