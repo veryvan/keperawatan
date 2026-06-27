@@ -74,3 +74,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Global Print Layout Customization */
+@media print {
+  html, body, #root, .min-h-screen, main, .flex-1, .overflow-hidden {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+    display: block !important;
+  }
+  
+  .print-hidden, .print\:hidden {
+    display: none !important;
+  }
+
+  /* Force print background colors and text colors */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+}

@@ -3,6 +3,7 @@ import nursingWallpaper from './assets/nursing_wallpaper.png';
 import certificateBackground from './assets/sertifikat.png';
 import logoRS from './assets/logo.png';
 import logoKudus from './assets/logo_kudus.png';
+import logoLars from './assets/lars.png';
 import AdminSoal from './AdminSoal';
 import AdminPejabat from './AdminPejabat';
 import {
@@ -11,7 +12,7 @@ import {
   Search, Menu, X, ChevronRight, Activity, Sun, Moon,
   Building, Briefcase, Tags, Edit2, Trash2, Check, XCircle, Eye, CheckCircle,
   Lock, LogOut, Shield, UserCheck, UserX, UserPlus, User, GraduationCap,
-  ChevronDown, Plus, ChevronLeft, AlertTriangle
+  ChevronDown, Plus, ChevronLeft, AlertTriangle, Printer
 } from 'lucide-react';
 
 const SidebarItem = ({ icon: Icon, label, active, onClick }) => (
@@ -1043,6 +1044,25 @@ const getDefaultForm09 = () => ({
   rekomendasiKajiUlang: ''
 });
 
+const formatIndoDate = (dateStr) => {
+  if (!dateStr) return '...';
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? '...' : d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+};
+
+const toProperCase = (str) => {
+  if (!str) return '';
+  return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+};
+
+const cleanJenjang = (jenjangStr) => {
+  if (!jenjangStr) return '';
+  return jenjangStr
+    .replace(/\b(terampil|ahli\s+pertama|ahli\s+muda|ahli\s+madya|ahli\s+utama|ahli)\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [filterStatusProses, setFilterStatusProses] = useState('Open');
@@ -1050,6 +1070,31 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [perawatData, setPerawatData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Kredensial & RKK states
+  const [jenisList, setJenisList] = useState([]);
+  const [rkkList, setRkkList] = useState([]);
+  const [kredensialList, setKredensialList] = useState([]);
+  const [kredensialSelectedPerawatId, setKredensialSelectedPerawatId] = useState('');
+  const [kredensialSearchPerawat, setKredensialSearchPerawat] = useState('');
+  const [jenisForm, setJenisForm] = useState({ kd_jenis: '', nm_jenis: '' });
+  const [editingJenisKd, setEditingJenisKd] = useState(null);
+  const [showJenisModal, setShowJenisModal] = useState(false);
+  const [rkkForm, setRkkForm] = useState({ kd_jenis: '', level_pk: 1, kewenangan: '', aktif: 1 });
+  const [editingRkkId, setEditingRkkId] = useState(null);
+  const [showRkkModal, setShowRkkModal] = useState(false);
+  const [kredensialWorksheet, setKredensialWorksheet] = useState({});
+  const [kredensialWorksheetDate, setKredensialWorksheetDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Master RKK Tab tracking
+  const [activeRkkJenisTab, setActiveRkkJenisTab] = useState('');
+  const [activeRkkLevelTab, setActiveRkkLevelTab] = useState(1);
+  const [currentPageRkk, setCurrentPageRkk] = useState(1);
+  const [itemsPerPageRkk, setItemsPerPageRkk] = useState(10);
+  const [currentPageJenis, setCurrentPageJenis] = useState(1);
+  const [itemsPerPageJenis, setItemsPerPageJenis] = useState(10);
+  const [kredensialActiveJenis, setKredensialActiveJenis] = useState('');
+
 
   // Authentication states
   const [currentUser, setCurrentUser] = useState(() => {
@@ -1059,7 +1104,23 @@ function App() {
       return null;
     }
   });
-  const API_URL = 'http://192.168.0.2/keperawatan/public/api';
+  const getApiUrl = () => {
+    const path = window.location.pathname;
+    let folder = 'keperawatan3';
+    if (path.includes('keperawatan3')) {
+      folder = 'keperawatan3';
+    } else if (path.includes('keperawatan')) {
+      const match = path.match(/\/(keperawatan[^\/]*)/);
+      if (match) {
+        folder = match[1];
+      }
+    }
+    if (window.location.port === '5173') {
+      return `${window.location.protocol}//${window.location.hostname}/${folder}/public/api`;
+    }
+    return `${window.location.origin}/${folder}/public/api`;
+  };
+  const API_URL = getApiUrl();
   const BASE_URL = API_URL.replace('/api', '');
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState('');
@@ -1277,6 +1338,16 @@ function App() {
   const [activeNursePelatihan, setActiveNursePelatihan] = useState([]);
   const [previewPhotoUrl, setPreviewPhotoUrl] = useState(null);
   const [sertifikatData, setSertifikatData] = useState(null);
+  const [customTglMulaiAsesmen, setCustomTglMulaiAsesmen] = useState('');
+  const [customTglSelesaiAsesmen, setCustomTglSelesaiAsesmen] = useState('');
+  const [customTglDitetapkan, setCustomTglDitetapkan] = useState('');
+  const [selectedPengajuanForMatriks, setSelectedPengajuanForMatriks] = useState(null);
+  const [showDetailMatriksModal, setShowDetailMatriksModal] = useState(false);
+  const [matriksTulisExamDetails, setMatriksTulisExamDetails] = useState(null);
+  const [searchQueryAsesmenRecap, setSearchQueryAsesmenRecap] = useState('');
+  const [filterUnitAsesmenRecap, setFilterUnitAsesmenRecap] = useState('');
+  const [filterJenisAsesmenRecap, setFilterJenisAsesmenRecap] = useState('');
+  const [filterRekomendasiAsesmenRecap, setFilterRekomendasiAsesmenRecap] = useState('');
   const [isCreatingPengajuan, setIsCreatingPengajuan] = useState(false);
   const [newPengajuanForm, setNewPengajuanForm] = useState({
     jenis_sertifikasi: 'Kompetensi Dasar',
@@ -1780,6 +1851,30 @@ function App() {
         .catch(err => console.error("Error fetching sertifikat data:", err));
     }
   }, [activePengajuan, activeTab, sertifikatSubTab]);
+
+  React.useEffect(() => {
+    if (activePengajuan && !customTglMulaiAsesmen) {
+      const defaultMulai = activePengajuan.tanggal_pengajuan || activePengajuan.created_at || '';
+      if (defaultMulai) {
+        setCustomTglMulaiAsesmen(defaultMulai.split('T')[0]);
+      } else {
+        setCustomTglMulaiAsesmen(new Date().toISOString().split('T')[0]);
+      }
+    }
+  }, [activePengajuan, customTglMulaiAsesmen]);
+
+  React.useEffect(() => {
+    if (!customTglSelesaiAsesmen || !customTglDitetapkan) {
+      if (sertifikatData && sertifikatData.tanggal_terbit) {
+        if (!customTglSelesaiAsesmen) setCustomTglSelesaiAsesmen(sertifikatData.tanggal_terbit.split('T')[0]);
+        if (!customTglDitetapkan) setCustomTglDitetapkan(sertifikatData.tanggal_terbit.split('T')[0]);
+      } else {
+        if (!customTglSelesaiAsesmen) setCustomTglSelesaiAsesmen(new Date().toISOString().split('T')[0]);
+        if (!customTglDitetapkan) setCustomTglDitetapkan(new Date().toISOString().split('T')[0]);
+      }
+    }
+  }, [sertifikatData, customTglSelesaiAsesmen, customTglDitetapkan]);
+
   const handleSimpanSertifikat = () => {
     if (!activePengajuan) return;
 
@@ -1793,7 +1888,7 @@ function App() {
       jenjang: activePengajuan.jenjang_tujuan,
       pejabat_1_id: pejabatKabid,
       pejabat_2_id: pejabatKetua,
-      tanggal_terbit: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
+      tanggal_terbit: customTglDitetapkan || new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
     };
 
     fetch(`${API_URL}/riwayat_sertifikat`, {
@@ -2188,6 +2283,151 @@ function App() {
     }
   }, [activePengajuan, selectedKompetensiKode, form03cData.grade1]);
 
+  const getRekomendasiAkhir = (p) => {
+    if (!p) return 'Dalam Proses';
+    const forms = p.form_data ? JSON.parse(p.form_data) : {};
+    const form07Key = Object.keys(forms).find(key => key.endsWith('_form07'));
+    const form07Data = form07Key ? (forms[form07Key] || {}) : {};
+    return form07Data.keputusan || 'Dalam Proses';
+  };
+
+  const getUjiLisanStatus = (p) => {
+    if (!p) return 'Belum Dinilai';
+    const forms = p.form_data ? JSON.parse(p.form_data) : {};
+    const oralData = forms['global_form03b'] || {};
+    const units = get12KompetensiForPengajuan(p);
+    
+    let evaluated = false;
+    let count = 0;
+    units.forEach(u => {
+      const val = oralData[`${u.kode}_nilai`];
+      if (val === 'K' || val === 'BK') {
+        evaluated = true;
+      }
+      if (val === 'K') {
+        count++;
+      }
+    });
+    
+    if (!evaluated) return 'Belum Dinilai';
+    return `${count}/${units.length} K`;
+  };
+
+  const getUjiObservasiStatus = (p) => {
+    if (!p) return 'Belum Dinilai';
+    const forms = p.form_data ? JSON.parse(p.form_data) : {};
+    const obsData = forms['global_form03a'] || {};
+    const units = get12KompetensiForPengajuan(p);
+    
+    let evaluated = false;
+    let count = 0;
+    units.forEach(u => {
+      const val = obsData[`${u.kode}_nilai`];
+      if (val === 'K' || val === 'BK') {
+        evaluated = true;
+      }
+      if (val === 'K') {
+        count++;
+      }
+    });
+    
+    if (!evaluated) return 'Belum Dinilai';
+    return `${count}/${units.length} K`;
+  };
+
+  const getUnitWrittenScore = (kompKode, examDetails) => {
+    if (!examDetails || !examDetails.soal) return null;
+    let correct = 0;
+    let total = 0;
+    examDetails.soal.forEach(s => {
+      const kdCode = mapDbCompToKd(s.id_kompetensi);
+      if (kdCode === kompKode) {
+        total++;
+        const userAns = (examDetails.jawaban_user[s.id_soal] || '').trim().toUpperCase();
+        const correctAns = (s.jawaban_benar || '').trim().toUpperCase();
+        if (userAns === correctAns) {
+          correct++;
+        }
+      }
+    });
+    return total > 0 ? Math.round((correct / total) * 100) : null;
+  };
+
+  const processedList = React.useMemo(() => {
+    return pengajuanHistoryList.filter(p => p.status === 'Approved');
+  }, [pengajuanHistoryList]);
+
+  const uniqueJenisSertifikasi = React.useMemo(() => {
+    const set = new Set(processedList.map(p => p.jenis_sertifikasi).filter(Boolean));
+    return Array.from(set);
+  }, [processedList]);
+
+  const filteredRecapList = React.useMemo(() => {
+    return processedList.filter(item => {
+      const nurse = perawatData.find(n => String(n.id_perawat) === String(item.id_perawat)) || {};
+      
+      const matchSearch = !searchQueryAsesmenRecap || 
+        (nurse.nama || '').toLowerCase().includes(searchQueryAsesmenRecap.toLowerCase()) ||
+        (nurse.nip || '').toLowerCase().includes(searchQueryAsesmenRecap.toLowerCase());
+        
+      const matchUnit = !filterUnitAsesmenRecap || nurse.unit_kerja === filterUnitAsesmenRecap;
+      
+      const matchJenis = !filterJenisAsesmenRecap || item.jenis_sertifikasi === filterJenisAsesmenRecap;
+      
+      const statusRecom = getRekomendasiAkhir(item);
+      const matchRecom = !filterRekomendasiAsesmenRecap || 
+        (filterRekomendasiAsesmenRecap === 'Dalam Proses' && statusRecom !== 'Kompeten' && statusRecom !== 'Belum Kompeten') ||
+        (filterRekomendasiAsesmenRecap === statusRecom);
+        
+      return matchSearch && matchUnit && matchJenis && matchRecom;
+    });
+  }, [processedList, perawatData, searchQueryAsesmenRecap, filterUnitAsesmenRecap, filterJenisAsesmenRecap, filterRekomendasiAsesmenRecap]);
+
+  const [currentPageRecap, setCurrentPageRecap] = useState(1);
+  const itemsPerPageRecap = 10;
+
+  React.useEffect(() => {
+    setCurrentPageRecap(1);
+  }, [searchQueryAsesmenRecap, filterUnitAsesmenRecap, filterJenisAsesmenRecap, filterRekomendasiAsesmenRecap]);
+
+  const handleExportExcel = () => {
+    const headers = ["NO", "NAMA ASESI", "NIP", "UNIT KERJA", "JABATAN", "JENIS SERTIFIKASI", "ASESOR UTAMA", "ASESOR PENDAMPING", "UJI TULIS", "UJI LISAN", "UJI OBSERVASI", "REKOMENDASI AKHIR"];
+    const rows = filteredRecapList.map((item, idx) => {
+      const nurse = perawatData.find(n => String(n.id_perawat) === String(item.id_perawat)) || {};
+      const primary = userData.find(u => String(u.id) === String(item.id_asesor))?.nama || '-';
+      const pendamping = userData.find(u => String(u.id) === String(item.id_asesor_pendamping))?.nama || '-';
+      const score = item.status_ujian === 'Selesai' ? `${parseFloat(item.nilai_ujian || '0')}%` : 'Belum Ujian';
+      const lisan = getUjiLisanStatus(item);
+      const obs = getUjiObservasiStatus(item);
+      const recom = getRekomendasiAkhir(item);
+      return [
+        idx + 1,
+        nurse.nama || '-',
+        nurse.nip || '-',
+        nurse.unit_kerja || '-',
+        nurse.jabatan || '-',
+        item.jenis_sertifikasi || '-',
+        primary,
+        pendamping,
+        score,
+        lisan,
+        obs,
+        recom
+      ];
+    });
+    
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
+      
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Rekap_Asesmen_Kompetensi.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const form03dData = getFormData('form03d', getDefaultForm03d);
   const setForm03dData = setFormDataWrapper('form03d');
 
@@ -2459,6 +2699,12 @@ function App() {
   const [selectedPerawat, setSelectedPerawat] = useState(null);
   const [activeDetailTab, setActiveDetailTab] = useState('profil');
   const [assessments, setAssessments] = useState([]);
+  const [allAssessmentsList, setAllAssessmentsList] = useState([]);
+  const [searchQueryAsesmen, setSearchQueryAsesmen] = useState('');
+  const [filterUnitAsesmen, setFilterUnitAsesmen] = useState('');
+  const [filterStatusAsesmen, setFilterStatusAsesmen] = useState('');
+  const [currentPageAsesmen, setCurrentPageAsesmen] = useState(1);
+  const [itemsPerPageAsesmen, setItemsPerPageAsesmen] = useState(10);
   const [riwayatKerja, setRiwayatKerja] = useState([]);
   const [sertifikatDataList, setSertifikatDataList] = useState([]);
 
@@ -2651,6 +2897,20 @@ function App() {
       .catch(() => showToast('Terjadi kesalahan sistem.', 'error'));
   };
 
+  const fetchAllAssessments = () => {
+    setIsLoading(true);
+    fetch(`${API_URL}/assessment?t=${Date.now()}`)
+      .then(res => res.json())
+      .then(data => {
+        setAllAssessmentsList(Array.isArray(data) ? data : []);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching all assessments:", err);
+        setIsLoading(false);
+      });
+  };
+
   const fetchPerawatData = () => {
     setIsLoading(true);
     fetch(`${API_URL}/perawat?t=${Date.now()}`)
@@ -2682,6 +2942,8 @@ function App() {
   // Fetch data perawat dari CI4 backend
   React.useEffect(() => {
     if (!currentUser) return;
+    if (jenisList.length === 0) fetchJenisList();
+    if (rkkList.length === 0) fetchRkkList();
     if (activeTab === 'perawat' || activeTab === 'str' || activeTab === 'dashboard') {
       fetchPerawatData();
       fetchUnitKerja();
@@ -2713,10 +2975,16 @@ function App() {
       fetchPengajuanHistory();
       fetchJenjangJabatan();
       fetchPejabatData();
-    } else if (activeTab === 'pelatihan') {
-      fetchAllPelatihan();
+    } else if (['kredensial', 'master_jenis', 'master_rkk'].includes(activeTab)) {
       fetchPerawatData();
+      fetchJenisList();
+      fetchRkkList();
+      fetchKredensialList();
+    } else if (activeTab === 'asesmen') {
+      fetchPerawatData();
+      fetchCompetencies();
       fetchUnitKerja();
+      fetchAllAssessments();
     }
   }, [activeTab, currentUser]);
 
@@ -2734,6 +3002,41 @@ function App() {
       }
     }
   }, [perawatData, currentUser, sertifikatSelectedNurseId]);
+
+  React.useEffect(() => {
+    if (jenisList.length > 0) {
+      if (!activeRkkJenisTab) setActiveRkkJenisTab(jenisList[0].kd_jenis);
+      if (!kredensialActiveJenis) setKredensialActiveJenis(jenisList[0].kd_jenis);
+    }
+  }, [jenisList, activeRkkJenisTab, kredensialActiveJenis]);
+
+  React.useEffect(() => {
+    setCurrentPageRkk(1);
+  }, [activeRkkJenisTab, activeRkkLevelTab]);
+
+
+  React.useEffect(() => {
+    if (kredensialSelectedPerawatId) {
+      const nurseCreds = kredensialList.filter(c => String(c.id_perawat) === String(kredensialSelectedPerawatId));
+      const worksheetData = {};
+      nurseCreds.forEach(c => {
+        worksheetData[c.id_rkk] = c.nilai;
+      });
+      setKredensialWorksheet(worksheetData);
+      
+      const firstCred = nurseCreds[0];
+      if (firstCred && firstCred.tgl_kredensial) {
+        setKredensialWorksheetDate(firstCred.tgl_kredensial);
+      } else {
+        setKredensialWorksheetDate(new Date().toISOString().split('T')[0]);
+      }
+    } else {
+      setKredensialWorksheet({});
+      setKredensialWorksheetDate(new Date().toISOString().split('T')[0]);
+    }
+  }, [kredensialSelectedPerawatId, kredensialList]);
+
+
 
   React.useEffect(() => {
     if (currentUser?.role === 'Perawat' && perawatData.length > 0) {
@@ -2849,6 +3152,186 @@ function App() {
       .then(data => setPejabatData(Array.isArray(data) ? data : []))
       .catch(err => console.error("Error fetching pejabat:", err));
   };
+
+  const fetchJenisList = () => {
+    fetch(API_URL + '/jenis')
+      .then(res => res.json())
+      .then(data => {
+        const list = Array.isArray(data) ? data : [];
+        setJenisList(list);
+      })
+      .catch(err => console.error("Error fetching RKK jenis:", err));
+  };
+
+  const fetchRkkList = () => {
+    fetch(API_URL + '/master_rkk')
+      .then(res => res.json())
+      .then(data => setRkkList(Array.isArray(data) ? data : []))
+      .catch(err => console.error("Error fetching master RKK:", err));
+  };
+
+  const fetchKredensialList = () => {
+    fetch(API_URL + '/kredensial')
+      .then(res => res.json())
+      .then(data => setKredensialList(Array.isArray(data) ? data : []))
+      .catch(err => console.error("Error fetching kredensial list:", err));
+  };
+
+  const getLevelNote = (lvl) => {
+    if (Number(lvl) === 2) return "Level PK 2 mencakup seluruh kewenangan klinis di PK 1.";
+    if (Number(lvl) === 3) return "Level PK 3 mencakup seluruh kewenangan klinis di PK 1 dan PK 2.";
+    if (Number(lvl) === 4) return "Level PK 4 mencakup seluruh kewenangan klinis di PK 1, PK 2, dan PK 3.";
+    if (Number(lvl) === 5) return "Level PK 5 mencakup seluruh kewenangan klinis di PK 1, PK 2, PK 3, dan PK 4.";
+    return null;
+  };
+
+  const handleAddJenis = (e) => {
+    e.preventDefault();
+    if (!jenisForm.kd_jenis || !jenisForm.nm_jenis) {
+      showToast('Kode dan nama jenis RKK wajib diisi.', 'error');
+      return;
+    }
+    fetch(API_URL + '/jenis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(jenisForm)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.messages?.error) {
+          showToast(data.messages.error, 'error');
+        } else {
+          showToast('Jenis RKK berhasil ditambahkan.', 'success');
+          fetchJenisList();
+          setJenisForm({ kd_jenis: '', nm_jenis: '' });
+          setShowJenisModal(false);
+        }
+      })
+      .catch(() => showToast('Gagal menambahkan jenis RKK.', 'error'));
+  };
+
+  const handleEditJenis = (e) => {
+    e.preventDefault();
+    if (!jenisForm.nm_jenis) {
+      showToast('Nama jenis RKK wajib diisi.', 'error');
+      return;
+    }
+    fetch(API_URL + `/jenis/${editingJenisKd}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nm_jenis: jenisForm.nm_jenis })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.messages?.error) {
+          showToast(data.messages.error, 'error');
+        } else {
+          showToast('Jenis RKK berhasil diperbarui.', 'success');
+          fetchJenisList();
+          setJenisForm({ kd_jenis: '', nm_jenis: '' });
+          setEditingJenisKd(null);
+          setShowJenisModal(false);
+        }
+      })
+      .catch(() => showToast('Gagal memperbarui jenis RKK.', 'error'));
+  };
+
+  const handleDeleteJenis = (kd) => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus jenis RKK ini? Semua RKK terkait mungkin akan terpengaruh.')) return;
+    fetch(API_URL + `/jenis/${kd}`, {
+      method: 'DELETE'
+    })
+      .then(res => {
+        if (res.ok) {
+          showToast('Jenis RKK berhasil dihapus.', 'success');
+          fetchJenisList();
+        } else {
+          showToast('Gagal menghapus jenis RKK.', 'error');
+        }
+      })
+      .catch(() => showToast('Gagal menghapus jenis RKK.', 'error'));
+  };
+
+  const handleSaveRkk = (e) => {
+    e.preventDefault();
+    if (!rkkForm.kd_jenis || !rkkForm.kewenangan) {
+      showToast('Jenis dan kewenangan RKK wajib diisi.', 'error');
+      return;
+    }
+    const isEdit = editingRkkId !== null;
+    const url = isEdit ? API_URL + `/master_rkk/${editingRkkId}` : API_URL + '/master_rkk';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rkkForm)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.messages?.error) {
+          showToast(data.messages.error, 'error');
+        } else {
+          showToast(isEdit ? 'Master RKK berhasil diperbarui.' : 'Master RKK berhasil ditambahkan.', 'success');
+          fetchRkkList();
+          const initialJenis = (activeRkkLevelTab === 1 && activeRkkJenisTab !== 'MGR' && activeRkkJenisTab !== 'MATER') ? 'KMB' : (activeRkkJenisTab || (jenisList[0]?.kd_jenis || ''));
+          setRkkForm({ kd_jenis: initialJenis, level_pk: activeRkkLevelTab || 1, kewenangan: '', aktif: 1 });
+          setEditingRkkId(null);
+          setShowRkkModal(false);
+        }
+      })
+      .catch(() => showToast('Gagal menyimpan Master RKK.', 'error'));
+  };
+
+  const handleDeleteRkk = (id) => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus RKK ini?')) return;
+    fetch(API_URL + `/master_rkk/${id}`, {
+      method: 'DELETE'
+    })
+      .then(res => {
+        if (res.ok) {
+          showToast('Master RKK berhasil dihapus.', 'success');
+          fetchRkkList();
+        } else {
+          showToast('Gagal menghapus Master RKK.', 'error');
+        }
+      })
+      .catch(() => showToast('Gagal menghapus Master RKK.', 'error'));
+  };
+
+  const handleSaveKredensial = () => {
+    if (!kredensialSelectedPerawatId) {
+      showToast('Pilih perawat terlebih dahulu.', 'error');
+      return;
+    }
+    const items = Object.entries(kredensialWorksheet).map(([id_rkk, nilai]) => ({
+      id_rkk: parseInt(id_rkk),
+      nilai: parseInt(nilai)
+    })).filter(item => item.nilai > 0);
+
+    const payload = {
+      id_perawat: parseInt(kredensialSelectedPerawatId),
+      tgl_kredensial: kredensialWorksheetDate,
+      items: items
+    };
+
+    fetch(API_URL + '/kredensial', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          showToast('Kredensial perawat berhasil disimpan.', 'success');
+          fetchKredensialList();
+        } else {
+          showToast(data.message || 'Gagal menyimpan kredensial.', 'error');
+        }
+      })
+      .catch(() => showToast('Gagal menyimpan kredensial.', 'error'));
+  };
+
 
   const handleAddUnitKerja = (e) => {
     e.preventDefault();
@@ -4068,7 +4551,7 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground flex overflow-hidden">
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 print:hidden`}>
         <div className="h-16 flex items-center px-6 border-b border-border">
           <Activity className="text-primary mr-2" size={24} />
           <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
@@ -4095,6 +4578,9 @@ function App() {
             <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Manajemen</p>
             <div className="space-y-1">
               <SidebarItem icon={FileText} label="Asesmen Kompetensi" active={activeTab === 'sertifikasi'} onClick={() => { setActiveTab('sertifikasi'); setActivePengajuan(null); setIsCreatingPengajuan(false); }} />
+              {['Admin', 'Asesor'].includes(currentUser?.role) && (
+                <SidebarItem icon={ClipboardCheck} label="Rekap Asesmen" active={activeTab === 'asesmen'} onClick={() => setActiveTab('asesmen')} />
+              )}
               {currentUser?.role === 'Admin' && (
                 <>
                   <SidebarItem icon={Stethoscope} label="Kredensial" active={activeTab === 'kredensial'} onClick={() => setActiveTab('kredensial')} />
@@ -4115,7 +4601,10 @@ function App() {
                 <SidebarItem icon={User} label="Master User" active={activeTab === 'master_user'} onClick={() => setActiveTab('master_user')} />
                 <SidebarItem icon={FileText} label="Master Soal" active={activeTab === 'master_soal'} onClick={() => setActiveTab('master_soal')} />
                 <SidebarItem icon={User} label="Master Pejabat" active={activeTab === 'master_pejabat'} onClick={() => setActiveTab('master_pejabat')} />
+                <SidebarItem icon={Tags} label="Master Jenis RKK" active={activeTab === 'master_jenis'} onClick={() => setActiveTab('master_jenis')} />
+                <SidebarItem icon={ClipboardCheck} label="Master RKK" active={activeTab === 'master_rkk'} onClick={() => setActiveTab('master_rkk')} />
               </div>
+
             </div>
           )}
 
@@ -4135,7 +4624,7 @@ function App() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden relative">
         {/* Header */}
-        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6 z-10">
+        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6 z-10 print:hidden">
           <div className="flex items-center">
             <button
               className="lg:hidden text-muted-foreground hover:text-foreground mr-4"
@@ -7131,6 +7620,7 @@ function App() {
                                   <th className="px-5 py-3.5">Jenis Sertifikasi</th>
                                   <th className="px-5 py-3.5">Tanggal Pengajuan</th>
                                   <th className="px-5 py-3.5 w-40">Status</th>
+                                  <th className="px-5 py-3.5">Hasil Uji Tulis</th>
                                   <th className="px-5 py-3.5">Tim Asesor</th>
                                   <th className="px-5 py-3.5 w-36 text-center">Aksi</th>
                                 </tr>
@@ -7193,6 +7683,26 @@ function App() {
                                             {item.status_proses || 'Open'}
                                           </span>
                                         </div>
+                                      </td>
+                                      <td className="px-5 py-4">
+                                        {item.status_ujian === 'Selesai' ? (
+                                          <div className="flex flex-col gap-1 items-start">
+                                            <span className="font-bold text-foreground text-xs">Nilai: {item.nilai_ujian}</span>
+                                            <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                                              parseFloat(item.nilai_ujian || '0') >= 70
+                                                ? 'bg-green-500/10 text-green-500 border border-green-500/20'
+                                                : 'bg-destructive/10 text-destructive border border-destructive/20'
+                                            }`}>
+                                              {parseFloat(item.nilai_ujian || '0') >= 70 ? 'Kompeten (K)' : 'Belum Kompeten (BK)'}
+                                            </span>
+                                          </div>
+                                        ) : item.status_ujian === 'Sedang Dikerjakan' ? (
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 uppercase">
+                                            Sedang Dikerjakan
+                                          </span>
+                                        ) : (
+                                          <span className="text-muted-foreground italic text-xs">Belum Ujian</span>
+                                        )}
                                       </td>
                                       <td className="px-5 py-4">
                                         {item.id_asesor ? (
@@ -7357,6 +7867,19 @@ function App() {
                               className="w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-primary/10 file:text-primary file:text-[10px] file:font-bold hover:file:bg-primary/20"
                             />
                             <p className="text-[10px] text-muted-foreground mt-1">Gunakan ini jika ingin melampirkan berkas PDF khusus pengajuan ini.</p>
+                            {['Kredensial Baru', 'Kredensial Ulang'].includes(newPengajuanForm.jenis_sertifikasi) && (
+                              <div className="mt-2.5 p-3 rounded-lg border border-primary/20 bg-primary/5 text-xs text-foreground font-sans space-y-1">
+                                <p className="font-semibold text-primary">Form Permohonan Kredensial:</p>
+                                <p className="text-muted-foreground text-[10px]">Silakan unduh template form permohonan kredensial di bawah ini, isi data Anda, dan unggah berkas yang telah ditandatangani.</p>
+                                <a 
+                                  href={`${BASE_URL}/uploads/form_permohonan_kredensial.md`} 
+                                  download="form_permohonan_kredensial.md"
+                                  className="inline-flex items-center gap-1 text-primary hover:underline font-bold mt-1 text-[11px]"
+                                >
+                                  Unduh Template Form (.md)
+                                </a>
+                              </div>
+                            )}
                           </div>
                         </div>
  
@@ -7566,7 +8089,7 @@ function App() {
                 {/* 3. Forms View Panel */}
                 {activePengajuan && (
                   <div className="space-y-6">
-                    <div className="bg-card border border-border p-5 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted/5">
+                    <div className="bg-card border border-border p-5 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted/5 print:hidden">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <button
@@ -7764,7 +8287,7 @@ function App() {
                       const filteredComps = combined.filter(c => codes.includes(c.kode));
 
                       return (
-                        <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
+                        <div className="bg-card p-5 rounded-xl border border-border shadow-sm print:hidden">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Asesi Keperawatan (Perawat)</label>
@@ -7802,7 +8325,7 @@ function App() {
                     })()}
 
                     {/* 13 Horizontal scrollable tabs bar */}
-                    <div className="bg-card p-3 rounded-xl border border-border shadow-sm overflow-hidden">
+                    <div className="bg-card p-3 rounded-xl border border-border shadow-sm overflow-hidden print:hidden">
                       <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-2 px-1">Navigasi Formulir Asesmen (13 Tab)</p>
                       <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 scrollbar-thin scrollbar-thumb-primary/10 scrollbar-track-transparent">
                         {[
@@ -7939,16 +8462,41 @@ function App() {
                       return (
                         <div className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-6">
 
-                          {/* Active SubTab 01 */}
                           {sertifikatSubTab === 'form_01' && (
-                            <div className="space-y-6">
-                              <div className="border-b border-border pb-4 flex justify-between items-center">
-                                <div>
-                                  <h3 className="text-lg font-bold text-primary">FORM-01. FORMULIR PERMOHONAN SERTIFIKASI KOMPETENSI</h3>
-                                  <p className="text-xs text-muted-foreground mt-0.5">Rincian Data Peserta dan Daftar Unit Kompetensi yang diajukan</p>
-                                </div>
-                                <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded font-bold">UMUM</span>
-                              </div>
+                             <div className="space-y-6">
+                               <div className="border-b border-border pb-4 flex justify-between items-center">
+                                 <div>
+                                   <h3 className="text-lg font-bold text-primary">
+                                     {['Kredensial Baru', 'Kredensial Ulang'].includes(activePengajuan.jenis_sertifikasi)
+                                       ? 'K.3. FORMULIR PERMOHONAN KREDENSIALING KEPERAWATAN'
+                                       : 'FORM-01. FORMULIR PERMOHONAN SERTIFIKASI KOMPETENSI'}
+                                   </h3>
+                                   <p className="text-xs text-muted-foreground mt-0.5">
+                                     {['Kredensial Baru', 'Kredensial Ulang'].includes(activePengajuan.jenis_sertifikasi)
+                                       ? 'Rincian Data Pemohon Kredensial dan Prasyarat Kredensial'
+                                       : 'Rincian Data Peserta dan Daftar Unit Kompetensi yang diajukan'}
+                                   </p>
+                                 </div>
+                                 <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded font-bold">
+                                   {['Kredensial Baru', 'Kredensial Ulang'].includes(activePengajuan.jenis_sertifikasi) ? 'KREDENSIAL' : 'UMUM'}
+                                 </span>
+                               </div>
+
+                               {['Kredensial Baru', 'Kredensial Ulang'].includes(activePengajuan.jenis_sertifikasi) && (
+                                 <div className="bg-primary/5 border border-primary/20 text-foreground p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-sans animate-in fade-in duration-200">
+                                   <div className="space-y-1">
+                                     <h4 className="font-bold text-primary flex items-center gap-1.5"><FileText size={15} /> Unduh Form Permohonan Kredensial (K.3)</h4>
+                                     <p className="text-muted-foreground text-[11px]">Gunakan berkas ini untuk mengisi detail identitas, status registrasi, status kredensialing yang diusulkan, prasyarat kredensialing, program CPD, dan pernyataan kredensial.</p>
+                                   </div>
+                                   <a
+                                     href={`${BASE_URL}/uploads/form_permohonan_kredensial.md`}
+                                     download="form_permohonan_kredensial.md"
+                                     className="px-4 py-2 bg-primary text-primary-foreground font-bold hover:bg-primary/95 rounded-lg text-xs shadow-sm transition-all whitespace-nowrap text-center shrink-0"
+                                   >
+                                     Unduh Template Form
+                                   </a>
+                                 </div>
+                               )}
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Personal Details */}
@@ -8072,31 +8620,235 @@ function App() {
                                   ))}
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="block text-xs font-semibold mb-1">Rekomendasi Penilaian Lanjut (Diisi Asesor)</label>
-                                    <input
-                                      type="text"
-                                      disabled={currentUser?.role === 'Perawat'}
-                                      value={form01Data.rekomendasi || ''}
-                                      onChange={e => setForm01Data({ ...form01Data, rekomendasi: e.target.value })}
-                                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                      placeholder="Rekomendasi kelanjutan asesmen..."
-                                    />
+                                {currentUser?.role !== 'Perawat' && (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="block text-xs font-semibold mb-1">Rekomendasi Penilaian Lanjut (Diisi Asesor)</label>
+                                      <input
+                                        type="text"
+                                        disabled={currentUser?.role === 'Perawat'}
+                                        value={form01Data.rekomendasi || ''}
+                                        onChange={e => setForm01Data({ ...form01Data, rekomendasi: e.target.value })}
+                                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                        placeholder="Rekomendasi kelanjutan asesmen..."
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-semibold mb-1">Catatan Asesor (Diisi Asesor)</label>
+                                      <input
+                                        type="text"
+                                        disabled={currentUser?.role === 'Perawat'}
+                                        value={form01Data.catatan || ''}
+                                        onChange={e => setForm01Data({ ...form01Data, catatan: e.target.value })}
+                                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                        placeholder="Catatan keahlian/perbaikan..."
+                                      />
+                                    </div>
                                   </div>
-                                  <div>
-                                    <label className="block text-xs font-semibold mb-1">Catatan Asesor (Diisi Asesor)</label>
-                                    <input
-                                      type="text"
-                                      disabled={currentUser?.role === 'Perawat'}
-                                      value={form01Data.catatan || ''}
-                                      onChange={e => setForm01Data({ ...form01Data, catatan: e.target.value })}
-                                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                      placeholder="Catatan keahlian/perbaikan..."
-                                    />
-                                  </div>
-                                </div>
+                                )}
                               </div>
+
+                              {/* Bagian 4: Kredensialing Keperawatan Form Integration */}
+                              {['Kredensial Baru', 'Kredensial Ulang'].includes(activePengajuan.jenis_sertifikasi) && (
+                                <div className="space-y-4 pt-4 border-t border-border animate-in fade-in duration-200">
+                                  <h4 className="font-bold text-xs text-foreground border-b border-border pb-1 uppercase tracking-wider">Bagian 4 : Pengusulan Status &amp; Peminatan Kredensial</h4>
+                                  
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {/* Kualifikasi Klinis */}
+                                    <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-2">
+                                      <label className="block text-xs font-bold text-primary uppercase tracking-wide">Kualifikasi Klinis</label>
+                                      <select
+                                        disabled={activePengajuan.status !== 'Pending'}
+                                        value={form01Data.kualifikasi_klinis || ''}
+                                        onChange={e => setForm01Data({ ...form01Data, kualifikasi_klinis: e.target.value })}
+                                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-semibold"
+                                      >
+                                        <option value="">-- Pilih Kualifikasi Klinis --</option>
+                                        {['Pra', 'I', 'II', 'III', 'IV', 'IVA', 'IVB', 'IVC', 'IVD', 'V', 'VA', 'VB', 'VC', 'VD'].map(val => (
+                                          <option key={val} value={val}>{val}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+
+                                    {/* Manajer */}
+                                    <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-2">
+                                      <label className="block text-xs font-bold text-primary uppercase tracking-wide">Kualifikasi Manajer</label>
+                                      <select
+                                        disabled={activePengajuan.status !== 'Pending'}
+                                        value={form01Data.kualifikasi_manajer || ''}
+                                        onChange={e => setForm01Data({ ...form01Data, kualifikasi_manajer: e.target.value })}
+                                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-semibold"
+                                      >
+                                        <option value="">-- Pilih Manajer --</option>
+                                        {['None', 'I', 'II', 'III', 'IV', 'V'].map(val => (
+                                          <option key={val} value={val}>{val === 'None' ? 'Bukan Manajer' : `Tingkat ${val}`}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+
+                                    {/* Riset */}
+                                    <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-2">
+                                      <label className="block text-xs font-bold text-primary uppercase tracking-wide">Kualifikasi Riset</label>
+                                      <select
+                                        disabled={activePengajuan.status !== 'Pending'}
+                                        value={form01Data.kualifikasi_riset || ''}
+                                        onChange={e => setForm01Data({ ...form01Data, kualifikasi_riset: e.target.value })}
+                                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-semibold"
+                                      >
+                                        <option value="">-- Pilih Riset --</option>
+                                        {['None', 'I', 'II', 'III', 'IV', 'V'].map(val => (
+                                          <option key={val} value={val}>{val === 'None' ? 'Bukan Riset' : `Tingkat ${val}`}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  {/* Keahlian / Peminatan Checkboxes */}
+                                  <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-3">
+                                    <label className="block text-xs font-bold text-foreground border-b border-border pb-1.5 uppercase tracking-wide">Keahlian / Peminatan Keperawatan</label>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                      {jenisList.map(j => {
+                                        const item = j.nm_jenis;
+                                        const peminatanList = form01Data.peminatan || [];
+                                        const isChecked = peminatanList.includes(item);
+                                        return (
+                                          <label key={j.kd_jenis} className="flex items-center gap-2.5 p-3 rounded-lg border border-border bg-background hover:bg-muted/20 cursor-pointer select-none">
+                                            <input
+                                              type="checkbox"
+                                              disabled={activePengajuan.status !== 'Pending'}
+                                              checked={isChecked}
+                                              onChange={e => {
+                                                let newList = [...peminatanList];
+                                                if (e.target.checked) {
+                                                  newList.push(item);
+                                                } else {
+                                                  newList = newList.filter(x => x !== item);
+                                                }
+                                                setForm01Data({ ...form01Data, peminatan: newList });
+                                              }}
+                                              className="rounded border-border text-primary focus:ring-primary w-4 h-4"
+                                            />
+                                            <span className="text-[11px] font-semibold text-foreground leading-tight">{item}</span>
+                                          </label>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+
+                                  {/* Tim Kredensialing (Asesor / Admin) */}
+                                  {currentUser?.role !== 'Perawat' && (
+                                    <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-3">
+                                      <label className="block text-xs font-bold text-foreground border-b border-border pb-1.5 uppercase tracking-wide">Identitas Tim Kredensialing (Diisi Asesor / Admin)</label>
+                                      <div className="overflow-x-auto rounded-lg border border-border bg-background">
+                                        <table className="w-full text-xs text-left">
+                                          <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                                            <tr>
+                                              <th className="px-4 py-2 w-12 text-center">No</th>
+                                              <th className="px-4 py-2">Nama Lengkap</th>
+                                              <th className="px-4 py-2">Kualifikasi Khusus / Jabatan</th>
+                                              <th className="px-4 py-2">Bidang Keahlian</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {[0, 1, 2].map(idx => {
+                                              const tim = form01Data.tim_kredensial || [];
+                                              const row = tim[idx] || { nama: '', jabatan: '', keahlian: '' };
+                                              const updateRow = (field, val) => {
+                                                const newTim = [...tim];
+                                                newTim[idx] = { ...row, [field]: val };
+                                                setForm01Data({ ...form01Data, tim_kredensial: newTim });
+                                              };
+                                              return (
+                                                <tr key={idx} className="border-b border-border last:border-0">
+                                                  <td className="px-4 py-2 font-bold text-muted-foreground text-center">{idx + 1}</td>
+                                                  <td className="px-2 py-2">
+                                                    <input
+                                                      type="text"
+                                                      disabled={currentUser?.role === 'Perawat'}
+                                                      value={row.nama || ''}
+                                                      onChange={e => updateRow('nama', e.target.value)}
+                                                      placeholder="Nama Anggota Tim..."
+                                                      className="w-full px-2 py-1 bg-background border border-border rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary text-foreground font-semibold"
+                                                    />
+                                                  </td>
+                                                  <td className="px-2 py-2">
+                                                    <input
+                                                      type="text"
+                                                      disabled={currentUser?.role === 'Perawat'}
+                                                      value={row.jabatan || ''}
+                                                      onChange={e => updateRow('jabatan', e.target.value)}
+                                                      placeholder="Jabatan di Tim..."
+                                                      className="w-full px-2 py-1 bg-background border border-border rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                                                    />
+                                                  </td>
+                                                  <td className="px-2 py-2">
+                                                    <input
+                                                      type="text"
+                                                      disabled={currentUser?.role === 'Perawat'}
+                                                      value={row.keahlian || ''}
+                                                      onChange={e => updateRow('keahlian', e.target.value)}
+                                                      placeholder="Bidang Keahlian..."
+                                                      className="w-full px-2 py-1 bg-background border border-border rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                                                    />
+                                                  </td>
+                                                </tr>
+                                              );
+                                            })}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Rekomendasi Mitra Bestari */}
+                                  {currentUser?.role === 'Perawat' ? (
+                                    form01Data.rekomendasi_kredensial && (
+                                      <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 space-y-2 text-xs">
+                                        <span className="font-bold text-primary block uppercase tracking-wide">Rekomendasi Sub Komite Kredensial</span>
+                                        <p className="font-bold text-foreground">
+                                          {form01Data.rekomendasi_kredensial === 'disetujui_penuh' && 'Direkomendasikan diberi kewenangan klinis penuh'}
+                                          {form01Data.rekomendasi_kredensial === 'disetujui_supervisi' && 'Direkomendasikan diberi kewenangan klinis dengan supervisi'}
+                                          {form01Data.rekomendasi_kredensial === 'ditangguhkan' && 'Ditangguhkan / belum disetujui'}
+                                        </p>
+                                        {form01Data.catatan_rekomendasi && (
+                                          <p className="text-muted-foreground mt-1">Catatan: {form01Data.catatan_rekomendasi}</p>
+                                        )}
+                                      </div>
+                                    )
+                                  ) : (
+                                    <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-3">
+                                      <label className="block text-xs font-bold text-foreground border-b border-border pb-1.5 uppercase tracking-wide">Rekomendasi Mitra Bestari (Sub Komite Kredensial)</label>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                          <label className="block text-xs font-semibold mb-1 text-muted-foreground">Rekomendasi Kredensial</label>
+                                          <select
+                                            disabled={currentUser?.role === 'Perawat'}
+                                            value={form01Data.rekomendasi_kredensial || ''}
+                                            onChange={e => setForm01Data({ ...form01Data, rekomendasi_kredensial: e.target.value })}
+                                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-semibold"
+                                          >
+                                            <option value="">-- Pilih Rekomendasi Kredensial --</option>
+                                            <option value="disetujui_penuh">Direkomendasikan diberi kewenangan klinis penuh</option>
+                                            <option value="disetujui_supervisi">Direkomendasikan diberi kewenangan klinis dengan supervisi</option>
+                                            <option value="ditangguhkan">Ditangguhkan / belum disetujui</option>
+                                          </select>
+                                        </div>
+                                        <div>
+                                          <label className="block text-xs font-semibold mb-1 text-muted-foreground">Catatan Rekomendasi</label>
+                                          <input
+                                            type="text"
+                                            disabled={currentUser?.role === 'Perawat'}
+                                            value={form01Data.catatan_rekomendasi || ''}
+                                            onChange={e => setForm01Data({ ...form01Data, catatan_rekomendasi: e.target.value })}
+                                            placeholder="Catatan tambahan mitra bestari..."
+                                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
 
                               {/* Dokumen Lampiran Profil Perawat */}
                               <div className="space-y-3 pt-2">
@@ -8377,7 +9129,7 @@ function App() {
                                       </div>
 
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                        <div>
+                                        <div className={currentUser?.role === 'Perawat' ? 'col-span-2' : ''}>
                                           <label className="block text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">Bukti-bukti Kompetensi Terkait</label>
                                           <input
                                             type="text"
@@ -8388,17 +9140,19 @@ function App() {
                                             placeholder="Cth: Sertifikat pelatihan terkait, logbook..."
                                           />
                                         </div>
-                                        <div>
-                                          <label className="block text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">Rekomendasi Asesor / Admin</label>
-                                          <input
-                                            type="text"
-                                            disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                            value={form02Data[rekomKey] || ''}
-                                            onChange={e => setForm02Data({ ...form02Data, [rekomKey]: e.target.value })}
-                                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                            placeholder="Rekomendasi kelanjutan asesmen mandiri..."
-                                          />
-                                        </div>
+                                        {currentUser?.role !== 'Perawat' && (
+                                          <div>
+                                            <label className="block text-[11px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">Rekomendasi Asesor / Admin</label>
+                                            <input
+                                              type="text"
+                                              disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                              value={form02Data[rekomKey] || ''}
+                                              onChange={e => setForm02Data({ ...form02Data, [rekomKey]: e.target.value })}
+                                              className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                              placeholder="Rekomendasi kelanjutan asesmen mandiri..."
+                                            />
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   );
@@ -9224,7 +9978,7 @@ function App() {
                                 <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded font-bold">REKOMENDASI</span>
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                              <div className={`grid grid-cols-1 ${currentUser?.role === 'Perawat' ? '' : 'md:grid-cols-2'} gap-6 text-xs`}>
                                 <div className="space-y-3.5">
                                   <h4 className="font-bold text-foreground border-b border-border pb-1">Keputusan Kelulusan Kompetensi</h4>
                                   <div className="flex items-center gap-6 mt-2">
@@ -9265,17 +10019,19 @@ function App() {
                                   </div>
                                 </div>
 
-                                <div>
-                                  <label className="block text-xs font-semibold mb-1">Catatan & Evaluasi Akhir Asesor</label>
-                                  <textarea
-                                    rows="5"
-                                    disabled={isFormLocked || currentUser?.role === 'Perawat'}
-                                    value={form07Data.catatanAsesor || ''}
-                                    onChange={e => setForm07Data({ ...form07Data, catatanAsesor: e.target.value })}
-                                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
-                                    placeholder="Tulis saran tindak lanjut/perbaikan berkelanjutan..."
-                                  />
-                                </div>
+                                {currentUser?.role !== 'Perawat' && (
+                                  <div>
+                                    <label className="block text-xs font-semibold mb-1">Catatan & Evaluasi Akhir Asesor</label>
+                                    <textarea
+                                      rows="5"
+                                      disabled={isFormLocked || currentUser?.role === 'Perawat'}
+                                      value={form07Data.catatanAsesor || ''}
+                                      onChange={e => setForm07Data({ ...form07Data, catatanAsesor: e.target.value })}
+                                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium"
+                                      placeholder="Tulis saran tindak lanjut/perbaikan berkelanjutan..."
+                                    />
+                                  </div>
+                                )}
                               </div>
 
                               <div className="pt-4 border-t border-border flex justify-end">
@@ -9539,140 +10295,366 @@ function App() {
                                   onClick={handleSimpanSertifikat}
                                   className="px-4 py-2 bg-primary text-white text-sm font-bold rounded flex items-center gap-2"
                                 >
-                                  Simpan & Cetak Sertifikat
+                                  <Printer size={16} /> Simpan & Cetak Sertifikat
                                 </button>
+                              </div>
+
+                              {/* CONFIGURATION INPUT FOR DATES */}
+                              <div className="p-4 bg-muted/40 border border-border rounded-lg grid grid-cols-1 md:grid-cols-4 gap-4 print:hidden items-end">
+                                <div className="space-y-1">
+                                  <label className="text-xs font-bold text-foreground">Tanggal Mulai Asesmen</label>
+                                  <input
+                                    type="date"
+                                    value={customTglMulaiAsesmen}
+                                    onChange={(e) => setCustomTglMulaiAsesmen(e.target.value)}
+                                    className="w-full text-sm bg-background border border-border rounded p-2 focus:ring-1 focus:ring-primary focus:outline-none text-foreground"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-xs font-bold text-foreground">Tanggal Selesai Asesmen</label>
+                                  <input
+                                    type="date"
+                                    value={customTglSelesaiAsesmen}
+                                    onChange={(e) => setCustomTglSelesaiAsesmen(e.target.value)}
+                                    className="w-full text-sm bg-background border border-border rounded p-2 focus:ring-1 focus:ring-primary focus:outline-none text-foreground"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-xs font-bold text-foreground">Tanggal Ditetapkan</label>
+                                  <input
+                                    type="date"
+                                    value={customTglDitetapkan}
+                                    onChange={(e) => setCustomTglDitetapkan(e.target.value)}
+                                    className="w-full text-sm bg-background border border-border rounded p-2 focus:ring-1 focus:ring-primary focus:outline-none text-foreground"
+                                  />
+                                </div>
+                                <div className="pt-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setCustomTglMulaiAsesmen('');
+                                      setCustomTglSelesaiAsesmen('');
+                                      setCustomTglDitetapkan('');
+                                    }}
+                                    className="w-full py-2 bg-secondary hover:bg-secondary/80 text-foreground text-xs font-bold rounded border border-border transition-all"
+                                    title="Klik untuk mereset dan memuat tanggal default dari asesi yang sedang aktif"
+                                  >
+                                    Reset ke Default Asesi
+                                  </button>
+                                </div>
                               </div>
 
                               <style>
                                 {`
+                                  .sertifikat-container-scroll {
+                                    overflow-x: auto;
+                                    max-width: 100%;
+                                  }
+                                  .printable-sertifikat {
+                                    background: #e2e8f0;
+                                    padding: 2rem 0;
+                                  }
+                                  .sertifikat-page {
+                                    width: 297mm;
+                                    height: 210mm;
+                                    box-sizing: border-box;
+                                    position: relative;
+                                    overflow: hidden;
+                                    background-color: white;
+                                    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+                                  }
+                                  .sertifikat-border-outer {
+                                    border: 2px solid #002d62;
+                                    padding: 8px;
+                                    box-sizing: border-box;
+                                    width: 100%;
+                                    height: 100%;
+                                    position: relative;
+                                  }
+                                  .sertifikat-border-inner {
+                                    border: 4px double #002d62;
+                                    box-sizing: border-box;
+                                    width: 100%;
+                                    height: 100%;
+                                    padding: 12px 24px 24px 24px;
+                                    position: relative;
+                                  }
                                   @media print {
-                                    @page { size: landscape; margin: 10mm; }
-                                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                                    @page { 
+                                      size: A4 landscape; 
+                                      margin: 0; 
+                                    }
+                                    body { 
+                                      -webkit-print-color-adjust: exact !important; 
+                                      print-color-adjust: exact !important; 
+                                      background-color: white !important;
+                                      margin: 0 !important;
+                                      padding: 0 !important;
+                                    }
+                                    /* Hide all components except the print container */
+                                    body * {
+                                      visibility: hidden !important;
+                                    }
+                                    .printable-sertifikat, .printable-sertifikat * {
+                                      visibility: visible !important;
+                                    }
+                                    .printable-sertifikat {
+                                      position: absolute !important;
+                                      left: 0 !important;
+                                      top: 0 !important;
+                                      width: 297mm !important;
+                                      height: auto !important;
+                                      margin: 0 !important;
+                                      padding: 0 !important;
+                                      background: white !important;
+                                    }
+                                    .sertifikat-page {
+                                      width: 297mm !important;
+                                      height: 210mm !important;
+                                      max-width: 297mm !important;
+                                      max-height: 210mm !important;
+                                      min-width: 297mm !important;
+                                      min-height: 210mm !important;
+                                      page-break-after: always !important;
+                                      page-break-inside: avoid !important;
+                                      break-after: page !important;
+                                      box-sizing: border-box !important;
+                                      margin: 0 !important;
+                                      padding: 0 !important;
+                                      position: relative !important;
+                                      overflow: hidden !important;
+                                      background-color: white !important;
+                                    }
+                                    .sertifikat-border-outer {
+                                      border: 2px solid #002d62 !important;
+                                      padding: 8px !important;
+                                      box-sizing: border-box !important;
+                                      width: 297mm !important;
+                                      height: 210mm !important;
+                                      position: relative !important;
+                                    }
+                                    .sertifikat-border-inner {
+                                      border: 4px double #002d62 !important;
+                                      box-sizing: border-box !important;
+                                      width: 100% !important;
+                                      height: 100% !important;
+                                      padding: 12px 24px 24px 24px !important;
+                                      position: relative !important;
+                                    }
                                   }
                                 `}
                               </style>
-                              <div className="bg-white text-black p-8 sm:p-12 border border-gray-300 mx-auto w-[297mm] min-h-[210mm] max-w-full font-serif print:p-0 print:border-none print:shadow-none relative print:w-full print:max-w-none print:min-h-0" id="print-area">
-                                {/* BACKGROUND WATERMARK */}
-                                <div
-                                  className="absolute inset-0 z-0 opacity-100 pointer-events-none print:opacity-100"
-                                  style={{ backgroundImage: `url(${certificateBackground})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
-                                ></div>
 
-                                <div className="relative z-10 px-16 py-12 sm:px-24 sm:py-16 print:pt-[160px] print:px-[140px] print:pb-[80px] h-full flex flex-col justify-center">
-                                  {/* KOP SURAT */}
-                                  <div className="flex justify-between items-center border-b-[3px] border-black pb-4 mb-4">
-                                    <div className="w-28 sm:w-32 flex justify-start">
-                                      <img src={logoKudus} alt="Logo Pemkab" className="h-32 sm:h-40 w-auto object-contain" />
-                                    </div>
-                                    <div className="text-center flex-1 px-4">
-                                      <h1 className="text-lg sm:text-xl font-bold uppercase tracking-wide">Pemerintah Kabupaten Kudus</h1>
-                                      <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-wide mt-1">Rumah Sakit Umum Daerah dr.LOEKMONO HADI</h2>
-                                      <p className="text-sm mt-2">Jl. dr. Lukmonohadi No. 19 Kudus 59348 ☎ (0291) 444001 📠 (0291) 438195</p>
-                                      <p className="text-sm">Email : rsuddrloekmonohadi@kuduskab.go.id ; rsudkudus@yahoo.co.id</p>
-                                      <p className="text-sm">Website : www.rsuddrloekmonohadi.kuduskab.go.id</p>
-                                    </div>
-                                    <div className="w-28 sm:w-32 flex justify-end">
-                                      <img src={logoRS} alt="Logo RS" className="h-32 sm:h-40 w-auto object-contain" />
+                              <div className="sertifikat-container-scroll print:overflow-visible">
+                                <div className="printable-sertifikat space-y-8 print:space-y-0">
+                                  {/* HALAMAN 1 */}
+                                  <div className="sertifikat-page bg-white text-black mx-auto font-serif relative shadow-md print:shadow-none" id="print-area">
+                                    <div className="sertifikat-border-outer">
+                                      <div className="sertifikat-border-inner">
+                                        {/* BACKGROUND WATERMARK */}
+                                        <div
+                                          className="absolute inset-0 z-0 opacity-100 pointer-events-none"
+                                          style={{ backgroundImage: `url(${certificateBackground})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+                                        ></div>
+
+                                        <div className="relative z-10 px-8 pt-0 pb-2 flex flex-col justify-between" style={{ height: 'calc(210mm - 60px)' }}>
+                                          {/* KOP SURAT */}
+                                          <div className="flex justify-between items-end relative pb-4 mb-4" style={{ minHeight: '100px' }}>
+                                            {/* Left Kudus Crest Logo */}
+                                            <div className="absolute left-0 top-[4px]">
+                                              <img src={logoKudus} alt="Logo Pemkab" className="h-[88px] w-auto object-contain" />
+                                            </div>
+
+                                            {/* Center Text */}
+                                            <div className="text-center w-full px-[240px] pb-1">
+                                              <h1 className="text-[13px] font-bold uppercase tracking-wide text-gray-800">Pemerintah Kabupaten Kudus</h1>
+                                              <h2 className="text-[16px] font-bold uppercase tracking-wide mt-0.5 text-blue-900">Rumah Sakit Umum Daerah dr.LOEKMONO HADI</h2>
+                                              <p className="text-[9.5px] mt-0.5 text-gray-600 font-sans">Jl. dr. Lukmonohadi No. 19 Kudus 59348 ☎ (0291) 444001 📠 (0291) 438195</p>
+                                              <p className="text-[9.5px] text-gray-600 font-sans">Email : rsuddrloekmonohadi@kuduskab.go.id ; rsudkudus@yahoo.co.id</p>
+                                              <p className="text-[9.5px] text-gray-600 font-sans">Website : www.rsuddrloekmonohadi.kuduskab.go.id</p>
+                                            </div>
+
+                                            {/* Right Logos */}
+                                            <div className="absolute right-0 top-0 flex items-center gap-3 h-full pb-4">
+                                              <img src={logoRS} alt="Logo RSUD" className="h-[78px] w-auto object-contain" />
+                                              <img src={logoLars} alt="Logo LARS" className="h-[78px] w-auto object-contain" />
+                                            </div>
+
+                                            {/* Divider Line */}
+                                            <div className="absolute bottom-0 left-0 right-0 border-b-[3px] border-black"></div>
+                                          </div>
+
+                                          {/* CENTER BODY CONTENT */}
+                                          <div className="flex-1 flex flex-col justify-center my-2 space-y-4">
+                                            {/* JUDUL */}
+                                            <div className="text-center">
+                                              <h3 style={{ fontFamily: '"Great Vibes", cursive' }} className="text-5xl sm:text-6xl font-normal text-blue-900 leading-none">Sertifikat Kompetensi</h3>
+                                              <div className="text-center text-xs mt-1 text-gray-700 font-sans">
+                                                Nomor : {sertifikatData?.nomor_sertifikat || "11/.../ASKOM/BIDKEP/" + new Date().getFullYear()}
+                                              </div>
+                                            </div>
+
+                                            {/* CONTENT */}
+                                            <div className="space-y-2 text-sm leading-relaxed text-center font-serif text-gray-900">
+                                              <p className="text-center text-gray-800">Menyatakan bahwa :</p>
+                                              <div className="flex flex-col items-center my-1">
+                                                <h2 className="text-2xl font-bold font-serif text-blue-950 border-b border-gray-400 pb-0.5 px-3 inline-block tracking-wider">
+                                                  {toProperCase(activeNurse?.nama || activePengajuan?.nama_pemohon)}
+                                                </h2>
+                                              </div>
+                                              <p className="text-center text-xs text-gray-700">
+                                                Lahir di {activeNurse?.tempat_lahir || '................'}, Tanggal : {activeNurse?.tanggal_lahir ? new Date(activeNurse.tanggal_lahir).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '................'}
+                                              </p>
+
+                                              <div className="text-center my-2">
+                                                <h2 className="text-3xl font-extrabold tracking-widest text-[#2e7d32] font-sans">KOMPETEN</h2>
+                                              </div>
+
+                                              <p className="text-center text-xs text-gray-800 font-sans">
+                                                Sebagai <strong>{cleanJenjang(form03Data?.pendekatan || activePengajuan?.jenjang_tujuan)}</strong> <br />
+                                                Setelah dilakukan asesmen kompetensi {cleanJenjang(form03Data?.pendekatan || activePengajuan?.jenjang_tujuan)} <br />
+                                                pada tanggal {formatIndoDate(customTglMulaiAsesmen)} s/d {formatIndoDate(customTglSelesaiAsesmen)} <br />
+                                                ( Daftar unit kompetensi terlampir pada halaman 2 )
+                                              </p>
+                                            </div>
+                                          </div>
+
+                                          {/* TANDA TANGAN */}
+                                          <div className="flex justify-end text-xs font-sans pb-4">
+                                            <div className="text-center w-64 text-gray-800">
+                                              <p className="text-left pl-6">Ditetapkan di : KUDUS</p>
+                                              <p className="text-left pl-6 mb-2">Pada Tanggal : {formatIndoDate(customTglDitetapkan)}</p>
+
+                                              <p className="font-bold mb-1 text-center">{pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.jabatan || 'Kepala Bidang Keperawatan'}</p>
+
+                                              {pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip ? (
+                                                <img
+                                                  src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip}`}
+                                                  alt="QR Code"
+                                                  className="mx-auto w-16 h-16 mb-1"
+                                                />
+                                              ) : (
+                                                <div className="h-16"></div>
+                                              )}
+
+                                              <p className="font-bold underline decoration-1 underline-offset-4 text-blue-950 text-center font-serif">{pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nama || '................................'}</p>
+                                              <p className="text-center">NIP. {pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip || '................................'}</p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
 
-                                  {/* JUDUL */}
-                                  <div className="text-center mb-2 mt-4">
-                                    <h3 style={{ fontFamily: '"Great Vibes", cursive' }} className="text-6xl font-normal mb-2">Sertifikat Kompetensi</h3>
-                                  </div>
+                                  {/* HALAMAN 2 */}
+                                  <div className="sertifikat-page bg-white text-black mx-auto font-serif relative shadow-md print:shadow-none mt-8 print:mt-0" style={{ pageBreakBefore: 'always', breakBefore: 'page' }}>
+                                    <div className="sertifikat-border-outer">
+                                      <div className="sertifikat-border-inner">
+                                        {/* BACKGROUND WATERMARK */}
+                                        <div
+                                          className="absolute inset-0 z-0 opacity-100 pointer-events-none"
+                                          style={{ backgroundImage: `url(${certificateBackground})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+                                        ></div>
 
-                                  <div className="text-center mb-2 text-sm">
-                                    Nomor : {sertifikatData?.nomor_sertifikat || "11/.../ASKOM/BIDKEP/" + new Date().getFullYear()}
-                                  </div>
+                                        <div className="relative z-10 px-8 pt-0 pb-2 flex flex-col justify-between" style={{ height: 'calc(210mm - 60px)' }}>
+                                          {/* KOP SURAT */}
+                                          <div className="flex justify-between items-end relative pb-4 mb-3" style={{ minHeight: '100px' }}>
+                                            {/* Left Kudus Crest Logo */}
+                                            <div className="absolute left-0 top-[4px]">
+                                              <img src={logoKudus} alt="Logo Pemkab" className="h-[88px] w-auto object-contain" />
+                                            </div>
 
-                                  <div className="space-y-3 text-base leading-relaxed">
-                                    <p className="text-center">Menyatakan bahwa :</p>
-                                    <h2 className="text-3xl font-bold text-center uppercase tracking-wide">{activeNurse?.nama || activePengajuan?.nama_pemohon}</h2>
-                                    <p className="text-center">
-                                      Lahir di {activeNurse?.tempat_lahir || '................'}, Tanggal : {activeNurse?.tanggal_lahir ? new Date(activeNurse.tanggal_lahir).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '................'}
-                                    </p>
+                                            {/* Center Text */}
+                                            <div className="text-center w-full px-[240px] pb-1">
+                                              <h1 className="text-[13px] font-bold uppercase tracking-wide text-gray-800">Pemerintah Kabupaten Kudus</h1>
+                                              <h2 className="text-[16px] font-bold uppercase tracking-wide mt-0.5 text-blue-900">Rumah Sakit Umum Daerah dr.LOEKMONO HADI</h2>
+                                              <p className="text-[9.5px] mt-0.5 text-gray-600 font-sans">Jl. dr. Lukmonohadi No. 19 Kudus 59348 ☎ (0291) 444001 📠 (0291) 438195</p>
+                                              <p className="text-[9.5px] text-gray-600 font-sans">Email : rsuddrloekmonohadi@kuduskab.go.id ; rsudkudus@yahoo.co.id</p>
+                                              <p className="text-[9.5px] text-gray-600 font-sans">Website : www.rsuddrloekmonohadi.kuduskab.go.id</p>
+                                            </div>
 
-                                    <div className="text-center py-6">
-                                      <h2 className="text-4xl font-bold tracking-widest text-primary print:text-black">KOMPETEN</h2>
-                                    </div>
+                                            {/* Right Logos */}
+                                            <div className="absolute right-0 top-0 flex items-center gap-3 h-full pb-4">
+                                              <img src={logoRS} alt="Logo RSUD" className="h-[78px] w-auto object-contain" />
+                                              <img src={logoLars} alt="Logo LARS" className="h-[78px] w-auto object-contain" />
+                                            </div>
 
-                                    <p className="text-center">
-                                      Sebagai <strong>{form03Data?.pendekatan || activePengajuan?.jenjang_tujuan}</strong> <br />
-                                      Setelah dilakukan asesmen kompetensi {form03Data?.pendekatan || activePengajuan?.jenjang_tujuan} <br />
-                                      pada tanggal {activePengajuan?.created_at ? new Date(activePengajuan.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '...'} s/d {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} <br />
-                                      ( Daftar unit kompetensi terlampir pada halaman 2 )
-                                    </p>
-                                    <p className="text-center font-bold">Sertifikat ini berlaku 3 ( tiga ) tahun</p>
-                                  </div>
+                                            {/* Divider Line */}
+                                            <div className="absolute bottom-0 left-0 right-0 border-b-[3px] border-black"></div>
+                                          </div>
 
-                                  <div className="mt-16 flex justify-end">
-                                    <div className="text-center w-64">
-                                      <p className="text-left">Ditetapkan di : KUDUS</p>
-                                      <p className="text-left mb-6">Pada Tanggal : {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                          {/* LAMPIRAN DETAILS */}
+                                          <div className="text-center space-y-0.5 my-0.5">
+                                            <h3 className="text-sm font-bold uppercase tracking-wide text-blue-950">Lampiran Sertifikat Kompetensi</h3>
+                                            <p className="text-xs font-bold text-gray-800">
+                                              Nomor : {sertifikatData?.nomor_sertifikat || "11/.../ASKOM/BIDKEP/" + new Date().getFullYear()}
+                                            </p>
+                                            <p className="text-xs text-gray-700">
+                                              Nama Asesi: <strong className="font-bold text-gray-900">{toProperCase(activeNurse?.nama || activePengajuan?.nama_pemohon)}</strong> | Jenjang: <strong className="font-bold text-gray-900">{activePengajuan?.jenis_sertifikasi}</strong>
+                                            </p>
+                                          </div>
 
-                                      <p className="font-bold mb-2">{pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.jabatan || 'Kepala Bidang Keperawatan'}</p>
+                                          {/* TABLE HEADER */}
+                                          <div className="text-left mt-1">
+                                            <h4 className="text-[10px] font-bold text-blue-950 uppercase tracking-wider">Daftar Unit Kompetensi Yang Dicapai:</h4>
+                                          </div>
 
-                                      {pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip ? (
-                                        <img
-                                          src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip}`}
-                                          alt="QR Code"
-                                          className="mx-auto w-20 h-20 mb-2"
-                                        />
-                                      ) : (
-                                        <div className="h-20"></div>
-                                      )}
+                                          {/* TABLE LIST */}
+                                          <div className="my-2 flex-1">
+                                            <table className="w-full border-collapse border border-black text-[10px] relative bg-white/90">
+                                              <thead className="bg-gray-100">
+                                                <tr>
+                                                  <th className="border border-black p-1 w-10 text-center">NO</th>
+                                                  <th className="border border-black p-1 text-left">KOMPETENSI</th>
+                                                  <th className="border border-black p-1 w-24 text-center">HASIL</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {get12KompetensiForPengajuan(activePengajuan).map((komp, idx) => (
+                                                  <tr key={idx}>
+                                                    <td className="border border-black p-1 text-center">{idx + 1}.</td>
+                                                    <td className="border border-black p-1">{komp.judul}</td>
+                                                    <td className="border border-black p-1 text-center font-bold text-emerald-700">Kompeten</td>
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
 
-                                      <p className="font-bold underline decoration-1 underline-offset-4">{pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nama || '................................'}</p>
-                                      <p>NIP. {pejabatData.find(p => p.jabatan.includes('Kepala Bidang'))?.nip || '................................'}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
+                                          {/* TANDA TANGAN KETUA PANITIA */}
+                                          <div className="flex justify-end text-xs font-sans pb-2">
+                                            <div className="text-center w-72 text-gray-800">
+                                              {(() => {
+                                                const rawJabatan = pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.jabatan || 'Ketua Panitia Asesmen Kompetensi Perawat/Bidan Klinis';
+                                                const cleaned = rawJabatan.replace(/perawat\/bidan klinis/gi, '').trim();
+                                                return (
+                                                  <>
+                                                    <p className="font-bold text-center leading-tight">{cleaned}</p>
+                                                    <p className="text-center text-[11px] text-gray-600 mb-1 leading-tight">Perawat/Bidan Klinis</p>
+                                                  </>
+                                                );
+                                              })()}
 
-                              {/* HALAMAN 2 */}
-                              <div className="bg-white text-black p-8 sm:p-12 border border-gray-300 mx-auto w-[297mm] min-h-[210mm] max-w-full font-serif print:p-0 print:border-none print:shadow-none relative print:w-full print:max-w-none print:h-[210mm] print:min-h-0 overflow-hidden mt-8 print:mt-0" style={{ pageBreakBefore: 'always', breakBefore: 'page' }}>
-                                <div
-                                  className="absolute inset-0 z-0 opacity-100 pointer-events-none print:opacity-100"
-                                  style={{ backgroundImage: `url(${certificateBackground})`, backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
-                                ></div>
-                                <div className="relative z-10 h-full flex flex-col pt-8 px-16 pb-12 sm:px-24 sm:pb-16 print:pt-[160px] print:px-[140px] print:pb-[80px]">
-                                  <h3 className="text-xl font-bold text-center mb-6 uppercase">Daftar Unit Kompetensi {activePengajuan?.jenjang_tujuan}</h3>
+                                              {pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip ? (
+                                                <img
+                                                  src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip}`}
+                                                  alt="QR Code"
+                                                  className="mx-auto w-14 h-14 mb-1"
+                                                />
+                                              ) : (
+                                                <div className="h-14"></div>
+                                              )}
 
-                                  <table className="w-full border-collapse border border-black text-sm mb-16 relative bg-white/90">
-                                    <thead>
-                                      <tr>
-                                        <th className="border border-black p-2 w-12 text-center">NO</th>
-                                        <th className="border border-black p-2 text-left">KOMPETENSI</th>
-                                        <th className="border border-black p-2 w-32 text-center">HASIL</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {get12KompetensiForPengajuan(activePengajuan).map((komp, idx) => (
-                                        <tr key={idx}>
-                                          <td className="border border-black p-2 text-center">{idx + 1}.</td>
-                                          <td className="border border-black p-2">{komp.judul}</td>
-                                          <td className="border border-black p-2 text-center font-bold">Kompeten</td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-
-                                  <div className="flex justify-end relative z-10 bg-white/80 p-2">
-                                    <div className="text-center w-72">
-                                      <p className="font-bold mb-2">{pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.jabatan || 'Ketua Panitia Asesmen'}</p>
-
-                                      {pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip ? (
-                                        <img
-                                          src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip}`}
-                                          alt="QR Code"
-                                          className="mx-auto w-20 h-20 mb-2"
-                                        />
-                                      ) : (
-                                        <div className="h-20"></div>
-                                      )}
-
-                                      <p className="font-bold underline decoration-1 underline-offset-4">{pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nama || '................................'}</p>
-                                      <p>NIP. {pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip || '................................'}</p>
+                                              <p className="font-bold underline decoration-1 underline-offset-4 text-blue-950 text-center font-serif">
+                                                {pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nama || '................................'}
+                                              </p>
+                                              <p className="text-center text-[11px]">
+                                                NIP. {pejabatData.find(p => p.jabatan.includes('Ketua Panitia'))?.nip || '................................'}
+                                              </p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -9874,6 +10856,923 @@ function App() {
               </div>
             )}
 
+            {activeTab === 'kredensial' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight text-foreground">Kredensial & Kewenangan Klinis Perawat</h2>
+                  <p className="text-muted-foreground text-sm mt-1">Kelola rincian kewenangan klinis (RKK) per perawat.</p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Left Pane: Nurse List */}
+                  <div className="bg-card border border-border rounded-xl p-4 flex flex-col h-[650px] shadow-sm">
+                    <div className="relative mb-4">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                      <input
+                        type="text"
+                        placeholder="Cari perawat..."
+                        value={kredensialSearchPerawat}
+                        onChange={e => setKredensialSearchPerawat(e.target.value)}
+                        className="pl-9 pr-4 py-2 w-full bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                    <div className="overflow-y-auto flex-1 space-y-2 pr-1">
+                      {perawatData
+                        .filter(p => p.nama.toLowerCase().includes(kredensialSearchPerawat.toLowerCase()))
+                        .map(p => {
+                          const isSelected = String(p.id_perawat) === String(kredensialSelectedPerawatId);
+                          return (
+                            <button
+                              key={p.id_perawat}
+                              onClick={() => setKredensialSelectedPerawatId(String(p.id_perawat))}
+                              className={`w-full text-left p-3 rounded-lg border text-sm transition-all flex flex-col gap-1 ${
+                                isSelected
+                                  ? 'bg-primary/10 border-primary text-primary font-semibold'
+                                  : 'bg-background hover:bg-muted border-border text-foreground'
+                              }`}
+                            >
+                              <div className="font-bold flex items-center justify-between">
+                                <span>{p.nama}</span>
+                                {kredensialList.some(c => String(c.id_perawat) === String(p.id_perawat)) && (
+                                  <span className="text-[10px] bg-green-500/20 text-green-600 px-1.5 py-0.5 rounded font-bold">
+                                    Terkredensial
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-xs text-muted-foreground font-medium">NIK: {p.nik}</span>
+                              <span className="text-xs text-muted-foreground font-medium">Unit: {p.unit_kerja}</span>
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </div>
+
+                  {/* Right Pane: Worksheet */}
+                  <div className="lg:col-span-2 bg-card border border-border rounded-xl shadow-sm flex flex-col h-[650px] overflow-hidden">
+                    {!kredensialSelectedPerawatId ? (
+                      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
+                        <Stethoscope size={48} className="text-muted-foreground/30 mb-4" />
+                        <h3 className="text-lg font-medium text-foreground mb-1">Perawat Belum Dipilih</h3>
+                        <p className="text-sm max-w-sm">Pilih perawat di sebelah kiri untuk mulai mengisi atau mengubah kewenangan klinis (RKK).</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Worksheet Header */}
+                        {(() => {
+                          const currentPerawat = perawatData.find(p => String(p.id_perawat) === String(kredensialSelectedPerawatId));
+                          return (
+                            <>
+                              <div className="p-5 border-b border-border bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                  <h3 className="font-bold text-foreground">{currentPerawat?.nama}</h3>
+                                  <p className="text-xs text-muted-foreground mt-0.5">NIK: {currentPerawat?.nik} | Unit: {currentPerawat?.unit_kerja}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <label className="text-xs font-semibold text-muted-foreground">Tgl Kredensial:</label>
+                                  <input
+                                    type="date"
+                                    value={kredensialWorksheetDate}
+                                    onChange={e => setKredensialWorksheetDate(e.target.value)}
+                                    className="px-2.5 py-1.5 bg-background border border-border rounded-lg text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Category selector for worksheet */}
+                              {jenisList.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 p-4 bg-muted/10 border-b border-border">
+                                  {jenisList.map(j => (
+                                    <button
+                                      key={j.kd_jenis}
+                                      type="button"
+                                      onClick={() => setKredensialActiveJenis(j.kd_jenis)}
+                                      className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                                        kredensialActiveJenis === j.kd_jenis
+                                          ? 'bg-primary text-primary-foreground shadow-sm'
+                                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                      }`}
+                                    >
+                                      {j.nm_jenis} ({j.kd_jenis})
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Worksheet Content */}
+                              <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                                {jenisList.length === 0 ? (
+                                  <p className="text-sm text-center text-muted-foreground">Data jenis RKK tidak ditemukan. Isi data master jenis RKK terlebih dahulu.</p>
+                                ) : (() => {
+                                  const selectedJenisObj = jenisList.find(j => j.kd_jenis === kredensialActiveJenis) || jenisList[0];
+                                  if (!selectedJenisObj) return null;
+
+                                  return (
+                                    <div className="space-y-6">
+                                      <h4 className="font-extrabold text-sm text-primary uppercase tracking-wide border-b border-primary/20 pb-1.5 flex items-center justify-between font-sans">
+                                        <span>Rincian Kewenangan: {selectedJenisObj.nm_jenis} ({selectedJenisObj.kd_jenis})</span>
+                                      </h4>
+
+                                      {[1, 2, 3, 4, 5].map(lvl => {
+                                        const targetJenis = (lvl === 1 && selectedJenisObj.kd_jenis !== 'MGR' && selectedJenisObj.kd_jenis !== 'MATER') ? 'KMB' : selectedJenisObj.kd_jenis;
+                                        const lvlItems = rkkList.filter(r => r.kd_jenis === targetJenis && Number(r.level_pk) === lvl && Number(r.aktif) === 1);
+                                        if (lvlItems.length === 0) return null;
+
+                                        return (
+                                          <div key={lvl} className="ml-2 space-y-2">
+                                            <div className="flex flex-col gap-1 bg-muted/40 px-3 py-2 rounded-md">
+                                              <div className="flex items-center justify-between">
+                                                <h5 className="font-bold text-xs text-foreground font-sans">Level PK {lvl}</h5>
+                                                <span className="text-[10px] text-muted-foreground font-bold font-sans">{lvlItems.length} tindakan</span>
+                                              </div>
+                                              {getLevelNote(lvl) && (
+                                                <p className="text-[10px] text-primary font-semibold font-sans">{getLevelNote(lvl)}</p>
+                                              )}
+
+                                            </div>
+                                            <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
+                                              {lvlItems.map((item, idx) => (
+                                                <div key={item.id_rkk} className="p-3 bg-card flex items-start justify-between gap-4 text-xs hover:bg-muted/10 transition">
+                                                  <div className="flex-1 flex gap-2">
+                                                    <span className="font-semibold text-muted-foreground w-6 font-sans">{idx + 1}.</span>
+                                                    <span className="text-foreground font-medium leading-relaxed font-sans">{item.kewenangan}</span>
+                                                  </div>
+                                                  <div className="flex gap-1 shrink-0">
+                                                    {[
+                                                      { val: 0, lbl: 'TA', activeClass: 'bg-muted text-muted-foreground border-border' },
+                                                      { val: 1, lbl: 'M', activeClass: 'bg-green-600 text-white border-green-600 font-bold shadow-sm' },
+                                                      { val: 2, lbl: 'DS', activeClass: 'bg-amber-600 text-white border-amber-600 font-bold shadow-sm' }
+                                                    ].map(opt => {
+                                                      const isSelected = (kredensialWorksheet[item.id_rkk] || 0) === opt.val;
+                                                      return (
+                                                        <button
+                                                          key={opt.val}
+                                                          type="button"
+                                                          onClick={() => {
+                                                            setKredensialWorksheet(prev => ({
+                                                              ...prev,
+                                                              [item.id_rkk]: opt.val
+                                                            }));
+                                                          }}
+                                                          className={`px-2.5 py-1 rounded text-[10px] font-bold border transition ${
+                                                            isSelected
+                                                              ? opt.activeClass
+                                                              : 'bg-background hover:bg-muted text-muted-foreground border-border'
+                                                          }`}
+                                                        >
+                                                          {opt.lbl}
+                                                        </button>
+                                                      );
+                                                    })}
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+
+                              {/* Worksheet Footer Actions */}
+                              <div className="p-4 border-t border-border bg-muted/20 flex justify-end gap-3">
+                                <button
+                                  type="button"
+                                  onClick={() => setKredensialSelectedPerawatId('')}
+                                  className="px-4 py-2 text-xs font-semibold hover:bg-muted border border-border rounded-lg transition"
+                                >
+                                  Batal
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleSaveKredensial}
+                                  className="px-5 py-2 text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/95 rounded-lg shadow-sm transition"
+                                >
+                                  Simpan Kredensial
+                                </button>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'asesmen' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-primary/10 rounded-xl text-primary shrink-0">
+                      <ClipboardCheck size={26} />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">Rekap Asesmen Kompetensi</h2>
+                      <p className="text-muted-foreground text-xs mt-0.5">Rekapitulasi hasil uji tulis (ujian online), uji lisan, dan unjuk kerja/observasi seluruh asesi.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <button
+                      onClick={handleExportExcel}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-sm"
+                    >
+                      <FileText size={14} /> Export Excel
+                    </button>
+                    <button
+                      onClick={() => window.print()}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-sm"
+                    >
+                      <Printer size={14} /> Cetak Laporan
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-card border border-border rounded-xl shadow-sm p-5 space-y-4">
+                  {/* Filters */}
+                  <div className="flex flex-wrap gap-3 items-center justify-between">
+                    <div className="flex flex-wrap gap-3 items-center flex-1 max-w-4xl">
+                      {/* Search */}
+                      <div className="relative flex-1 min-w-[240px]">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                        <input
+                          type="text"
+                          placeholder="Cari nama perawat atau NIP..."
+                          value={searchQueryAsesmenRecap}
+                          onChange={e => setSearchQueryAsesmenRecap(e.target.value)}
+                          className="pl-9 pr-4 py-2 w-full bg-background border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
+                      
+                      {/* Unit Kerja Filter */}
+                      <select
+                        value={filterUnitAsesmenRecap}
+                        onChange={e => setFilterUnitAsesmenRecap(e.target.value)}
+                        className="px-3 py-2 bg-background border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary min-w-[160px]"
+                      >
+                        <option value="">Semua Unit Kerja</option>
+                        {unitKerjaData.map(u => (
+                          <option key={u.id} value={u.nama_unit}>{u.nama_unit}</option>
+                        ))}
+                      </select>
+
+                      {/* Jenis Sertifikasi Filter */}
+                      <select
+                        value={filterJenisAsesmenRecap}
+                        onChange={e => setFilterJenisAsesmenRecap(e.target.value)}
+                        className="px-3 py-2 bg-background border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary min-w-[180px]"
+                      >
+                        <option value="">Semua Jenis Sertifikasi</option>
+                        {uniqueJenisSertifikasi.map(j => (
+                          <option key={j} value={j}>{j}</option>
+                        ))}
+                      </select>
+
+                      {/* Rekomendasi Filter */}
+                      <select
+                        value={filterRekomendasiAsesmenRecap}
+                        onChange={e => setFilterRekomendasiAsesmenRecap(e.target.value)}
+                        className="px-3 py-2 bg-background border border-border rounded-lg text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary min-w-[160px]"
+                      >
+                        <option value="">Semua Rekomendasi</option>
+                        <option value="Kompeten">Kompeten</option>
+                        <option value="Belum Kompeten">Belum Kompeten</option>
+                        <option value="Dalam Proses">Dalam Proses</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Stat Cards */}
+                  {(() => {
+                    const totalAsesi = filteredRecapList.length;
+                    const kompetenCount = filteredRecapList.filter(item => getRekomendasiAkhir(item) === 'Kompeten').length;
+                    const bkCount = filteredRecapList.filter(item => getRekomendasiAkhir(item) === 'Belum Kompeten').length;
+                    const prosesCount = totalAsesi - kompetenCount - bkCount;
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-1 pb-3">
+                        <div className="bg-card p-4 rounded-xl border border-border flex items-center justify-between shadow-sm">
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Total Asesi</p>
+                            <h3 className="text-2xl font-bold text-foreground">{totalAsesi}</h3>
+                          </div>
+                          <div className="p-2.5 bg-blue-500/10 text-blue-500 rounded-lg">
+                            <Users size={18} />
+                          </div>
+                        </div>
+                        <div className="bg-card p-4 rounded-xl border border-border flex items-center justify-between shadow-sm">
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Kompeten (K)</p>
+                            <h3 className="text-2xl font-bold text-green-600">{kompetenCount}</h3>
+                          </div>
+                          <div className="p-2.5 bg-green-500/10 text-green-500 rounded-lg">
+                            <CheckCircle size={18} />
+                          </div>
+                        </div>
+                        <div className="bg-card p-4 rounded-xl border border-border flex items-center justify-between shadow-sm">
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Belum Kompeten (BK)</p>
+                            <h3 className="text-2xl font-bold text-red-600">{bkCount}</h3>
+                          </div>
+                          <div className="p-2.5 bg-red-500/10 text-red-500 rounded-lg">
+                            <XCircle size={18} />
+                          </div>
+                        </div>
+                        <div className="bg-card p-4 rounded-xl border border-border flex items-center justify-between shadow-sm">
+                          <div>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Dalam Proses</p>
+                            <h3 className="text-2xl font-bold text-amber-500">{prosesCount}</h3>
+                          </div>
+                          <div className="p-2.5 bg-amber-500/10 text-amber-500 rounded-lg">
+                            <Clock size={18} />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Table */}
+                  <div className="overflow-x-auto rounded-lg border border-border bg-card">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-muted/50 border-b border-border text-muted-foreground uppercase text-[10px] font-bold">
+                        <tr>
+                          <th className="px-4 py-3.5 w-12 text-center">NO</th>
+                          <th className="px-4 py-3.5">NAMA ASESI / NIP</th>
+                          <th className="px-4 py-3.5">UNIT KERJA & JABATAN</th>
+                          <th className="px-4 py-3.5">JENIS SERTIFIKASI</th>
+                          <th className="px-4 py-3.5">ASESOR</th>
+                          <th className="px-4 py-3.5 text-center">UJI TULIS</th>
+                          <th className="px-4 py-3.5 text-center">UJI LISAN</th>
+                          <th className="px-4 py-3.5 text-center">UJI OBSERVASI</th>
+                          <th className="px-4 py-3.5 text-center">REKOMENDASI AKHIR</th>
+                          <th className="px-4 py-3.5 text-center">AKSI</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/40">
+                        {(() => {
+                          if (filteredRecapList.length === 0) {
+                            return (
+                              <tr>
+                                <td colSpan="10" className="px-4 py-16 text-center text-muted-foreground font-medium">
+                                  Tidak ada data asesmen yang cocok dengan filter.
+                                </td>
+                              </tr>
+                            );
+                          }
+
+                          // Pagination
+                          const idxLast = currentPageRecap * itemsPerPageRecap;
+                          const idxFirst = idxLast - itemsPerPageRecap;
+                          const currentItems = filteredRecapList.slice(idxFirst, idxLast);
+                          const totalPages = Math.ceil(filteredRecapList.length / itemsPerPageRecap);
+
+                          return (
+                            <>
+                              {currentItems.map((item, idx) => {
+                                const nurse = perawatData.find(n => String(n.id_perawat) === String(item.id_perawat)) || {};
+                                const primaryAsesor = userData.find(u => String(u.id) === String(item.id_asesor))?.nama || '-';
+                                const coAsesor = userData.find(u => String(u.id) === String(item.id_asesor_pendamping))?.nama || '-';
+                                const lisanStatus = getUjiLisanStatus(item);
+                                const obsStatus = getUjiObservasiStatus(item);
+                                const recom = getRekomendasiAkhir(item);
+                                
+                                return (
+                                  <tr key={item.id || idx} className="hover:bg-muted/10 transition-colors">
+                                    <td className="px-4 py-4 text-center font-semibold text-muted-foreground">
+                                      {idxFirst + idx + 1}.
+                                    </td>
+                                    <td className="px-4 py-4 font-bold text-foreground">
+                                      <div>{toProperCase(nurse.nama)}</div>
+                                      <div className="text-[10px] text-muted-foreground font-medium mt-0.5">{nurse.nip || '-'}</div>
+                                    </td>
+                                    <td className="px-4 py-4">
+                                      <div className="font-bold text-foreground text-xs">{nurse.unit_kerja || '-'}</div>
+                                      <div className="text-[10px] text-muted-foreground mt-0.5">{nurse.jabatan || '-'}</div>
+                                    </td>
+                                    <td className="px-4 py-4 font-medium text-foreground">
+                                      {item.jenis_sertifikasi || '-'}
+                                    </td>
+                                    <td className="px-4 py-4 text-xs font-semibold text-foreground">
+                                      <div>{primaryAsesor}</div>
+                                      {item.id_asesor_pendamping && (
+                                        <div className="text-[9.5px] text-muted-foreground font-medium mt-0.5">Pendamping: {coAsesor}</div>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-4 text-center whitespace-nowrap">
+                                      {item.status_ujian === 'Selesai' ? (
+                                        (() => {
+                                          const scoreVal = parseFloat(item.nilai_ujian || '0');
+                                          return (
+                                            <span className={`px-2.5 py-1 rounded font-bold text-xs whitespace-nowrap inline-block ${
+                                              scoreVal >= 70 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                                            }`}>
+                                              {scoreVal.toFixed(1)}%
+                                            </span>
+                                          );
+                                        })()
+                                      ) : item.status_ujian === 'Sedang Dikerjakan' ? (
+                                        <span className="px-2 py-0.5 bg-yellow-50 text-yellow-755 border border-yellow-200 rounded font-semibold text-[10px] whitespace-nowrap inline-block">Sedang Dikerjakan</span>
+                                      ) : (
+                                        <span className="text-gray-400 italic text-[11px] font-medium whitespace-nowrap">Belum Ujian</span>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-4 text-center whitespace-nowrap">
+                                      {lisanStatus === 'Belum Dinilai' ? (
+                                        <span className="text-gray-400 italic text-[11px] font-medium whitespace-nowrap">Belum Dinilai</span>
+                                      ) : (
+                                        <span className="px-2 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded font-bold text-xs whitespace-nowrap inline-block">
+                                          {lisanStatus}
+                                        </span>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-4 text-center whitespace-nowrap">
+                                      {obsStatus === 'Belum Dinilai' ? (
+                                        <span className="text-gray-400 italic text-[11px] font-medium whitespace-nowrap">Belum Dinilai</span>
+                                      ) : (
+                                        <span className="px-2 py-1 bg-green-50 text-green-700 border border-green-200 rounded font-bold text-xs whitespace-nowrap inline-block">
+                                          {obsStatus}
+                                        </span>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-4 text-center whitespace-nowrap">
+                                      {recom === 'Kompeten' ? (
+                                        <span className="px-2.5 py-1 bg-green-600 text-white rounded font-bold text-[10px] uppercase tracking-wider shadow-sm whitespace-nowrap inline-block">KOMPETEN</span>
+                                      ) : recom === 'Belum Kompeten' ? (
+                                        <span className="px-2.5 py-1 bg-red-600 text-white rounded font-bold text-[10px] uppercase tracking-wider shadow-sm whitespace-nowrap inline-block">BELUM KOMPETEN</span>
+                                      ) : (
+                                        <span className="px-2.5 py-1 bg-amber-500 text-white rounded font-bold text-[10px] uppercase tracking-wider shadow-sm whitespace-nowrap inline-block">DALAM PROSES</span>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-4 text-center whitespace-nowrap">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedPengajuanForMatriks(item);
+                                          setShowDetailMatriksModal(true);
+                                          if (item.status_ujian === 'Selesai') {
+                                            fetch(`${API_URL}/ujian/hasil/${item.id}`)
+                                              .then(res => res.json())
+                                              .then(data => {
+                                                if (data.success) {
+                                                  setMatriksTulisExamDetails(data);
+                                                }
+                                              })
+                                              .catch(err => console.error("Error loading exam details:", err));
+                                          } else {
+                                            setMatriksTulisExamDetails(null);
+                                          }
+                                        }}
+                                        className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 border border-blue-200 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm mx-auto whitespace-nowrap"
+                                      >
+                                        <Eye size={12} /> Detail
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                              
+                              {/* Pagination Controls */}
+                              {totalPages > 1 && (
+                                <tr>
+                                  <td colSpan="10" className="px-4 py-3 bg-muted/10 border-t border-border">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[11px] text-muted-foreground font-medium">
+                                        Menampilkan {idxFirst + 1} - {Math.min(idxLast, filteredRecapList.length)} dari {filteredRecapList.length} data
+                                      </span>
+                                      <div className="flex items-center gap-1">
+                                        <button
+                                          onClick={() => setCurrentPageRecap(p => Math.max(1, p - 1))}
+                                          disabled={currentPageRecap === 1}
+                                          className="p-1 border border-border rounded text-muted-foreground hover:bg-muted disabled:opacity-40 transition-colors"
+                                        >
+                                          <ChevronLeft size={14} />
+                                        </button>
+                                        <span className="px-3 py-1 text-[11px] font-bold bg-primary/10 text-primary rounded border border-primary/20">
+                                          {currentPageRecap} / {totalPages}
+                                        </span>
+                                        <button
+                                          onClick={() => setCurrentPageRecap(p => Math.min(totalPages, p + 1))}
+                                          disabled={currentPageRecap === totalPages}
+                                          className="p-1 border border-border rounded text-muted-foreground hover:bg-muted disabled:opacity-40 transition-colors"
+                                        >
+                                          <ChevronRight size={14} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'master_jenis' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-bold tracking-tight text-foreground">Master Jenis RKK</h2>
+                    <p className="text-muted-foreground text-sm mt-1">Kelola data kategori / kelompok Kewenangan Klinis (RKK).</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setJenisForm({ kd_jenis: '', nm_jenis: '' });
+                      setEditingJenisKd(null);
+                      setShowJenisModal(true);
+                    }}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm"
+                  >
+                    + Tambah Kategori RKK
+                  </button>
+                </div>
+
+                <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                      <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border font-bold">
+                        <tr>
+                          <th className="px-6 py-4 font-semibold">Kode Kategori</th>
+                          <th className="px-6 py-4 font-semibold">Nama Kategori RKK</th>
+                          <th className="px-6 py-4 text-center font-semibold w-32">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {(() => {
+                          const totalItemsJenis = jenisList.length;
+                          const indexOfLastItemJenis = currentPageJenis * itemsPerPageJenis;
+                          const indexOfFirstItemJenis = indexOfLastItemJenis - itemsPerPageJenis;
+                          const currentItemsJenis = jenisList.slice(indexOfFirstItemJenis, indexOfLastItemJenis);
+                          const totalPagesJenis = Math.ceil(totalItemsJenis / itemsPerPageJenis);
+
+                          if (totalItemsJenis === 0) {
+                            return (
+                              <tr>
+                                <td colSpan={3} className="px-6 py-8 text-center text-muted-foreground">
+                                  Tidak ada data kategori RKK.
+                                </td>
+                              </tr>
+                            );
+                          }
+
+                          return (
+                            <>
+                              {currentItemsJenis.map(j => (
+                                <tr key={j.kd_jenis} className="hover:bg-muted/10 transition">
+                                  <td className="px-6 py-4 font-bold text-foreground">{j.kd_jenis}</td>
+                                  <td className="px-6 py-4 font-medium text-foreground">{j.nm_jenis}</td>
+                                  <td className="px-6 py-4 text-center">
+                                    <div className="flex justify-center gap-2">
+                                      <button
+                                        onClick={() => {
+                                          setJenisForm({ kd_jenis: j.kd_jenis, nm_jenis: j.nm_jenis });
+                                          setEditingJenisKd(j.kd_jenis);
+                                          setShowJenisModal(true);
+                                        }}
+                                        className="p-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded transition"
+                                        title="Edit"
+                                      >
+                                        <Edit2 size={14} />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteJenis(j.kd_jenis)}
+                                        className="p-1.5 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white rounded transition"
+                                        title="Hapus"
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+
+                              {/* Nested pagination control render row for Jenis RKK */}
+                              {totalPagesJenis > 1 && (
+                                <tr>
+                                  <td colSpan={3} className="p-0 border-t border-border">
+                                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-muted/5">
+                                      <div className="flex flex-wrap items-center gap-2.5">
+                                        <span className="text-xs text-muted-foreground font-semibold font-sans">Tampilkan</span>
+                                        <select
+                                          value={itemsPerPageJenis}
+                                          onChange={e => {
+                                            setItemsPerPageJenis(Number(e.target.value));
+                                            setCurrentPageJenis(1);
+                                          }}
+                                          className="px-2 py-1 bg-background border border-border rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold"
+                                        >
+                                          <option value={5}>5 baris</option>
+                                          <option value={10}>10 baris</option>
+                                          <option value={25}>25 baris</option>
+                                        </select>
+                                        <span className="text-xs text-muted-foreground font-semibold font-sans">
+                                          Menampilkan {indexOfFirstItemJenis + 1} - {Math.min(indexOfLastItemJenis, totalItemsJenis)} dari {totalItemsJenis} data
+                                        </span>
+                                      </div>
+
+                                      <div className="flex items-center gap-1">
+                                        <button
+                                          onClick={() => setCurrentPageJenis(p => Math.max(1, p - 1))}
+                                          disabled={currentPageJenis === 1}
+                                          className="p-1.5 border border-border rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground transition-colors"
+                                          title="Sebelumnya"
+                                        >
+                                          <ChevronRight size={15} className="rotate-180" />
+                                        </button>
+
+                                        {Array.from({ length: totalPagesJenis }, (_, i) => i + 1).map((pageNum) => {
+                                          if (
+                                            pageNum === 1 ||
+                                            pageNum === totalPagesJenis ||
+                                            (pageNum >= currentPageJenis - 1 && pageNum <= currentPageJenis + 1)
+                                          ) {
+                                            return (
+                                              <button
+                                                key={pageNum}
+                                                onClick={() => setCurrentPageJenis(pageNum)}
+                                                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                                                  currentPageJenis === pageNum
+                                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                                    : 'hover:bg-muted text-muted-foreground hover:text-foreground border border-transparent hover:border-border'
+                                                }`}
+                                              >
+                                                {pageNum}
+                                              </button>
+                                            );
+                                          } else if (
+                                            (pageNum === 2 && currentPageJenis > 3) ||
+                                            (pageNum === totalPagesJenis - 1 && currentPageJenis < totalPagesJenis - 2)
+                                          ) {
+                                            return <span key={pageNum} className="text-muted-foreground text-xs px-0.5">...</span>;
+                                          }
+                                          return null;
+                                        })}
+
+                                        <button
+                                          onClick={() => setCurrentPageJenis(p => Math.min(totalPagesJenis, p + 1))}
+                                          disabled={currentPageJenis === totalPagesJenis}
+                                          className="p-1.5 border border-border rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground transition-colors"
+                                          title="Selanjutnya"
+                                        >
+                                          <ChevronRight size={15} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'master_rkk' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-bold tracking-tight text-foreground">Master Rincian Kewenangan Klinis (RKK)</h2>
+                    <p className="text-muted-foreground text-sm mt-1">Daftar standard kewenangan klinis perawat berdasarkan kelompok dan jenjang PK.</p>
+                  </div>
+                  <button
+                   onClick={() => {
+                      const initialJenis = (activeRkkLevelTab === 1 && activeRkkJenisTab !== 'MGR' && activeRkkJenisTab !== 'MATER') ? 'KMB' : (activeRkkJenisTab || (jenisList[0]?.kd_jenis || ''));
+                      setRkkForm({ kd_jenis: initialJenis, level_pk: activeRkkLevelTab || 1, kewenangan: '', aktif: 1 });
+                      setEditingRkkId(null);
+                      setShowRkkModal(true);
+                    }}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm"
+                  >
+                    + Tambah Rincian RKK
+                  </button>
+                </div>
+
+                {/* Top tabs for Jenis RKK */}
+                {jenisList.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pb-2 border-b border-border">
+                    {jenisList.map(j => (
+                      <button
+                        key={j.kd_jenis}
+                        onClick={() => {
+                          setActiveRkkJenisTab(j.kd_jenis);
+                          setActiveRkkLevelTab(1);
+                        }}
+                        className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                          activeRkkJenisTab === j.kd_jenis
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        }`}
+                      >
+                        {j.nm_jenis} ({j.kd_jenis})
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Sub-tabs for Level PK */}
+                <div className="flex flex-wrap gap-2 mb-4 bg-muted/20 p-2 rounded-xl border border-border">
+                  {[1, 2, 3, 4, 5].map(lvl => {
+                    const targetJenis = (lvl === 1 && activeRkkJenisTab !== 'MGR' && activeRkkJenisTab !== 'MATER') ? 'KMB' : activeRkkJenisTab;
+                    const count = rkkList.filter(r => r.kd_jenis === targetJenis && Number(r.level_pk) === lvl).length;
+                    const isActive = activeRkkLevelTab === lvl;
+                    return (
+                      <button
+                        key={lvl}
+                        onClick={() => setActiveRkkLevelTab(lvl)}
+                        className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all flex items-center gap-2 ${
+                          isActive
+                            ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                            : 'bg-background border-border text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'
+                        }`}
+                      >
+                        <span>Level PK {lvl}</span>
+                        <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          isActive ? 'bg-primary-foreground text-primary' : 'bg-muted text-muted-foreground'
+                        }`}>
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Note/Alert Blocks based on Level & Jenis */}
+                {getLevelNote(activeRkkLevelTab) && (
+                  <div className="bg-primary/5 border border-primary/20 text-primary p-3 rounded-lg flex items-center gap-2.5 text-xs font-medium font-sans animate-in fade-in duration-200">
+                    <AlertTriangle size={16} className="text-primary shrink-0" />
+                    <span>{getLevelNote(activeRkkLevelTab)}</span>
+                  </div>
+                )}
+                
+
+
+                {/* Table display */}
+                <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                      <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border font-bold">
+                        <tr>
+                          <th className="px-5 py-4 font-semibold w-16 text-center">No</th>
+                          <th className="px-5 py-4 font-semibold">Kewenangan Klinis</th>
+                          <th className="px-5 py-4 font-semibold w-28 text-center">Status</th>
+                          <th className="px-5 py-4 text-center font-semibold w-32">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {(() => {
+                          const targetJenis = (Number(activeRkkLevelTab) === 1 && activeRkkJenisTab !== 'MGR' && activeRkkJenisTab !== 'MATER') ? 'KMB' : activeRkkJenisTab;
+                          const filtered = rkkList.filter(r => r.kd_jenis === targetJenis && Number(r.level_pk) === activeRkkLevelTab);
+                          
+                          const totalItemsRkk = filtered.length;
+                          const indexOfLastItemRkk = currentPageRkk * itemsPerPageRkk;
+                          const indexOfFirstItemRkk = indexOfLastItemRkk - itemsPerPageRkk;
+                          const currentItemsRkk = filtered.slice(indexOfFirstItemRkk, indexOfLastItemRkk);
+                          const totalPagesRkk = Math.ceil(totalItemsRkk / itemsPerPageRkk);
+
+                          if (filtered.length === 0) {
+                            return (
+                              <tr>
+                                <td colSpan={4} className="px-5 py-8 text-center text-muted-foreground">
+                                  Tidak ada data kewenangan klinis untuk {activeRkkJenisTab} Level PK {activeRkkLevelTab}.
+                                </td>
+                              </tr>
+                            );
+                          }
+
+                          return (
+                            <>
+                              {currentItemsRkk.map((r, idx) => (
+                                <tr key={r.id_rkk} className="hover:bg-muted/10 transition">
+                                  <td className="px-5 py-4 text-center font-medium text-muted-foreground">{indexOfFirstItemRkk + idx + 1}</td>
+                                  <td className="px-5 py-4 font-medium text-foreground leading-relaxed">{r.kewenangan}</td>
+                                  <td className="px-5 py-4 text-center">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                      Number(r.aktif) === 1
+                                        ? 'bg-green-500/10 text-green-600 border border-green-500/20'
+                                        : 'bg-destructive/10 text-destructive border border-destructive/20'
+                                    }`}>
+                                      {Number(r.aktif) === 1 ? 'Aktif' : 'Nonaktif'}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-4 text-center">
+                                    <div className="flex justify-center gap-2">
+                                      <button
+                                        onClick={() => {
+                                          setRkkForm({ kd_jenis: r.kd_jenis, level_pk: Number(r.level_pk), kewenangan: r.kewenangan, aktif: Number(r.aktif) });
+                                          setEditingRkkId(r.id_rkk);
+                                          setShowRkkModal(true);
+                                        }}
+                                        className="p-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded transition"
+                                        title="Edit"
+                                      >
+                                        <Edit2 size={13} />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteRkk(r.id_rkk)}
+                                        className="p-1.5 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white rounded transition"
+                                        title="Hapus"
+                                      >
+                                        <Trash2 size={13} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+
+                              {/* Nested pagination control render row */}
+                              {totalPagesRkk > 1 && (
+                                <tr>
+                                  <td colSpan={4} className="p-0 border-t border-border">
+                                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-muted/5">
+                                      <div className="flex flex-wrap items-center gap-2.5">
+                                        <span className="text-xs text-muted-foreground font-semibold font-sans">Tampilkan</span>
+                                        <select
+                                          value={itemsPerPageRkk}
+                                          onChange={e => {
+                                            setItemsPerPageRkk(Number(e.target.value));
+                                            setCurrentPageRkk(1);
+                                          }}
+                                          className="px-2 py-1 bg-background border border-border rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold"
+                                        >
+                                          <option value={5}>5 baris</option>
+                                          <option value={10}>10 baris</option>
+                                          <option value={25}>25 baris</option>
+                                          <option value={50}>50 baris</option>
+                                        </select>
+                                        <span className="text-xs text-muted-foreground font-semibold font-sans">
+                                          Menampilkan {indexOfFirstItemRkk + 1} - {Math.min(indexOfLastItemRkk, totalItemsRkk)} dari {totalItemsRkk} data
+                                        </span>
+                                      </div>
+
+                                      <div className="flex items-center gap-1">
+                                        <button
+                                          onClick={() => setCurrentPageRkk(p => Math.max(1, p - 1))}
+                                          disabled={currentPageRkk === 1}
+                                          className="p-1.5 border border-border rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground transition-colors"
+                                          title="Sebelumnya"
+                                        >
+                                          <ChevronRight size={15} className="rotate-180" />
+                                        </button>
+
+                                        {Array.from({ length: totalPagesRkk }, (_, i) => i + 1).map((pageNum) => {
+                                          if (
+                                            pageNum === 1 ||
+                                            pageNum === totalPagesRkk ||
+                                            (pageNum >= currentPageRkk - 1 && pageNum <= currentPageRkk + 1)
+                                          ) {
+                                            return (
+                                              <button
+                                                key={pageNum}
+                                                onClick={() => setCurrentPageRkk(pageNum)}
+                                                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                                                  currentPageRkk === pageNum
+                                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                                    : 'hover:bg-muted text-muted-foreground hover:text-foreground border border-transparent hover:border-border'
+                                                }`}
+                                              >
+                                                {pageNum}
+                                              </button>
+                                            );
+                                          } else if (
+                                            (pageNum === 2 && currentPageRkk > 3) ||
+                                            (pageNum === totalPagesRkk - 1 && currentPageRkk < totalPagesRkk - 2)
+                                          ) {
+                                            return <span key={pageNum} className="text-muted-foreground text-xs px-0.5">...</span>;
+                                          }
+                                          return null;
+                                        })}
+
+                                        <button
+                                          onClick={() => setCurrentPageRkk(p => Math.min(totalPagesRkk, p + 1))}
+                                          disabled={currentPageRkk === totalPagesRkk}
+                                          className="p-1.5 border border-border rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground transition-colors"
+                                          title="Selanjutnya"
+                                        >
+                                          <ChevronRight size={15} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* Modal Pilih Asesor */}
             {isAssessorModalOpen && activePengajuan && (
               <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -10417,6 +12316,148 @@ function App() {
         </div>
       )}
 
+      {/* Modal Jenis RKK */}
+      {showJenisModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-md rounded-xl border border-border shadow-lg flex flex-col overflow-hidden max-h-[90vh] animate-fade-in">
+            <div className="flex justify-between items-center p-6 border-b border-border bg-muted/30">
+              <h3 className="font-bold text-xl">{editingJenisKd ? 'Edit Kategori RKK' : 'Tambah Kategori RKK'}</h3>
+              <button type="button" onClick={() => setShowJenisModal(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <form onSubmit={editingJenisKd ? handleEditJenis : handleAddJenis} className="p-6 space-y-4 overflow-y-auto">
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase">Kode Kategori *</label>
+                <input
+                  type="text"
+                  placeholder="Contoh: KMB, ANA, GADAR"
+                  value={jenisForm.kd_jenis}
+                  onChange={e => setJenisForm({ ...jenisForm, kd_jenis: e.target.value.toUpperCase() })}
+                  disabled={editingJenisKd !== null}
+                  required
+                  maxLength={10}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase">Nama Kategori RKK *</label>
+                <input
+                  type="text"
+                  placeholder="Contoh: Keperawatan Medikal Bedah"
+                  value={jenisForm.nm_jenis}
+                  onChange={e => setJenisForm({ ...jenisForm, nm_jenis: e.target.value })}
+                  required
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-border flex justify-end space-x-3">
+                <button type="button" onClick={() => setShowJenisModal(false)} className="px-5 py-2 bg-muted text-foreground rounded-md text-sm font-medium hover:bg-muted/80 transition-colors">Batal</button>
+                <button type="submit" className="px-5 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">Simpan</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Master RKK */}
+      {showRkkModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-lg rounded-xl border border-border shadow-lg flex flex-col overflow-hidden max-h-[90vh] animate-fade-in">
+            <div className="flex justify-between items-center p-6 border-b border-border bg-muted/30">
+              <h3 className="font-bold text-xl">{editingRkkId ? 'Edit Kewenangan Klinis (RKK)' : 'Tambah Kewenangan Klinis (RKK)'}</h3>
+              <button type="button" onClick={() => setShowRkkModal(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleSaveRkk} className="p-6 space-y-4 overflow-y-auto">
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase">Kategori RKK *</label>
+                <select
+                  value={rkkForm.kd_jenis}
+                  onChange={e => {
+                    const newJenis = e.target.value;
+                    setRkkForm(prev => {
+                      const next = { ...prev, kd_jenis: newJenis };
+                      if (next.level_pk === 1 && newJenis !== 'MGR' && newJenis !== 'MATER') {
+                        next.kd_jenis = 'KMB';
+                      }
+                      return next;
+                    });
+                  }}
+                  required
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="">-- Pilih Kategori --</option>
+                  {jenisList.map(j => {
+                    if (rkkForm.level_pk === 1 && j.kd_jenis !== 'KMB' && j.kd_jenis !== 'MGR' && j.kd_jenis !== 'MATER') {
+                      return null;
+                    }
+                    return (
+                      <option key={j.kd_jenis} value={j.kd_jenis}>{j.nm_jenis} ({j.kd_jenis})</option>
+                    );
+                  })}
+                </select>
+
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase">Level PK *</label>
+                <select
+                  value={rkkForm.level_pk}
+                  onChange={e => {
+                    const newLvl = Number(e.target.value);
+                    setRkkForm(prev => {
+                      const next = { ...prev, level_pk: newLvl };
+                      if (newLvl === 1 && next.kd_jenis !== 'MGR' && next.kd_jenis !== 'MATER') {
+                        next.kd_jenis = 'KMB';
+                      }
+                      return next;
+                    });
+                  }}
+                  required
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value={1}>Level PK 1</option>
+                  <option value={2}>Level PK 2</option>
+                  <option value={3}>Level PK 3</option>
+                  <option value={4}>Level PK 4</option>
+                  <option value={5}>Level PK 5</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase">Rincian Kewenangan Klinis *</label>
+                <textarea
+                  placeholder="Tuliskan detail tindakan / kewenangan klinis..."
+                  value={rkkForm.kewenangan}
+                  onChange={e => setRkkForm({ ...rkkForm, kewenangan: e.target.value })}
+                  required
+                  rows={4}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase">Status Aktif *</label>
+                <select
+                  value={rkkForm.aktif}
+                  onChange={e => setRkkForm({ ...rkkForm, aktif: Number(e.target.value) })}
+                  required
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value={1}>Aktif</option>
+                  <option value={0}>Nonaktif</option>
+                </select>
+              </div>
+
+              <div className="pt-4 border-t border-border flex justify-end space-x-3">
+                <button type="button" onClick={() => setShowRkkModal(false)} className="px-5 py-2 bg-muted text-foreground rounded-md text-sm font-medium hover:bg-muted/80 transition-colors">Batal</button>
+                <button type="submit" className="px-5 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">Simpan</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Modal CRUD User */}
       {isUserModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -10601,11 +12642,149 @@ function App() {
             >
               <X size={20} />
             </button>
-            <img 
-              src={previewPhotoUrl} 
-              alt="Preview Foto Profil" 
-              className="max-w-[90vw] md:max-w-[40vw] max-h-[75vh] object-contain rounded-xl shadow-inner bg-muted/20"
-            />
+          </div>
+        </div>
+      )}
+
+      {/* Detail Matriks Hasil Asesmen Modal */}
+      {showDetailMatriksModal && selectedPengajuanForMatriks && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 print:p-0">
+          <div className="bg-card w-full max-w-5xl rounded-xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] print:max-h-none print:shadow-none print:border-none print:w-full print:rounded-none">
+            {/* Header */}
+            <div className="px-6 py-4 bg-muted/20 border-b border-border flex justify-between items-start print:pb-2 print:border-b-2 print:border-black">
+              <div>
+                <h3 className="text-lg font-bold text-foreground print:text-xl">Detail Matriks Hasil Asesmen</h3>
+                {(() => {
+                  const nurse = perawatData.find(n => String(n.id_perawat) === String(selectedPengajuanForMatriks.id_perawat)) || {};
+                  const primaryAsesor = userData.find(u => String(u.id) === String(selectedPengajuanForMatriks.id_asesor))?.nama || '-';
+                  const pendampingAsesor = userData.find(u => String(u.id) === String(selectedPengajuanForMatriks.id_asesor_pendamping))?.nama || '-';
+                  return (
+                    <div className="mt-1 text-xs text-muted-foreground space-y-0.5 print:text-black">
+                      <p>
+                        Asesi: <strong className="text-foreground print:text-black">{toProperCase(nurse.nama)}</strong> ({nurse.nip || '-'}) | Unit: <strong className="text-foreground print:text-black">{nurse.unit_kerja || '-'}</strong>
+                      </p>
+                      <p>
+                        Asesor Utama: <strong className="text-foreground print:text-black">{primaryAsesor}</strong> | Asesor Pendamping: <strong className="text-foreground print:text-black">{pendampingAsesor}</strong>
+                      </p>
+                    </div>
+                  );
+                })()}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDetailMatriksModal(false);
+                  setSelectedPengajuanForMatriks(null);
+                  setMatriksTulisExamDetails(null);
+                }}
+                className="p-1 hover:bg-muted rounded text-muted-foreground print:hidden"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Content Table */}
+            <div className="p-6 overflow-y-auto flex-1 print:overflow-visible print:p-0">
+              <div className="overflow-x-auto rounded-lg border border-border print:border-none">
+                <table className="w-full text-xs text-left border-collapse print:text-[10px]">
+                  <thead className="bg-muted/40 border-b border-border text-muted-foreground uppercase text-[10px] font-bold print:border-b-2 print:border-black print:text-black">
+                    <tr>
+                      <th className="px-4 py-3.5 w-12 text-center">NO</th>
+                      <th className="px-4 py-3.5">UNIT KOMPETENSI</th>
+                      <th className="px-4 py-3.5 text-center w-24">UJI TULIS</th>
+                      <th className="px-4 py-3.5 text-center w-24">UJI LISAN</th>
+                      <th className="px-4 py-3.5 text-center w-24">UJI OBSERVASI</th>
+                      <th className="px-4 py-3.5 text-center w-48">EVALUASI PORTOFOLIO</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60 print:divide-y print:divide-black">
+                    {(() => {
+                      const units = get12KompetensiForPengajuan(selectedPengajuanForMatriks);
+                      const forms = selectedPengajuanForMatriks.form_data ? JSON.parse(selectedPengajuanForMatriks.form_data) : {};
+                      const oralData = forms['global_form03b'] || {};
+                      const obsData = forms['global_form03a'] || {};
+                      
+                      return units.map((u, idx) => {
+                        const writtenScore = getUnitWrittenScore(u.kode, matriksTulisExamDetails);
+                        const oralVal = oralData[`${u.kode}_nilai`] || '';
+                        const obsVal = obsData[`${u.kode}_nilai`] || '';
+                        const portVal = forms[`${u.kode}_form03d`] || {};
+                        const isPortValid = portVal.v1 && portVal.a1 && portVal.t1 && portVal.k1;
+                        const portText = isPortValid ? "Memadai / Kompeten" : "Tidak Memadai / Belum Diisi";
+
+                        return (
+                          <tr key={u.kode} className="hover:bg-muted/10">
+                            <td className="px-4 py-3 text-center font-semibold text-muted-foreground">{idx + 1}.</td>
+                            <td className="px-4 py-3">
+                              <div className="font-bold text-foreground">{u.kode}</div>
+                              <div className="text-[10px] text-muted-foreground font-medium mt-0.5">{u.judul}</div>
+                            </td>
+                            <td className="px-4 py-3 text-center whitespace-nowrap">
+                              {writtenScore !== null ? (
+                                <span className={`px-2 py-0.5 rounded font-bold text-xs whitespace-nowrap inline-block ${
+                                  writtenScore >= 70 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                                }`}>
+                                  {writtenScore}%
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-center whitespace-nowrap">
+                              {oralVal === 'K' && (
+                                <span className="px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 rounded font-bold text-xs whitespace-nowrap inline-block">K</span>
+                              )}
+                              {oralVal === 'BK' && (
+                                <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded font-bold text-xs whitespace-nowrap inline-block">BK</span>
+                              )}
+                              {!oralVal && <span className="text-muted-foreground">-</span>}
+                            </td>
+                            <td className="px-4 py-3 text-center whitespace-nowrap">
+                              {obsVal === 'K' && (
+                                <span className="px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 rounded font-bold text-xs whitespace-nowrap inline-block">K</span>
+                              )}
+                              {obsVal === 'BK' && (
+                                <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded font-bold text-xs whitespace-nowrap inline-block">BK</span>
+                              )}
+                              {!obsVal && <span className="text-muted-foreground">-</span>}
+                            </td>
+                            <td className="px-4 py-3 text-center whitespace-nowrap">
+                              <span className={`px-2.5 py-1 text-[10px] font-semibold rounded border whitespace-nowrap inline-block ${
+                                isPortValid ? 'bg-green-50 text-green-700 border-green-200' : 'bg-muted text-muted-foreground border-border'
+                              }`}>
+                                {portText}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      });
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-border bg-muted/10 flex justify-end gap-3 print:hidden">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-all flex items-center gap-2 shadow-sm"
+              >
+                <Printer size={16} /> Cetak Matriks
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDetailMatriksModal(false);
+                  setSelectedPengajuanForMatriks(null);
+                  setMatriksTulisExamDetails(null);
+                }}
+                className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-foreground text-sm font-semibold rounded-lg border border-border transition-all"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}
